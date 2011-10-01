@@ -1,0 +1,38 @@
+#! /usr/bin/octave -q 
+
+files = { 'bestof3', 'bestof5' };
+
+format( 'short' );
+
+printf( '#include "polynom.h"\n\n' );
+
+for f = 1:length(files)
+  t = load( files{ f } );
+  t_cols = size( t, 2 );
+  x = t(:, 1);
+
+  printf( 'struct polynom %s[] = {\n', files{ f } );
+
+  for i = 2:t_cols
+    y_orig = t(:,i);
+    # interpolating by polynom of 3rd order
+    [p, s, mu] = polyfit( x, y_orig, 3 );
+
+    # calculating the error of interpolation
+    # y_int = polyval( p, x, [], mu );
+
+    printf( '{\n .p = { ' ); 
+    for j=1:length(p)
+      printf( '%e, ', p(j) );
+    end
+    printf( '},\n .mu = { ' ); 
+    for j=1:length(mu)
+      printf( '%e, ', mu(j) );
+    end
+
+    printf( '}\n},\n' );
+  end
+
+  printf( '};\n\n' );
+end
+

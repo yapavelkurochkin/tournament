@@ -1,14 +1,27 @@
 #include "match.h"
 
-Match::Match( Player a, Player b )
-: _a( a ),
-  _b ( b )
+/// Validates the result of a game.
+// Game is valid if one player has more than 11 points
+// and difference of points is more than 2.
+// Valid games: 11:9, 13:11. Invalid games: 6:0, 11:10
+bool GameResult::validate() const
 {
+  if ( ( a >= 11 ) && ( (int)(a - b) >= 2 ) ) {
+    return true;
+  } 
+
+  if ( ( b >= 11 ) && ( (int)(b - a) >= 2 ) ) {
+    return true;
+  }
+
+  return false;
 }
 
-void Match::addGameResult( GameResult res )
+Match::Match( Player a, Player b, Type type )
+: _a( a ),
+  _b ( b ),
+  _type( type )
 {
-  _results << res;
 }
 
 Player Match::won() const 
@@ -33,4 +46,51 @@ int Match::aScores() const
 int Match::bScores() const 
 {
   return _results.count() - aScores();
+}
+
+bool Match::validate() const
+{
+  if ( ( aScores() + bScores() ) > maxGames() ) {
+    return false;
+  }
+
+  if ( aScores() == bScores() ) {
+    return false;
+  }
+
+  if ( _type == BestOf3 ) {
+    if ( ( aScores() == 2 ) || ( bScores() == 2 ) ) {
+      return true;
+    }
+  }
+  
+  if ( _type == BestOf5 ) {
+    if ( ( aScores() == 3 ) || ( bScores() == 3 ) ) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+/** Prints results of match in a multiline string */
+QString Match::resultsAsString( ) const
+{
+  QString ret;
+  for ( int i = 0; i < _results.count(); i ++ ) {
+    if ( i > 0 )
+      ret += "\n";
+
+    GameResult game = _results.at( i );
+    ret += QString::number( game.a );
+    ret += " : "; 
+    ret += QString::number( game.b );
+  }
+
+  return ret;
+}
+
+QString Match::scoresAsString() const 
+{
+  return QString::number( aScores() ) + " : " + QString::number( bScores() );
 }

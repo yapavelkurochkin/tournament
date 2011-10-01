@@ -17,10 +17,12 @@ class RRGroup
 
   MatchList _matches;
 
+  void roundRobin();
+
   public:
     RRGroup( QChar name, PlayerList players = PlayerList() );
 
-    PlayerList& players() { return _players; }
+    void addPlayer( Player player );
     PlayerList const_players() const { return _players; }
     MatchList& matches() { return _matches; }
     Match& match( Player a, Player b );

@@ -21,7 +21,7 @@ TournamentWidget::TournamentWidget( Tournament* tourn, QWidget* parent )
 
 void TournamentWidget::addGroupsToLayout( QVBoxLayout* vl )
 {
-  RRGroupList groups = _tourn->groupList();
+  RRGroupList& groups = _tourn->groupList();
   for ( int i = 0; i < groups.count(); i ++ ) {
     RRTable* rt = new RRTable( &groups[ i ], this );
     vl->addWidget( rt );

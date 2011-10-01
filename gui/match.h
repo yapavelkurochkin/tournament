@@ -6,18 +6,25 @@
 
 struct GameResult
 {
-  int a;
-  int b;
+  unsigned int a;
+  unsigned int b;
+
+  bool validate() const;
 };
 
 class Match 
 {
-  Player _a;
-  Player _b;
-  QList< GameResult > _results;
   public:
-    Match( Player a, Player b );
-    void addGameResult( GameResult res );
+    typedef enum { 
+      BestOf3,
+      BestOf5
+    } Type;
+    
+    Match( Player a, Player b, Type type = BestOf3 );
+
+    QList< GameResult > results_const( ) const { return _results; }
+    QList< GameResult >& results( ) { return _results; }
+    QString resultsAsString( ) const;
     Player won() const;
 
     Player playerA() const { return _a; }
@@ -25,12 +32,18 @@ class Match
  
     int aScores() const;
     int bScores() const;
+    QString scoresAsString() const;
 
-  typedef enum { 
-    BestOf3,
-    BestOf5
-  } Type;
-    
+    Type type() const { return _type; }
+    int maxGames() const { return ( _type == BestOf3 ) ? 3 : 5; }
+
+    bool validate() const;
+
+  protected:
+    Player _a;
+    Player _b;
+    QList< GameResult > _results;
+    Type _type;  
 };
 
 typedef QList< Match > MatchList;

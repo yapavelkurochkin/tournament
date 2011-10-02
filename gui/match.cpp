@@ -1,31 +1,52 @@
 #include "match.h"
 
+/*****************************
+ * Game                      *
+ ****************************/
+
 /// Validates the result of a game.
 // Game is valid if one player has more than 11 points
 // and difference of points is more than 2.
 // Valid games: 11:9, 13:11. Invalid games: 6:0, 11:10
-bool GameResult::validate() const
+bool Game::validate() const
 {
-  if ( ( a >= 11 ) && ( (int)(a - b) >= 2 ) ) {
+  if ( ( aBalls >= 11 ) && ( (int)(aBalls - bBalls) >= 2 ) ) {
     return true;
   } 
 
-  if ( ( b >= 11 ) && ( (int)(b - a) >= 2 ) ) {
+  if ( ( bBalls >= 11 ) && ( (int)(bBalls - aBalls) >= 2 ) ) {
     return true;
   }
 
   return false;
 }
 
-GameResult& GameResult::swap( )
+Game& Game::swap( )
 {
-  unsigned int A = a;
+  unsigned int ab = aBalls;
+  aBalls = bBalls;
+  bBalls = ab;
+ 
+  Player A = a;
   a = b;
   b = A;
-  
+ 
   return (*this);
 }
 
+Player Game::winner() const
+{
+  return ( aBalls > bBalls ) ? a : b;
+}
+
+unsigned int Game::balls( Player p ) const
+{
+  return ( p == a ) ? aBalls : bBalls;
+}
+
+/******************************
+ * Match                      *
+ *****************************/
 Match::Match( Player a, Player b, Type type )
 : _a( a ),
   _b ( b ),
@@ -33,48 +54,46 @@ Match::Match( Player a, Player b, Type type )
 {
 }
 
-Player Match::won() const 
+Player Match::winner() const 
 {
-  return ( aScores() > bScores() ) ? _a : _b;
+  return ( gamesWon( _a ) > gamesWon( _b ) ) ? _a : _b;
 }
 
-int Match::aScores() const 
+unsigned int Match::gamesWon( Player p ) const 
 {
-  int a_scores = 0; 
+  unsigned int games = 0; 
   
   for ( int i = 0; i < _results.count(); i ++ ) {
-    GameResult res = _results.at( i );
-    if ( res.a > res.b ) {
-      a_scores ++;
+    Game res = _results.at( i );
+    if ( res.winner() == p ) { 
+      games ++;
     } 
   }
 
-  return a_scores;
+  return games;
 }
  
-int Match::bScores() const 
-{
-  return _results.count() - aScores();
-}
-
 bool Match::validate() const
 {
-  if ( ( aScores() + bScores() ) > maxGames() ) {
+  unsigned int aGames = gamesWon( _a );
+  unsigned int bGames = gamesWon( _b );
+
+  if ( ( aGames + bGames ) > maxGames() ) {
     return false;
   }
 
-  if ( aScores() == bScores() ) {
+  if ( aGames == bGames ) {
     return false;
   }
 
   if ( _type == BestOf3 ) {
-    if ( ( aScores() == 2 ) || ( bScores() == 2 ) ) {
+    if ( ( aGames == 2 ) || ( bGames == 2 ) ) {
       return true;
     }
   }
   
   if ( _type == BestOf5 ) {
-    if ( ( aScores() == 3 ) || ( bScores() == 3 ) ) {
+    if ( ( aGames == 3 ) || ( bGames == 3 ) ) {
       return true;
     }
   }
@@ -95,24 +114,25 @@ Match& Match::swapPlayers()
   return (*this);
 }
 
-/** Prints results of match in a multiline string */
-QString Match::resultsAsString( ) const
+/** Prints results of games in a multiline string */
+QString Match::gamesToString( ) const
 {
   QString ret;
   for ( int i = 0; i < _results.count(); i ++ ) {
     if ( i > 0 )
       ret += "\n";
 
-    GameResult game = _results.at( i );
-    ret += QString::number( game.a );
+    Game game = _results.at( i );
+    ret += QString::number( game.aBalls );
     ret += " : "; 
-    ret += QString::number( game.b );
+    ret += QString::number( game.bBalls );
   }
 
   return ret;
 }
 
-QString Match::scoresAsString() const 
+QString Match::toString() const 
 {
-  return QString::number( aScores() ) + " : " + QString::number( bScores() );
+  return QString::number( gamesWon( _a ) ) 
+             + " : " + QString::number( gamesWon( _b ) );
 }

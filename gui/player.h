@@ -9,6 +9,7 @@ class Player {
 
   public:
     Player( QString n, double r );
+    Player( );
 
     QString name() const { return _name; }
     double rating() const { return _rating; }

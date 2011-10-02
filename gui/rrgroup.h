@@ -4,6 +4,7 @@
 #include <QList>
 #include <QChar>
 #include "playerlist.h"
+#include "playerscores.h"
 #include "match.h"
 
 /** \brief Round robin group
@@ -25,9 +26,14 @@ class RRGroup
     void addPlayer( Player player );
     PlayerList const_players() const { return _players; }
 
-    MatchList& matches() { return _matches; }
+//    MatchList& matches() { return _matches; }
     Match& match( Player a, Player b );
-    void setMatchResults( Player a, Player b, QList< GameResult > res );
+    MatchList matchList( Player p ) const;
+    MatchList playedMatchList( Player p ) const;
+    void setMatchResults( Player a, Player b, QList< Game > res );
+
+    PlayerResultsList playersResults() const;
+    unsigned int playerPlace( Player p ) const;
 
     QChar name() const { return _name; }
     int size() const { return _players.count(); }

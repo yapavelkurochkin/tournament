@@ -80,15 +80,15 @@ void RRTable::editMatchResults( int row, int col )
  
   Match match = _group->match( a, b );
 
-  qDebug() << __FUNCTION__ << "edit match" << match.resultsAsString();
+  qDebug() << __FUNCTION__ << "edit match" << match.gamesToString();
   MatchResDialog dialog( match, this );
 
   if ( dialog.exec() == QDialog::Accepted ) {
-    _group->setMatchResults( a, b, dialog.match().results() ); 
+    _group->setMatchResults( a, b, dialog.match().games_const() ); 
 
     updateMatchCell( row, col );
     updateMatchCell( col, row );
-    //updatePlaces( );
+    updatePlaces( );
   }
 }
 
@@ -111,15 +111,25 @@ void RRTable::updateMatchCell( int row, int col )
  
   const Match& m = _group->match( a, b );
 
-  item( row, col )->setText( m.scoresAsString() );
-  item( row, col )->setToolTip( m.resultsAsString() );
+  item( row, col )->setText( m.toString() );
+  item( row, col )->setToolTip( m.gamesToString() );
   item( row, col )->setBackground( Qt::green ); 
 }
 
 /** Updates places column. RRGroup should return list of players
  * which sorted by won games.
-
-void MatchResDialog::updatePlaces()
-{
-}
  */
+void RRTable::updatePlaces()
+{
+  PlayerList players = _group->const_players();
+  for ( int i = 0; i < players.count(); i ++ ) {
+    Player p = players.at( i );
+    qDebug() << __FUNCTION__ << i;
+    if ( _group->playedMatchList( p ).count() > 0 ) { 
+      // player already have played at least one match
+      item( i + 1, players.count() + 1)
+          ->setText( QString::number( _group->playerPlace( p ) ) );
+    }
+  } 
+}
+

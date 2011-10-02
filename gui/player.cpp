@@ -1,5 +1,10 @@
 #include "player.h"
 
+Player::Player( )
+: _rating( 0.0 )
+{
+}
+
 Player::Player( QString name, double rating )
   : _name( name ),
   _rating( rating )

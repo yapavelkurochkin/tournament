@@ -4,13 +4,17 @@
 #include <QList>
 #include "playerlist.h"
 
-struct GameResult
+struct Game
 {
-  unsigned int a;
-  unsigned int b;
+  Player a;
+  Player b;
+  unsigned int aBalls;
+  unsigned int bBalls;
 
   bool validate() const;
-  GameResult& swap();
+  Game& swap();
+  Player winner() const;
+  unsigned int balls( Player p ) const;
 };
 
 class Match 
@@ -23,29 +27,30 @@ class Match
     
     Match( Player a, Player b, Type type = BestOf3 );
 
-    QList< GameResult > results_const( ) const { return _results; }
-    QList< GameResult >& results( ) { return _results; }
-
-    QString resultsAsString( ) const;
-    Player won() const;
+    QList< Game > games_const( ) const { return _results; }
+    QList< Game >& games( ) { return _results; }
+    QString gamesToString( ) const;
 
     Player playerA() const { return _a; }
     Player playerB() const { return _b; }
     Match& swapPlayers();
  
-    int aScores() const;
-    int bScores() const;
-    QString scoresAsString() const;
+    Player winner() const;
+    unsigned int gamesWon( Player p ) const;
+    unsigned int ballsWon( Player p ) const;
+
+    QString toString() const;
 
     Type type() const { return _type; }
-    int maxGames() const { return ( _type == BestOf3 ) ? 3 : 5; }
+    unsigned int maxGames() const { return ( _type == BestOf3 ) ? 3 : 5; }
+    bool played() const { return validate(); }
 
     bool validate() const;
 
   protected:
     Player _a;
     Player _b;
-    QList< GameResult > _results;
+    QList< Game > _results;
     Type _type;  
 };
 

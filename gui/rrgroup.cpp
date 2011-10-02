@@ -47,11 +47,83 @@ Match& RRGroup::match( Player a, Player b )
   return (* new Match( a, b ) );
 }
 
-void RRGroup::setMatchResults( Player a, Player b, QList< GameResult > res )
+/** Find all matches which player 'p' is participating.
+ */
+MatchList RRGroup::matchList( Player p ) const
+{
+  MatchList ml;
+
+  for ( int i = 0; i < _matches.count(); i ++ ) { 
+    Match m = _matches.at( i );
+
+    if ( ( m.playerA() == p ) || ( m.playerB() == p ) ) {
+      ml << m;
+    } 
+  }
+ 
+  return ml; 
+}
+
+MatchList RRGroup::playedMatchList( Player p ) const
+{
+  MatchList ml;
+
+  for ( int i = 0; i < _matches.count(); i ++ ) { 
+    Match m = _matches.at( i );
+
+    if ( ( m.playerA() == p ) || ( m.playerB() == p ) ) {
+      if ( m.played() ) {
+        ml << m;
+      }
+    } 
+  }
+ 
+  return ml; 
+
+}
+
+void RRGroup::setMatchResults( Player a, Player b, QList< Game > res )
 {
   Match& m = match( a, b );
-  m.results().clear();
-  m.results() << res;
+  m.games().clear();
+  m.games() << res;
+}
+
+/** Calculates scores for each player (who played at least one match)
+ *  and returns list of results
+ */
+PlayerResultsList RRGroup::playersResults() const 
+{
+  PlayerResultsList list;
+  for ( int i = 0; i < _players.count(); i ++ ) {
+    Player p = _players.at( i );
+    MatchList ml = playedMatchList( p );
+
+    if ( !ml.isEmpty() ) {
+      PlayerResults res( p, ml );
+      list << res;
+    }
+  }
+
+  return list;
+}
+
+/** \return a place of player in a group. from 1 (best) to 
+ *   _players.count() (worst )
+ */
+unsigned int RRGroup::playerPlace( Player p ) const
+{
+  PlayerResultsList prl = playersResults(); 
+
+  qSort( prl.begin(), prl.end(), qGreater< PlayerResults >() );
+
+  for ( int i = 0; i < prl.count(); i ++ ) {
+    if ( prl.at( i ).player() == p ) { 
+      return ( i + 1 );
+    }
+  }
+
+  return 0xdeadbeef;
 }
 
 /** Sorts player list and pushes cool players into first places
@@ -78,4 +150,5 @@ RRGroupList breakPlayers( PlayerList players, int groupSize )
   
   return groups;
 }
+
 

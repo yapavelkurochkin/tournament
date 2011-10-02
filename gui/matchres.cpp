@@ -19,16 +19,16 @@ MatchResDialog::MatchResDialog( Match match, QWidget* parent )
   l->addWidget( playerA, 0, 0, Qt::AlignJustify );
   l->addWidget( playerB, 0, 1, Qt::AlignJustify );
 
-  int games = match.results_const().count();
-  for ( int i = 0; i < match.maxGames(); i ++ ) {
+  unsigned int games = match.games_const().count();
+  for ( unsigned int i = 0; i < match.maxGames(); i ++ ) {
     QLineEdit* ballsA = new QLineEdit( this );
     QLineEdit* ballsB = new QLineEdit( this );
 
     if ( i < games ) {
       // this should be done before connecting of lineedits to textChanged
       // slot
-      ballsA->setText( QString::number( match.results_const().at( i ).a ) );
-      ballsB->setText( QString::number( match.results_const().at( i ).b ) );
+      ballsA->setText( QString::number( match.games_const().at( i ).aBalls ) );
+      ballsB->setText( QString::number( match.games_const().at( i ).bBalls ) );
     }
 
     connect( ballsA, SIGNAL( textChanged( const QString& ) ),
@@ -61,12 +61,10 @@ void MatchResDialog::okButtonClicked( )
  */ 
 void MatchResDialog::textChanged( )
 {
-  QList< GameResult > res;
+  QList< Game > res;
   QGridLayout* l = qobject_cast< QGridLayout* >( layout () );
 
-  for ( int i = 0; i < _match.maxGames(); i ++ ) {
-    GameResult game;
-  
+  for ( unsigned int i = 0; i < _match.maxGames(); i ++ ) {
     QWidget* w = l->itemAtPosition( i + 1, 0 )->widget(); 
     QLineEdit* leA = qobject_cast< QLineEdit* >( w ); 
   
@@ -77,10 +75,13 @@ void MatchResDialog::textChanged( )
       continue;
     } 
   
-    game.a = leA->text().toInt(); 
-    game.b = leB->text().toInt(); 
+    Game game;
+    game.a = _match.playerA();
+    game.b = _match.playerB(); 
+    game.aBalls = leA->text().toInt(); 
+    game.bBalls = leB->text().toInt(); 
 
-    qDebug() << __FUNCTION__ << i << game.a << game.b;
+    qDebug() << __FUNCTION__ << i << game.aBalls << game.bBalls;
 
     if ( !game.validate() ) {
       qDebug() << __FUNCTION__ << "wrong game!";
@@ -95,7 +96,7 @@ void MatchResDialog::textChanged( )
   // all games are correct at this time.
 
   _match = Match( _match.playerA(), _match.playerB(), _match.type() );
-  _match.results() << res;
+  _match.games() << res;
  
   _okButton->setEnabled( _match.validate() );
 }

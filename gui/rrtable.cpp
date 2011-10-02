@@ -11,11 +11,27 @@ RRTable::RRTable( RRGroup* group, QWidget* parent )
 : QTableWidget( parent ),
   _group( group )
 {
-  setRowCount( group->const_players().count() + 1 );
-  setColumnCount( group->const_players().count() + 1 );
+  setupCells();
+
+  verticalHeader()->hide();
+  horizontalHeader()->hide();
+
+  connect( this, SIGNAL( cellDoubleClicked( int, int ) ),
+           this, SLOT( editMatchResults( int, int ) ) );
+//  resizeColumnsToContents();
+}
+
+/** should be called in constructor for basic setup of 
+ * table cells.
+ */
+void RRTable::setupCells()
+{
+  int plCnt = _group->const_players().count();
+  setRowCount( plCnt + 1 );
+  setColumnCount( plCnt + 1 + 1 ); // 1 column for total results
 
   for ( int i = 0; i < rowCount(); i ++ ) {
-    for ( int j = 0; j < columnCount(); j ++ ) {
+    for ( int j = 0; j < plCnt + 1; j ++ ) {
       QTableWidgetItem *item = new QTableWidgetItem( );
       QString text;
       if ( i == j ) {
@@ -23,14 +39,14 @@ RRTable::RRTable( RRGroup* group, QWidget* parent )
                                               QPalette::Background ) );
         
         if ( i == 0 )  {
-          text = group->name();
+          text = _group->name();
         }
         item->setFlags( Qt::NoItemFlags );
       } else if ( i == 0 ) {
-        text = group->const_players().at( j - 1 ).name();
+        text = _group->const_players().at( j - 1 ).name();
         item->setFlags( Qt::NoItemFlags );
       } else if ( j == 0 ) {
-        text = group->const_players().at( i - 1 ).name();
+        text = _group->const_players().at( i - 1 ).name();
         item->setFlags( Qt::NoItemFlags );
       } else {
         item->setFlags( Qt::ItemIsSelectable | Qt::ItemIsEnabled );
@@ -40,18 +56,18 @@ RRTable::RRTable( RRGroup* group, QWidget* parent )
 
       setItem( i, j, item );
     }
+  
+    QTableWidgetItem *item = new QTableWidgetItem( );
+    if ( i == 0 ) {
+      item->setText( tr( "Place" ) );
+    }
+    item->setFlags( Qt::NoItemFlags );
+    setItem( i, plCnt + 1, item );
   }
-
-  verticalHeader()->hide();
-  horizontalHeader()->hide();
-
-  connect( this, SIGNAL( cellDoubleClicked( int, int ) ),
-           this, SLOT( editMatchResults( int, int ) ) );
-//  resizeColumnsToContents();
-
-  qDebug() << itemDelegate()->metaObject()->className();
 }
 
+/** Shows match result dialog and saves match result.
+ */
 void RRTable::editMatchResults( int row, int col )
 {
   int aIndex = row - 1;
@@ -64,15 +80,46 @@ void RRTable::editMatchResults( int row, int col )
  
   Match match = _group->match( a, b );
 
-  qDebug() << __FUNCTION__ << "will edit match" << match.resultsAsString();
+  qDebug() << __FUNCTION__ << "edit match" << match.resultsAsString();
   MatchResDialog dialog( match, this );
 
   if ( dialog.exec() == QDialog::Accepted ) {
-    Match& m = _group->match( a, b );
-    m.results().clear();
-    m.results() << dialog.match().results();
+    _group->setMatchResults( a, b, dialog.match().results() ); 
 
-    item( row, col )->setText( m.scoresAsString() );
-    item( row, col )->setToolTip( m.resultsAsString() );
+    updateMatchCell( row, col );
+    updateMatchCell( col, row );
+    //updatePlaces( );
   }
 }
+
+/** Writes match result into specified cell.
+ */
+void RRTable::updateMatchCell( int row, int col )
+{
+  int aIndex = row - 1;
+  int bIndex = col - 1;
+
+  PlayerList players = _group->const_players();
+
+  if ( aIndex >= players.count() || bIndex >= players.count() ) {
+    qCritical() << __FUNCTION__ << "invalid row&col indexes: " << row << col;
+    return;
+  }
+
+  Player a = players.at( aIndex );
+  Player b = players.at( bIndex );
+ 
+  const Match& m = _group->match( a, b );
+
+  item( row, col )->setText( m.scoresAsString() );
+  item( row, col )->setToolTip( m.resultsAsString() );
+  item( row, col )->setBackground( Qt::green ); 
+}
+
+/** Updates places column. RRGroup should return list of players
+ * which sorted by won games.
+
+void MatchResDialog::updatePlaces()
+{
+}
+ */

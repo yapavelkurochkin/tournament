@@ -17,6 +17,15 @@ bool GameResult::validate() const
   return false;
 }
 
+GameResult& GameResult::swap( )
+{
+  unsigned int A = a;
+  a = b;
+  b = A;
+  
+  return (*this);
+}
+
 Match::Match( Player a, Player b, Type type )
 : _a( a ),
   _b ( b ),
@@ -71,6 +80,19 @@ bool Match::validate() const
   }
 
   return false;
+}
+
+Match& Match::swapPlayers()
+{
+  for ( int i = 0; i < _results.count(); i ++ ) {
+    _results[i].swap();
+  }
+
+  Player A = _a;
+  _a = _b;
+  _b = A;
+
+  return (*this);
 }
 
 /** Prints results of match in a multiline string */

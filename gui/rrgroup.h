@@ -24,8 +24,11 @@ class RRGroup
 
     void addPlayer( Player player );
     PlayerList const_players() const { return _players; }
+
     MatchList& matches() { return _matches; }
     Match& match( Player a, Player b );
+    void setMatchResults( Player a, Player b, QList< GameResult > res );
+
     QChar name() const { return _name; }
     int size() const { return _players.count(); }
 

@@ -14,6 +14,10 @@ class RRTable: public QTableWidget
 
   protected slots:
     void editMatchResults( int row, int col );
+
+  protected:
+    void setupCells();
+    void updateMatchCell( int row, int col );
 };
 
 #endif // PLAYERTABLE__H

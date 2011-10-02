@@ -119,6 +119,7 @@ int main(int argc, char *argv[])
   TournamentWidget* tw = new TournamentWidget( t );
   scrollArea->setWidget( tw );
   scrollArea->show();  
+  scrollArea->resize( 800, 600 );
 
 //  qDebug() << tw->sizeHint();
   tw->show();

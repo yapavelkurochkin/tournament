@@ -10,6 +10,7 @@ struct GameResult
   unsigned int b;
 
   bool validate() const;
+  GameResult& swap();
 };
 
 class Match 
@@ -24,11 +25,13 @@ class Match
 
     QList< GameResult > results_const( ) const { return _results; }
     QList< GameResult >& results( ) { return _results; }
+
     QString resultsAsString( ) const;
     Player won() const;
 
     Player playerA() const { return _a; }
     Player playerB() const { return _b; }
+    Match& swapPlayers();
  
     int aScores() const;
     int bScores() const;

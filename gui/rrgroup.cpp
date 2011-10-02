@@ -31,20 +31,27 @@ void RRGroup::addPlayer( Player player )
  */
 Match& RRGroup::match( Player a, Player b )
 {
-  qDebug() << __FUNCTION__ << "searching for a match of" << a.name() << "and" << b.name();
-  qDebug() << __FUNCTION__ << "matches count" << _matches.count();
   for ( int i = 0; i < _matches.count(); i ++ ) { 
     Match m = _matches.at( i );
-    qDebug() << __FUNCTION__ << m.playerA().name() << m.playerB().name();
-    if ( ( ( m.playerA() == a ) && ( m.playerB() == b ) ) ||
-         ( ( m.playerB() == a ) && ( m.playerA() == b ) ) ) {
-      qDebug() << __FUNCTION__ << "Found match!";
+
+    if ( ( m.playerA() == a ) && ( m.playerB() == b ) ) {
+      return _matches[ i ];
+    } else if ( ( m.playerB() == a ) && ( m.playerA() == b ) ) {
+      _matches[i].swapPlayers();
       return _matches[ i ];
     } 
   }
 
   // should never get here!  
+  qWarning() <<  "can't find match of " << a.name() << "and" << b.name();
   return (* new Match( a, b ) );
+}
+
+void RRGroup::setMatchResults( Player a, Player b, QList< GameResult > res )
+{
+  Match& m = match( a, b );
+  m.results().clear();
+  m.results() << res;
 }
 
 /** Sorts player list and pushes cool players into first places

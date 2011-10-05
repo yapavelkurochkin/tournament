@@ -3,7 +3,6 @@
 
 #include "playerlist.h"
 #include "rrgroup.h"
-#include "match.h"
 
 class Tournament {
 public:
@@ -17,6 +16,8 @@ public:
   Tournament( PlayerList players, Category category,
               Match::Type matchType = Match::BestOf3, int groupSize = 4 );
 
+  void groupChanged( Group* g );
+  
   RRGroupList& groupList( ) { return _groupList; }
 
 protected:
@@ -25,6 +26,8 @@ protected:
   RRGroupList _groupList;
   Match::Type _matchType;
   Category _category;
+
+  void breakPlayers( PlayerList players );
 };
 
 #endif // TOURNAMENT__H

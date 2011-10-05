@@ -35,7 +35,7 @@ typedef struct _sig_ucontext {
  sigset_t          uc_sigmask;
 } sig_ucontext_t;
 
-void crit_err_hdlr(int sig_num, siginfo_t * info, void * ucontext)
+void crit_err_hdlr(int , siginfo_t * , void * )
 {
  void *             array[50];
  char **            messages;

@@ -14,20 +14,28 @@ public:
   } Category;
 
   Tournament( PlayerList players, Category category,
-              Match::Type matchType = Match::BestOf3, int groupSize = 4 );
+              Match::Type matchType = Match::BestOf3, unsigned int groupSize = 3, 
+              unsigned int stagesCnt = 4 );
 
   void groupChanged( Group* g );
+  QList<Group*> groupList( unsigned int stage ) const 
+                 { return _groups[ stage ]; }
   
-  RRGroupList& groupList( ) { return _groupList; }
-
 protected:
   PlayerList _players; 
-  int _groupSize;
-  RRGroupList _groupList;
+  unsigned int _groupSize;
+  unsigned int _stagesCnt;
+  /*<< playing stages including round robin */
+
+  QList<Group*>* _groups;
+  /*<< one list of groups per one stage */
+
   Match::Type _matchType;
   Category _category;
 
   void breakPlayers( PlayerList players );
+  bool roundRobinCompleted() const;
+  PlayerResultsList roundRobinResults() const;
 };
 
 #endif // TOURNAMENT__H

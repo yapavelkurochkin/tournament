@@ -4,8 +4,10 @@
 #include "tournament.h"
 #include "rrgroup.h"
 
+/** Round robin games are followed first always
+ */
 RRGroup::RRGroup( QChar name, Tournament* t, PlayerList players )
- : Group( name, t, players ) 
+ : Group( name, t, 0, players ) 
 {
   roundRobin();
 }

@@ -3,10 +3,11 @@
 #include "tournament.h"
 #include "group.h"
 
-Group::Group( QString name, Tournament* t, PlayerList players )
+Group::Group( QString name, Tournament* t, unsigned int stage, PlayerList players )
  : _name( name ),
    _players( players ),
-   _tournament( t )
+   _tournament( t ),
+   _stage( stage )
 {
 }
 
@@ -97,6 +98,18 @@ PlayerResultsList Group::playersResults() const
   return list;
 }
 
+PlayerResults Group::playerResults( Player p ) const
+{
+  PlayerResultsList list = playersResults();
+  for ( int i = 0; i < list.count(); i ++ ) {
+    if ( list.at( i ).player() == p ) {
+      return list.at( i );
+    }
+  } 
+
+  return PlayerResults( p );
+}
+
 /** \return a place of player in a group. from 1 (best) to 
  *   _players.count() (worst )
  */
@@ -113,6 +126,23 @@ unsigned int Group::playerPlace( Player p ) const
   }
 
   return 0xdeadbeef;
+}
+
+/** reverse to playerPlace()
+ */
+Player Group::playerByPlace( unsigned int place ) const
+{
+  PlayerResultsList prl = playersResults(); 
+
+  qSort( prl.begin(), prl.end(), qGreater< PlayerResults >() );
+
+  for ( int i = 0; i < prl.count(); i ++ ) {
+    if ( ( i + 1 ) == place ) {
+      return prl.at( i ).player();
+    }
+  }
+
+  return Player();
 }
 
 /** \return true if all group matches where played. 

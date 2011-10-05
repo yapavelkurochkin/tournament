@@ -24,9 +24,10 @@ class Group
     PlayerList _players;
     MatchList _matches;
     Tournament* _tournament;
+    unsigned int _stage;
 
   public:
-    Group( QString name, Tournament* tourn, PlayerList players = PlayerList() );
+    Group( QString name, Tournament* tourn, unsigned int stage, PlayerList players = PlayerList() );
 
     virtual void addPlayer( Player player );
     PlayerList const_players() const { return _players; }
@@ -37,11 +38,14 @@ class Group
     void setMatchResults( Player a, Player b, QList< Game > res );
 
     PlayerResultsList playersResults() const;
+    PlayerResults playerResults( Player p ) const;
     unsigned int playerPlace( Player p ) const;
+    Player playerByPlace( unsigned int place ) const;
 
     QString name() const { return _name; }
     int size() const { return _players.count(); }
     bool completed() const;
+    unsigned int stage() const { return _stage; }
 
     virtual bool operator< (const Group& gr) const { return _name < gr.name(); }
 };

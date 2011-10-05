@@ -7,7 +7,7 @@
 
 /** Round-robin table. Represents one round-robin group of players.
  */
-RRTable::RRTable( RRGroup* group, QWidget* parent )
+RRTable::RRTable( Group* group, QWidget* parent )
 : QTableWidget( parent ),
   _group( group )
 {

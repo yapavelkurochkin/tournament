@@ -1,5 +1,6 @@
 #include <QScrollArea>
 #include <QDebug>
+
 #include "tournwidget.h"
 #include "rrtable.h"
 
@@ -21,9 +22,9 @@ TournamentWidget::TournamentWidget( Tournament* tourn, QWidget* parent )
 
 void TournamentWidget::addGroupsToLayout( QVBoxLayout* vl )
 {
-  RRGroupList& groups = _tourn->groupList();
+  QList< Group* > groups = _tourn->groupList( 0 );
   for ( int i = 0; i < groups.count(); i ++ ) {
-    RRTable* rt = new RRTable( &groups[ i ], this );
+    RRTable* rt = new RRTable( groups[ i ], this );
     vl->addWidget( rt );
   }
 }

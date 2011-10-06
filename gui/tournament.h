@@ -1,41 +1,51 @@
 #ifndef TOURNAMENT__H
 #define TOURNAMENT__H
 
+#include <QObject>
 #include "playerlist.h"
 #include "rrgroup.h"
 
-class Tournament {
-public:
-  typedef enum {
-    M1, 
-    M2, 
-    M3,
-    Elite
-  } Category;
+class Tournament : public QObject {
+  Q_OBJECT;
 
-  Tournament( PlayerList players, Category category,
-              Match::Type matchType = Match::BestOf3, unsigned int groupSize = 3, 
-              unsigned int stagesCnt = 4 );
+  public:
+    typedef enum {
+      M1, 
+      M2, 
+      M3,
+      Elite
+    } Category;
 
-  void groupChanged( Group* g );
-  QList<Group*> groupList( unsigned int stage ) const 
-                 { return _groups[ stage ]; }
+    Tournament( PlayerList players, Category category,
+                Match::Type matchType = Match::BestOf3, unsigned int groupSize = 3, 
+                unsigned int stagesCnt = 4 );
+    Tournament(  );
+
+    void groupChanged( Group* g );
+    QList<Group*> groupList( unsigned int stage ) const 
+                          { return _groups[ stage ]; }
   
-protected:
-  PlayerList _players; 
-  unsigned int _groupSize;
-  unsigned int _stagesCnt;
-  /*<< playing stages including round robin */
+  public slots:
+    void save();
 
-  QList<Group*>* _groups;
-  /*<< one list of groups per one stage */
+  protected:
+    PlayerList _players; 
+    unsigned int _groupSize;
+    unsigned int _stagesCnt;
+    /*<< playing stages including round robin */
 
-  Match::Type _matchType;
-  Category _category;
+    QList<Group*>* _groups;
+    /*<< one list of groups per one stage */
 
-  void breakPlayers( PlayerList players );
-  bool roundRobinCompleted() const;
-  PlayerResultsList roundRobinResults() const;
+    Match::Type _matchType;
+    Category _category;
+
+    void breakPlayers( PlayerList players );
+    bool roundRobinCompleted() const;
+    PlayerResultsList roundRobinResults() const;
+
+    friend QDataStream &operator>>(QDataStream &, Tournament&);
+    friend QDataStream &operator<<(QDataStream &, const Tournament&);
 };
 
 #endif // TOURNAMENT__H

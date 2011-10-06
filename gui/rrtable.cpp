@@ -19,6 +19,9 @@ RRTable::RRTable( Group* group, QWidget* parent )
   connect( this, SIGNAL( cellDoubleClicked( int, int ) ),
            this, SLOT( editMatchResults( int, int ) ) );
 //  resizeColumnsToContents();
+
+  updateMatchCells();
+  updatePlaces();
 }
 
 /** should be called in constructor for basic setup of 
@@ -110,10 +113,27 @@ void RRTable::updateMatchCell( int row, int col )
   Player b = players.at( bIndex );
  
   const Match& m = _group->match( a, b );
+  
+  if ( m.played() ) {
+    item( row, col )->setText( m.toString() );
+    item( row, col )->setToolTip( m.gamesToString() );
+    item( row, col )->setBackground( Qt::green ); 
+  }
+}
 
-  item( row, col )->setText( m.toString() );
-  item( row, col )->setToolTip( m.gamesToString() );
-  item( row, col )->setBackground( Qt::green ); 
+/** calls updateMatchCell for each math cell ;)
+ */
+void RRTable::updateMatchCells( )
+{
+  int plCnt = _group->const_players().count();
+
+  for ( int i = 1; i < rowCount(); i ++ ) {
+    for ( int j = 1; j < plCnt + 1; j ++ ) {
+      if ( i != j ) {
+        updateMatchCell( i, j );
+      }
+    }
+  }
 }
 
 /** Updates places column. RRGroup should return list of players

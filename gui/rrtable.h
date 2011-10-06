@@ -18,6 +18,7 @@ class RRTable: public QTableWidget
   protected:
     void setupCells();
     void updateMatchCell( int row, int col );
+    void updateMatchCells( );
     void updatePlaces( );
 };
 

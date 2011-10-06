@@ -21,6 +21,7 @@
 #include <QX11Info>
 #include <QDebug>
 #include <QScrollArea>
+#include <QFile>
 
 #include "playerlist.h"
 #include "playertable.h"
@@ -111,10 +112,22 @@ int main(int argc, char *argv[])
     qDebug() << players.at( i ).name() << players.at( i ).rating();
   }
 
-  PlayerTable table( players );
+/*  PlayerTable table( players );
   table.show();
+*/
+  QFile file( "tourn.dat" );
+  Tournament* t = NULL;
+  if ( file.exists() && file.open( QIODevice::ReadOnly ) ) {
+    t = new Tournament();
+    QDataStream ds( &file );
+    
+    ds >> (*t); 
+  } else {
+    t = new Tournament( players, Tournament::M2, Match::BestOf3, 4 );
+  }
+  QObject::connect( &a, SIGNAL( aboutToQuit() ),
+                     t, SLOT( save() ) );
 
-  Tournament* t = new Tournament( players, Tournament::M2, Match::BestOf3, 4 );
   QScrollArea* scrollArea = new QScrollArea();
   TournamentWidget* tw = new TournamentWidget( t );
   scrollArea->setWidget( tw );

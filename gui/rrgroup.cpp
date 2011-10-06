@@ -6,7 +6,7 @@
 
 /** Round robin games are followed first always
  */
-RRGroup::RRGroup( QChar name, Tournament* t, PlayerList players )
+RRGroup::RRGroup( QString name, Tournament* t, PlayerList players )
  : Group( name, t, 0, players ) 
 {
   roundRobin();
@@ -28,5 +28,21 @@ void RRGroup::addPlayer( Player player )
 {
   Group::addPlayer( player );
   roundRobin();
+}
+
+/** Serialization operators
+  */
+QDataStream &operator<<( QDataStream &s, const RRGroup &g )
+{
+  s << dynamic_cast< const Group& >( g );
+
+  return s;
+}
+
+QDataStream &operator>>( QDataStream &s, RRGroup &g )
+{
+  s >> dynamic_cast< Group& >( g );
+  
+  return s;
 }
 

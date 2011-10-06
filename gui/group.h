@@ -31,7 +31,8 @@ class Group
     friend QDataStream &operator<<(QDataStream &, const Group&);
 
   public:
-    Group( QString name, Tournament* tourn, unsigned int stage, PlayerList players = PlayerList() );
+    Group( QString name = QString(), Tournament* tourn = NULL, 
+           unsigned int stage = 0, PlayerList players = PlayerList() );
 
     virtual void addPlayer( Player player );
     PlayerList const_players() const { return _players; }
@@ -45,6 +46,8 @@ class Group
     PlayerResults playerResults( Player p ) const;
     unsigned int playerPlace( Player p ) const;
     Player playerByPlace( unsigned int place ) const;
+
+    void setTournament( Tournament* t ) { _tournament = t; }
 
     QString name() const { return _name; }
     int size() const { return _players.count(); }

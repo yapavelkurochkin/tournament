@@ -3,6 +3,7 @@
 
 #include <QList>
 #include <QChar>
+#include <QDataStream>
 #include "playerlist.h"
 #include "playerscores.h"
 #include "match.h"
@@ -25,6 +26,9 @@ class Group
     MatchList _matches;
     Tournament* _tournament;
     unsigned int _stage;
+
+    friend QDataStream &operator>>(QDataStream &, Group&);
+    friend QDataStream &operator<<(QDataStream &, const Group&);
 
   public:
     Group( QString name, Tournament* tourn, unsigned int stage, PlayerList players = PlayerList() );

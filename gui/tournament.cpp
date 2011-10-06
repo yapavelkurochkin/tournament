@@ -16,7 +16,7 @@ Tournament::Tournament( PlayerList players, Category category,
   _groups = new QList<Group*>[ _stagesCnt ];
   Q_CHECK_PTR( _groups );
 
-   breakPlayers( players );
+  breakPlayers( players );
 }
 
 void Tournament::groupChanged( Group* g )

@@ -2,10 +2,14 @@
 #define PLAYER__H
 
 #include <QString>
+#include <QDataStream>
 
 class Player {
   QString _name;
   double _rating;
+
+  friend QDataStream &operator>>(QDataStream &, Player &);
+  friend QDataStream &operator<<(QDataStream &, const Player&);
 
   public:
     Player( QString n, double r );

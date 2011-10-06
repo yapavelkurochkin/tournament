@@ -158,3 +158,24 @@ bool Group::completed() const
   return true;
 }
 
+/** Serialization operators
+  */
+QDataStream &operator<<( QDataStream &s, const Group &g )
+{
+  s << g._name;
+  s << g._players;
+  s << g._matches;
+  s << g._stage;
+
+  return s;
+}
+
+QDataStream &operator>>( QDataStream &s, Group &g )
+{
+  s >> g._name;
+  s >> g._players;
+  s >> g._matches;
+  s >> g._stage;
+  
+  return s;
+}

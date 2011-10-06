@@ -44,6 +44,18 @@ unsigned int Game::balls( Player p ) const
   return ( p == a ) ? aBalls : bBalls;
 }
 
+QDataStream &operator>>(QDataStream &s, Game &g)
+{
+  s >> g.a >> g.b >> g.aBalls >> g.bBalls;
+  return s;
+}
+
+QDataStream &operator<<(QDataStream &s, const Game &g)
+{
+  s << g.a << g.b << g.aBalls << g.bBalls;
+  return s;
+}
+
 /******************************
  * Match                      *
  *****************************/
@@ -136,3 +148,21 @@ QString Match::toString() const
   return QString::number( gamesWon( _a ) ) 
              + " : " + QString::number( gamesWon( _b ) );
 }
+
+/* serialization operators
+ */
+QDataStream &operator >> ( QDataStream &s, Match &m )
+{
+  qint32 type;
+  s >> m._a >> m._b >> m._results >> type;
+  m._type = (Match::Type) type;
+  return s;
+}
+
+QDataStream &operator << ( QDataStream &s, const Match &m )
+{
+  qint32 type = (Match::Type) m._type;
+  s << m._a << m._b << m._results << type;
+  return s;
+}
+

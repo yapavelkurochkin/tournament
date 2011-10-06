@@ -21,3 +21,22 @@ bool Player::operator== ( const Player& pl ) const
 {
   return _name == pl.name();
 }
+
+/* serialization operators 
+ */  
+QDataStream &operator>>( QDataStream & s, Player &p )
+{
+  s >> p._name;
+  s >> p._rating;
+
+  return s;
+}
+
+QDataStream &operator<<( QDataStream & s, const Player& p )
+{
+  s << p._name;
+  s << p._rating;
+
+  return s;
+}
+

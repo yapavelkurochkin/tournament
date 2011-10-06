@@ -2,6 +2,7 @@
 #define MATCH__H
 
 #include <QList>
+#include <QDataStream>
 #include "playerlist.h"
 
 struct Game
@@ -15,6 +16,9 @@ struct Game
   Game& swap();
   Player winner() const;
   unsigned int balls( Player p ) const;
+
+  friend QDataStream &operator>>(QDataStream &s, Game &g);
+  friend QDataStream &operator<<(QDataStream &s, const Game &g);
 };
 
 class Match 
@@ -25,7 +29,7 @@ class Match
       BestOf5
     } Type;
     
-    Match( Player a, Player b, Type type = BestOf3 );
+    Match( Player a = Player(), Player b = Player(), Type type = BestOf3 );
 
     QList< Game > games_const( ) const { return _results; }
     QList< Game >& games( ) { return _results; }
@@ -52,6 +56,9 @@ class Match
     Player _b;
     QList< Game > _results;
     Type _type;  
+
+    friend QDataStream &operator >> ( QDataStream &s, Match &m );
+    friend QDataStream &operator << ( QDataStream &s, const Match &m );
 };
 
 typedef QList< Match > MatchList;

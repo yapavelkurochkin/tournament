@@ -136,7 +136,7 @@ int main(int argc, char *argv[])
 
 //  qDebug() << tw->sizeHint();
   tw->show();
-  tw->setMinimumWidth( 700 );
+  tw->setMinimumWidth( 1000 );
 
   return a.exec();
 }

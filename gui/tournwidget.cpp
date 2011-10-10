@@ -3,6 +3,8 @@
 
 #include "tournwidget.h"
 #include "rrtable.h"
+#include "swissgroup.h"
+#include "swisstable.h"
 
 TournamentWidget::TournamentWidget( Tournament* tourn, QWidget* parent )
  : QWidget( parent ),
@@ -17,6 +19,9 @@ TournamentWidget::TournamentWidget( Tournament* tourn, QWidget* parent )
   _hLayout->addLayout( groupLayout );
 
   addGroupsToLayout( groupLayout );
+
+  connect( tourn, SIGNAL( newSwissGroupCreated( SwissGroup* ) ),
+           this, SLOT( newSwissGroupCreated( SwissGroup* ) ) );
 }
 
 
@@ -27,4 +32,10 @@ void TournamentWidget::addGroupsToLayout( QVBoxLayout* vl )
     RRTable* rt = new RRTable( groups[ i ], this );
     vl->addWidget( rt );
   }
+}
+
+void TournamentWidget::newSwissGroupCreated( SwissGroup* g )
+{
+  SwissTable* st = new SwissTable( g, this );
+  layout()->addWidget( st );
 }

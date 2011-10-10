@@ -6,11 +6,19 @@
 #include "rrgroup.h"
 #include "tournament.h"
 
+class SwissGroup;
+
 class TournamentWidget : public QWidget {
+  Q_OBJECT;
+
   Tournament* _tourn;
   QHBoxLayout* _hLayout;
 
   void addGroupsToLayout( QVBoxLayout* vl );
+
+protected slots:
+  void newSwissGroupCreated( SwissGroup* g );
+
 public:
   TournamentWidget( Tournament* tourn, QWidget* parent = NULL );
 };

@@ -35,5 +35,7 @@ class PlayerResults {
 
 typedef QList< PlayerResults > PlayerResultsList;
 
+extern PlayerList toPlayerList ( const PlayerResultsList& l );
+
 #endif // PLAYERSCORES__H
 

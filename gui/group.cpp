@@ -79,6 +79,11 @@ void Group::setMatchResults( Player a, Player b, QList< Game > res )
   _tournament->groupChanged( this );
 }
 
+void Group::setMatchResults( Match m )
+{
+  setMatchResults( m.playerA(), m.playerB(), m.games_const() );
+}
+
 /** Calculates scores for each player (who played at least one match)
  *  and returns list of results
  */
@@ -137,7 +142,7 @@ Player Group::playerByPlace( unsigned int place ) const
   qSort( prl.begin(), prl.end(), qGreater< PlayerResults >() );
 
   for ( int i = 0; i < prl.count(); i ++ ) {
-    if ( ( i + 1 ) == place ) {
+    if ( ( i + 1 ) == (int)place ) {
       return prl.at( i ).player();
     }
   }

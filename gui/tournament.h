@@ -5,6 +5,8 @@
 #include "playerlist.h"
 #include "rrgroup.h"
 
+class SwissGroup;
+
 class Tournament : public QObject {
   Q_OBJECT;
 
@@ -24,7 +26,11 @@ class Tournament : public QObject {
     void groupChanged( Group* g );
     QList<Group*> groupList( unsigned int stage ) const 
                           { return _groups[ stage ]; }
-  
+ 
+    unsigned int stagesCnt() const { return _stagesCnt; }
+ 
+  signals:
+    void newSwissGroupCreated( SwissGroup* g );
   public slots:
     void save();
 
@@ -43,6 +49,9 @@ class Tournament : public QObject {
     void breakPlayers( PlayerList players );
     bool roundRobinCompleted() const;
     PlayerResultsList roundRobinResults() const;
+
+    SwissGroup* newSwissGroup( QString name, unsigned int stage, 
+                               PlayerList players );
 
     friend QDataStream &operator>>(QDataStream &, Tournament&);
     friend QDataStream &operator<<(QDataStream &, const Tournament&);

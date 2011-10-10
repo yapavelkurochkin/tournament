@@ -1,14 +1,14 @@
-#ifndef RRTABLE__H
-#define RRTABLE__H
+#ifndef SWISSTABLE__H
+#define SWISSTABLE__H
 
 #include "grouptable.h"
 
-class RRTable: public GroupTable 
+class SwissTable: public GroupTable 
 {
   Q_OBJECT;
 
   public:
-    RRTable( Group* group, QWidget* parent = NULL );
+    SwissTable( Group* group, QWidget* parent = NULL );
 
   protected slots:
     void editMatchResults( int row, int col );
@@ -17,7 +17,6 @@ class RRTable: public GroupTable
     void setupCells();
     void updateMatchCell( int row, int col );
     void updateMatchCells( );
-    void updatePlaces( );
 };
 
-#endif // PLAYERTABLE__H
+#endif 

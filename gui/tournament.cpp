@@ -4,6 +4,7 @@
 
 #include "tournament.h"
 #include "rrgroup.h"
+#include "swissgroup.h"
 
 Tournament::Tournament( PlayerList players, Category category,
                         Match::Type matchType, unsigned int groupSize,
@@ -88,8 +89,27 @@ void Tournament::groupChanged( Group* g )
       for ( int i = 0; i < loosers.count(); i ++ ) {
         qDebug() << loosers.at( i ).player().name() << loosers.at( i ).scores();
       }
+
+     newSwissGroup( QString( "1 - %1" ).arg( players.count() ), 1, 
+                    toPlayerList( players ) );
+
+      if ( loosers.count() ) {      
+        newSwissGroup( QString(  "..." ), 1, toPlayerList( loosers ) );
+      }
     }
   }
+
+  save();
+}
+
+SwissGroup* Tournament::newSwissGroup( QString name, unsigned int stage, 
+                                       PlayerList players )
+{
+  SwissGroup* sg = new SwissGroup( name, this, stage, players );
+
+  _groups[ 1 ] << sg;
+  emit newSwissGroupCreated( sg );
+  return sg;
 }
 
 /** Sorts player list and pushes cool players into first places
@@ -180,11 +200,11 @@ QDataStream &operator>>(QDataStream &s, Tournament& t)
         rrg->setTournament( &t );
         t._groups[i] << rrg; 
       } else {
-        Group* g = new Group();
-        s >> (*g);
+        SwissGroup* sg = new SwissGroup();
+        s >> (*sg);
         
-        g->setTournament( &t );
-        t._groups[i] << g; 
+        sg->setTournament( &t );
+        t._groups[i] << sg; 
       }
     }   
   }
@@ -203,9 +223,12 @@ QDataStream &operator<<(QDataStream &s, const Tournament& t)
       const Group* g = t._groups[ i ].at( j );
       if ( i == 0 ) { // round robin stage
         const RRGroup* rrg = dynamic_cast< const RRGroup* >( g );
+
         s << (*rrg);
       } else {
-        s << (*g);
+        const SwissGroup* sg = dynamic_cast< const SwissGroup* >( g );
+         
+        s << (*sg);
       }
     }   
   }

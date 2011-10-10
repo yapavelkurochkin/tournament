@@ -8,20 +8,17 @@
 /** Round-robin table. Represents one round-robin group of players.
  */
 RRTable::RRTable( Group* group, QWidget* parent )
-: QTableWidget( parent ),
-  _group( group )
+: GroupTable( group, parent ) 
 {
   setupCells();
 
-  verticalHeader()->hide();
-  horizontalHeader()->hide();
-
   connect( this, SIGNAL( cellDoubleClicked( int, int ) ),
            this, SLOT( editMatchResults( int, int ) ) );
-//  resizeColumnsToContents();
 
   updateMatchCells();
   updatePlaces();
+
+  resizeColumnsToContents();
 }
 
 /** should be called in constructor for basic setup of 
@@ -58,6 +55,8 @@ void RRTable::setupCells()
       item->setText( text );
 
       setItem( i, j, item );
+
+      qDebug() << "column" << j <<  sizeHintForColumn( j );
     }
   
     QTableWidgetItem *item = new QTableWidgetItem( );
@@ -93,6 +92,9 @@ void RRTable::editMatchResults( int row, int col )
     updateMatchCell( col, row );
     updatePlaces( );
   }
+
+  qDebug() << maximumViewportSize();
+  qDebug() << viewport()->sizeHint();
 }
 
 /** Writes match result into specified cell.

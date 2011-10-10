@@ -64,3 +64,12 @@ bool PlayerResults::operator>( const PlayerResults& pr ) const
   return ( _scores > pr.scores() );
 }
 
+PlayerList toPlayerList ( const PlayerResultsList& l )
+{
+  PlayerList ret;
+  for ( int i = 0; i < l.count(); i ++ ) {
+    ret << l.at(i).player();
+  }
+
+  return ret;
+}

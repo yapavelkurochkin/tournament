@@ -4,6 +4,7 @@
 #include "playertable.h"
 #include "rrtable.h"
 #include "matchres.h"
+#include "global.h"
 
 /** Round-robin table. Represents one round-robin group of players.
  */
@@ -94,7 +95,6 @@ void RRTable::editMatchResults( int row, int col )
   }
 
   qDebug() << maximumViewportSize();
-  qDebug() << viewport()->sizeHint();
 }
 
 /** Writes match result into specified cell.
@@ -119,11 +119,11 @@ void RRTable::updateMatchCell( int row, int col )
   if ( m.played() ) {
     item( row, col )->setText( m.toString() );
     item( row, col )->setToolTip( m.gamesToString() );
-    item( row, col )->setBackground( Qt::green ); 
+    item( row, col )->setBackground( SPRING_GREEN1 ); 
   }
 }
 
-/** calls updateMatchCell for each math cell ;)
+/** calls updateMatchCell for each match cell ;)
  */
 void RRTable::updateMatchCells( )
 {

@@ -93,8 +93,11 @@ void Tournament::groupChanged( Group* g )
      newSwissGroup( QString( "1 - %1" ).arg( players.count() ), 1, 
                     toPlayerList( players ) );
 
-      if ( loosers.count() ) {      
-        newSwissGroup( QString(  "..." ), 1, toPlayerList( loosers ) );
+      if ( loosers.count() ) {
+        QString groupName = QString(  "%1 - %2" )
+                            .arg( players.count() + 1 )
+                            .arg( players.count() + loosers.count() );
+        newSwissGroup( groupName, 1, toPlayerList( loosers ) );
       }
     }
   }

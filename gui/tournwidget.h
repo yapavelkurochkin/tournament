@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QHBoxLayout>
+#include <QVBoxLayout>
 #include "rrgroup.h"
 #include "tournament.h"
 
@@ -12,9 +13,11 @@ class TournamentWidget : public QWidget {
   Q_OBJECT;
 
   Tournament* _tourn;
-  QHBoxLayout* _hLayout;
+  QList<QVBoxLayout*> _groupLayouts;
+  /*<< one layout per group */
 
-  void addGroupsToLayout( QVBoxLayout* vl );
+  void createTablesForGroups(); 
+  void setupLayout( QHBoxLayout* );
 
 protected slots:
   void newSwissGroupCreated( SwissGroup* g );

@@ -2,6 +2,7 @@
 
 #include "swisstable.h"
 #include "matchres.h"
+#include "global.h"
 
 /** Round-robin table. Represents one round-robin group of players.
  */
@@ -39,6 +40,8 @@ void SwissTable::setupCells()
         } 
         
         item->setFlags( Qt::NoItemFlags );
+        item->setBackground( palette().brush( QPalette::Disabled,
+                                              QPalette::Background ) );
       } else {
         Match m = matches.at( i - 1 );
         if ( j == 0 ) {
@@ -46,7 +49,6 @@ void SwissTable::setupCells()
           item->setFlags( Qt::NoItemFlags );
         } else {
           item->setFlags( Qt::ItemIsSelectable | Qt::ItemIsEnabled );
-          updateMatchCell( i, j );
         }
       }
 
@@ -55,6 +57,9 @@ void SwissTable::setupCells()
       setItem( i, j, item );
     }
   }
+
+  // name cell is spanned
+  setSpan( 0, 0, 1, 2 );
 }
 
 /** Shows match result dialog and saves match result.
@@ -82,16 +87,18 @@ void SwissTable::updateMatchCell( int row, int col )
   MatchList matches = _group->matchList();
 
   if ( mIndex >= matches.count() ) {
-    qCritical() << __FUNCTION__ << "invalid row indexe: " << row;
+    qCritical() << __FUNCTION__ << "invalid row index: " << row;
     return;
   }
 
-  const Match m = matches.at( mIndex );
+  Match m = matches.at( mIndex );
   
   if ( m.played() ) {
     item( row, col )->setText( m.toString() );
     item( row, col )->setToolTip( m.gamesToString() );
-    item( row, col )->setBackground( Qt::green ); 
+    item( row, col )->setBackground( SPRING_GREEN1 ); 
+
+    resizeColumnsToContents();
   }
 }
 

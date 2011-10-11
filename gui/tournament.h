@@ -48,10 +48,13 @@ class Tournament : public QObject {
 
     void breakPlayers( PlayerList players );
     bool roundRobinCompleted() const;
-    PlayerResultsList roundRobinResults() const;
+    PlayerList roundRobinResults() const;
 
-    SwissGroup* newSwissGroup( QString name, unsigned int stage, 
+    SwissGroup* newSwissGroup( unsigned int fromPlace, unsigned int stage, 
                                PlayerList players );
+
+    void buildGroups( );
+    void splitSwissGroup( SwissGroup* g );
 
     friend QDataStream &operator>>(QDataStream &, Tournament&);
     friend QDataStream &operator<<(QDataStream &, const Tournament&);

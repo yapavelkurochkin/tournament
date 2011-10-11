@@ -7,4 +7,6 @@ GroupTable::GroupTable( Group* group, QWidget* parent )
 {
   verticalHeader()->hide();
   horizontalHeader()->hide();
+
+  horizontalHeader()->setStretchLastSection( true );
 }

@@ -71,6 +71,11 @@ Player Match::winner() const
   return ( gamesWon( _a ) > gamesWon( _b ) ) ? _a : _b;
 }
 
+Player Match::looser() const 
+{
+  return ( gamesWon( _a ) < gamesWon( _b ) ) ? _a : _b;
+}
+
 unsigned int Match::gamesWon( Player p ) const 
 {
   unsigned int games = 0; 

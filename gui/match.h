@@ -40,6 +40,8 @@ class Match
     Match& swapPlayers();
  
     Player winner() const;
+    Player looser() const;
+
     unsigned int gamesWon( Player p ) const;
     unsigned int ballsWon( Player p ) const;
 

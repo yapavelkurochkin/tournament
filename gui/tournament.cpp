@@ -32,83 +32,68 @@ Tournament::Tournament( )
 void Tournament::groupChanged( Group* g )
 {
   if ( g->stage() == 0 ) {
-    bool rrCompleted = roundRobinCompleted();
-    if ( rrCompleted ) {
-      // 1st stage group size.
-      // stages = 4 => gs(1) = 8
-      // stages = 3 => gs(1) = 4
-      int gs = 1 << (_stagesCnt - 1); 
-
-      PlayerResultsList results = roundRobinResults();
-
-      // at first we should get first and second places from each group.
-      int winnersCnt = 2*_groups[0].count();
-      PlayerResultsList players;
-     
-      if ( gs < winnersCnt ) {
-        qWarning() << "Invalid stages count" << _stagesCnt;
-      }
-
-      for ( int i = 0; ( i < results.count() ) 
-                        && ( i < (int)winnersCnt ) 
-                        && ( i < gs );               i ++ ) {
-        players << results.takeFirst(); 
-      }
-
-      // other players should be sorted accordingly to their scores.
-      qSort( results.begin(), results.end(), qGreater< PlayerResults >() );
-      
-      for ( int i = players.count(); i < gs; i ++ ) {
-        players << results.takeFirst();
-      }
-  
-      PlayerResultsList loosers; // other players who are loose group games.
-      int nloosers = results.count();
-      if ( nloosers <= 1 ) {
-        nloosers = 0;
-      } else {
-        // finding such nloosers that log2( nloosers ) is integer.
-        while ( gs != 1 ) {
-          if ( nloosers >= gs ) {
-            nloosers = gs;
-            break;
-          }
-          gs = gs/2;
-        } 
-      }
- 
-      for ( int i = 0; i < nloosers; i ++ ) {
-        loosers << results.takeFirst();
-      }
-
-      qDebug() << "PLAYERS";
-      for ( int i = 0; i < players.count(); i ++ ) {
-        qDebug() << players.at( i ).player().name() << players.at( i ).scores();
-      }
-      qDebug() << "LOOSERS";
-      for ( int i = 0; i < loosers.count(); i ++ ) {
-        qDebug() << loosers.at( i ).player().name() << loosers.at( i ).scores();
-      }
-
-     newSwissGroup( QString( "1 - %1" ).arg( players.count() ), 1, 
-                    toPlayerList( players ) );
-
-      if ( loosers.count() ) {
-        QString groupName = QString(  "%1 - %2" )
-                            .arg( players.count() + 1 )
-                            .arg( players.count() + loosers.count() );
-        newSwissGroup( groupName, 1, toPlayerList( loosers ) );
-      }
+    if ( roundRobinCompleted() ) {
+      buildGroups( ); 
+    }
+  } else {
+    if ( g->completed() && ( g->stage() != ( _stagesCnt - 1 ) ) ) {
+      splitSwissGroup( dynamic_cast< SwissGroup* >( g ) ); 
     }
   }
 
   save();
 }
 
-SwissGroup* Tournament::newSwissGroup( QString name, unsigned int stage, 
+/** build groups by results of round-robin stage 
+ */
+void Tournament::buildGroups( )
+{
+  // 1st stage group size.
+  // stages = 4 => gs(1) = 8
+  // stages = 3 => gs(1) = 4
+  int gs = 1 << ( _stagesCnt - 1 ); 
+  PlayerList players = roundRobinResults( );
+
+  newSwissGroup( 1, 1, players.mid( 0, gs ) );
+
+  int nloosers = players.count() - gs;
+  if ( nloosers <= 1 ) {
+    nloosers = 0;
+  } else {
+    int size = gs;
+    // finding such nloosers that log2( nloosers ) is integer.
+    while ( size != 1 ) {
+      if ( nloosers >= size ) {
+        // finding such nloosers that is not greater than gs
+        nloosers = size;
+        break;
+      }
+      size = size/2;
+    } 
+  } 
+
+  newSwissGroup( gs + 1, 1, players.mid( gs, nloosers ) ); 
+}
+
+/** splits groups for two groups - group of winners and group of loosers.
+ */
+void Tournament::splitSwissGroup( SwissGroup* g )
+{
+  QList< Group* > groups = g->split();   
+
+  if ( groups.count() ) {
+    _groups[ groups.at( 0 )->stage() ] << groups;
+  }
+
+  for ( int i = 0; i < groups.count(); i ++ ) {
+    emit newSwissGroupCreated( dynamic_cast< SwissGroup* >( groups.at( i ) ) );
+  }
+}
+
+SwissGroup* Tournament::newSwissGroup( unsigned int fromPlace, unsigned int stage, 
                                        PlayerList players )
 {
-  SwissGroup* sg = new SwissGroup( name, this, stage, players );
+  SwissGroup* sg = new SwissGroup( fromPlace, this, stage, players );
 
   _groups[ 1 ] << sg;
   emit newSwissGroupCreated( sg );
@@ -138,10 +123,10 @@ void Tournament::breakPlayers( PlayerList players )
   }
 }
 
-bool Tournament::roundRobinCompleted() const 
+bool Tournament::roundRobinCompleted( ) const
 {
-  for ( int i = 0; i < _groups[0].count(); i ++ ) {
-    if ( ! _groups[0].at( i )->completed() ) {
+  for ( int i = 0; i < _groups[ 0 ].count(); i ++ ) {
+    if ( ! _groups[ 0 ].at( i )->completed() ) {
       return false;
     }
   }
@@ -152,20 +137,38 @@ bool Tournament::roundRobinCompleted() const
 /** \return player list built by cyclic principle: 1st from 1 group,
  *          1st from 2 group, 1st from Nth group; 2nd from 1 group etc...
  */
-PlayerResultsList Tournament::roundRobinResults() const
+PlayerList Tournament::roundRobinResults() const
 {
-  PlayerResultsList list;
-  for ( int p = 1; p <= (int)_groupSize; p ++ ) {
+  PlayerResultsList bestlist;
+
+  // 1st and 2nd places
+  for ( int p = 1; p <= (int)2; p ++ ) {
     for ( int i = 0; i < _groups[0].count(); i ++ ) {
       const Group* g = _groups[0].at( i );
       if ( p <= g->size() ) {
         Player player = g->playerByPlace( p );
-        list << g->playerResults( player );
+        bestlist << g->playerResults( player );
       }
     }
   }
 
-  return list;
+  PlayerResultsList list;
+  // 3rd and more places
+  for ( int p = 3; p <= _groupSize; p ++ ) {
+    for ( int i = 0; i < _groups[0].count(); i ++ ) {
+      const Group* g = _groups[0].at( i );
+      if ( p <= g->size() ) {
+        Player player = g->playerByPlace( p );
+        bestlist << g->playerResults( player );
+      }
+    }
+  }
+
+  qSort( list.begin(), list.end(), qGreater< PlayerResults >() );
+
+  bestlist << list;
+
+  return toPlayerList( bestlist );
 }
 
 /** called when app exits by the signal aboutToQuit();

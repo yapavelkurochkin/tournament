@@ -81,8 +81,6 @@ void MatchResDialog::textChanged( )
     game.aBalls = leA->text().toInt(); 
     game.bBalls = leB->text().toInt(); 
 
-    qDebug() << __FUNCTION__ << i << game.aBalls << game.bBalls;
-
     if ( !game.validate() ) {
       qDebug() << __FUNCTION__ << "wrong game!";
       

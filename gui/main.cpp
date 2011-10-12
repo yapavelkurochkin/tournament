@@ -131,12 +131,13 @@ int main(int argc, char *argv[])
   QScrollArea* scrollArea = new QScrollArea();
   TournamentWidget* tw = new TournamentWidget( t );
   scrollArea->setWidget( tw );
+  scrollArea->setWidgetResizable( true );
   scrollArea->show();  
-  scrollArea->resize( 800, 600 );
+//  scrollArea->resize( 800, 600 );
 
 //  qDebug() << tw->sizeHint();
-  tw->show();
-  tw->setMinimumWidth( 1000 );
+//  tw->show();
+//  tw->setMinimumWidth( 1000 );
 
   return a.exec();
 }

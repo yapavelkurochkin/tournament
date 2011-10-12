@@ -15,8 +15,8 @@ SwissTable::SwissTable( Group* group, QWidget* parent )
            this, SLOT( editMatchResults( int, int ) ) );
 
   updateMatchCells();
-  
   resizeColumnsToContents( );
+  adjustSize();
 }
 
 /** should be called in constructor for basic setup of 
@@ -75,6 +75,7 @@ void SwissTable::editMatchResults( int row, int col )
     _group->setMatchResults( dialog.match() ); 
 
     updateMatchCell( row, col );
+    adjustSize();
   }
 }
 
@@ -99,6 +100,7 @@ void SwissTable::updateMatchCell( int row, int col )
     item( row, col )->setBackground( SPRING_GREEN1 ); 
 
     resizeColumnsToContents();
+    adjustSize();
   }
 }
 

@@ -20,6 +20,7 @@ RRTable::RRTable( Group* group, QWidget* parent )
   updatePlaces();
 
   resizeColumnsToContents();
+  adjustSize();
 }
 
 /** should be called in constructor for basic setup of 
@@ -56,8 +57,6 @@ void RRTable::setupCells()
       item->setText( text );
 
       setItem( i, j, item );
-
-      qDebug() << "column" << j <<  sizeHintForColumn( j );
     }
   
     QTableWidgetItem *item = new QTableWidgetItem( );
@@ -92,9 +91,8 @@ void RRTable::editMatchResults( int row, int col )
     updateMatchCell( row, col );
     updateMatchCell( col, row );
     updatePlaces( );
+    adjustSize();
   }
-
-  qDebug() << maximumViewportSize();
 }
 
 /** Writes match result into specified cell.
@@ -146,7 +144,6 @@ void RRTable::updatePlaces()
   PlayerList players = _group->const_players();
   for ( int i = 0; i < players.count(); i ++ ) {
     Player p = players.at( i );
-    qDebug() << __FUNCTION__ << i;
     if ( _group->playedMatchList( p ).count() > 0 ) { 
       // player already have played at least one match
       item( i + 1, players.count() + 1)

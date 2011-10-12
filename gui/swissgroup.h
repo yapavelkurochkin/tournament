@@ -6,6 +6,9 @@
 class SwissGroup : public Group
 {
   unsigned int _fromPlace;
+
+  void initGroupName();
+
   public:
     SwissGroup( unsigned int fromPlace = 1,
                 Tournament* tourn = NULL,
@@ -16,6 +19,7 @@ class SwissGroup : public Group
     friend QDataStream &operator>>( QDataStream &s, SwissGroup &g );
 
     QList< Group* > split() const;
+    unsigned int fromPlace() const { return _fromPlace; }
 };
 
 #endif // SWISSGROUP__H

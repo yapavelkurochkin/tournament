@@ -12,8 +12,12 @@ class GroupTable: public QTableWidget
   
   protected:
     Group* _group;
+  
+    void adjustSize();
   public:
     GroupTable( Group* group, QWidget* parent = NULL );
+
+    const Group* group() const { return _group; }
 };
 
 

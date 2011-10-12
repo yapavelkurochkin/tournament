@@ -39,6 +39,15 @@ void TournamentWidget::setupLayout( QHBoxLayout* hLayout )
   }
 }
 
+/** Compares swiss groups by their fromPlace field.
+ */
+bool swissGroupLessThen(const Group* g1, const Group* g2)
+{
+  const SwissGroup* sg1 = dynamic_cast< const SwissGroup* >( g1 );
+  const SwissGroup* sg2 = dynamic_cast< const SwissGroup* >( g2 );
+
+  return sg1->fromPlace() < sg2->fromPlace();
+}
 
 /** scans Tournament for all groups in each stage, creates
  *  proper table and inserts it to corresponding group layout
@@ -46,8 +55,14 @@ void TournamentWidget::setupLayout( QHBoxLayout* hLayout )
 void TournamentWidget::createTablesForGroups( )
 {
   for ( unsigned int gr = 0; gr < _tourn->stagesCnt(); gr ++ ) {
+    // todo: may be groupList should return sorted list?
     QList< Group* > groups = _tourn->groupList( gr );
-    // FIXME: assuming that groups are sorted in proper order?
+
+    if ( gr > 0 ) {
+      // there are swiss groups in list
+      qSort( groups.begin(), groups.end(), swissGroupLessThen );
+    }
+
     for ( int i = 0; i < groups.count(); i ++ ) {
       GroupTable* t;
       if ( gr == 0 ) {
@@ -61,13 +76,38 @@ void TournamentWidget::createTablesForGroups( )
   }
 }
 
+/** creates table for group and inserts it to layout.
+ */
 void TournamentWidget::newSwissGroupCreated( SwissGroup* g )
 {
-  SwissTable* st = new SwissTable( g, this );
-  _groupLayouts.at( g->stage() )->addWidget( st );
+  SwissTable* newst = new SwissTable( g, this );
+  
+  // because of swiss group creation context we assume that g->stage()
+  // is more than 0.
+  QVBoxLayout* l = _groupLayouts.at( g->stage() );
 
-  // TODO: ensure that groups are sorted in proper order!
+  // ensuring that groups are sorted in proper order!
   // otherwise, games for 1-8 places can be inserted into 
   // layout after games for 9-15
+  int i = 0;
+  for ( i = 0; i < l->count(); i ++ ) {
+    QWidget* w = l->itemAt( i )->widget();
+    SwissTable* st = dynamic_cast< SwissTable* >( w );
+    if ( st ) {
+      const SwissGroup* sg = dynamic_cast< const SwissGroup* >( st->group() );
+      const SwissGroup* newsg = dynamic_cast< const SwissGroup* >( newst->group() );
+
+      if ( sg && newsg && ( newsg->fromPlace() < sg->fromPlace() ) ) {
+        break;
+      }
+    }
+  }
+
+  l->insertWidget( i, newst ); 
+/*  if ( i < l->count() ) {
+    l->insertWidget( i, newst ); 
+  } else {
+    l->addWidget( newst );
+  }*/
 }
 

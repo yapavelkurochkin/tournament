@@ -45,6 +45,7 @@ void Tournament::groupChanged( Group* g )
 }
 
 /** build groups by results of round-robin stage 
+ *   \todo this code should be in split() method of RRGroup
  */
 void Tournament::buildGroups( )
 {
@@ -80,6 +81,9 @@ void Tournament::buildGroups( )
 void Tournament::splitSwissGroup( SwissGroup* g )
 {
   QList< Group* > groups = g->split();   
+
+  // if group contains only 1 match then it will not be splitted
+  // and 
 
   if ( groups.count() ) {
     _groups[ groups.at( 0 )->stage() ] << groups;

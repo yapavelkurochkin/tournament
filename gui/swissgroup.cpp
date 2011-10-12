@@ -23,15 +23,35 @@ SwissGroup::SwissGroup( unsigned int fromPlace, Tournament* tourn,
     _matches << Match( a, b );
   }
 
-  _name =  QString( "%1 - %2" )
-                  .arg( fromPlace )
-                  .arg( fromPlace + players.count() - 1 );
+  initGroupName( );
+}
+
+void SwissGroup::initGroupName()
+{
+  int cnt = _players.count();
+  if ( _fromPlace == 1 ) {
+    if ( cnt == 2 ) {
+      _name = QObject::tr( "Final" );
+    } else if ( cnt == 4 ) {
+      _name = QObject::tr( "1/2 Final" );
+    } else if ( cnt == 8 ) {
+      _name = QObject::tr( "1/4 Final" );
+    }
+  } else {
+    _name =  QString( "%1 - %2" )
+                  .arg( _fromPlace )
+                  .arg( _fromPlace + cnt - 1 );
+  }
 }
 
 /** Creates 2 groups: one from winners and one from loosers
  */
 QList< Group* > SwissGroup::split( ) const
 {
+  if ( _matches.count() < 2 ) { // nothing to split
+    return QList< Group* >();
+  }
+
   PlayerList winners, loosers;
   for ( int i = 0; i < _matches.count(); i ++ ) {
     winners << _matches.at( i ).winner();

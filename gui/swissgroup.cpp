@@ -1,4 +1,5 @@
 #include <QDebug>
+#include "tournament.h"
 #include "swissgroup.h"
 
 /** first plays with last. second plays with pre-last. and so on.
@@ -16,27 +17,41 @@ SwissGroup::SwissGroup( unsigned int fromPlace, Tournament* tourn,
                << cnt;
   }
 
+  // final games are always best of 5
+  Match::Type type = tourn->matchType();
+  bool is34 = ( _players.count() == 2 ) && ( _fromPlace == 3 );
+  if ( isFinal() || is34 ) {
+    type = Match::BestOf5;
+  }
+
   for ( int i = 0; i < cnt / 2; i ++ ) {
     Player a = _players.at( i );
     Player b = _players.at( cnt - 1 - i );
     qDebug() << __FUNCTION__ << a.name() << b.name(); 
-    _matches << Match( a, b );
+    _matches << Match( a, b, type );
   }
 
   initGroupName( );
 }
 
+/** Should be used only whe serializing/deserializing
+ */
+SwissGroup::SwissGroup()
+: Group( QString( "" ), NULL, 2, PlayerList() ),
+  _fromPlace( 1 )
+{
+
+}
+
 void SwissGroup::initGroupName()
 {
   int cnt = _players.count();
-  if ( _fromPlace == 1 ) {
-    if ( cnt == 2 ) {
-      _name = QObject::tr( "Final" );
-    } else if ( cnt == 4 ) {
-      _name = QObject::tr( "1/2 Final" );
-    } else if ( cnt == 8 ) {
-      _name = QObject::tr( "1/4 Final" );
-    }
+  if ( isFinal() ) {
+    _name = QObject::tr( "Final" ); 
+  } else if ( isHalfFinal() ) {
+    _name = QObject::tr( "1/2 Final" );
+  } else if ( isQuarterFinal() ) {
+    _name = QObject::tr( "1/4 Final" );
   } else {
     _name =  QString( "%1 - %2" )
                   .arg( _fromPlace )

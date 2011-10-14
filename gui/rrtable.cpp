@@ -1,5 +1,6 @@
 #include <QHeaderView>
 #include <QDebug>
+#include <QMessageBox>
 
 #include "playertable.h"
 #include "rrtable.h"
@@ -76,6 +77,13 @@ void RRTable::editMatchResults( int row, int col )
   int bIndex = col - 1;
 
   qDebug() << __FUNCTION__ << row << col;
+ 
+  if ( _group->readOnly() ) {
+    QMessageBox::information( this, _group->name(), 
+                              "Group cannot be edited!" );
+    qDebug() << __FUNCTION__ << "group cannot be edited!";
+    return;
+  }
 
   Player a = _group->const_players().at( aIndex );
   Player b = _group->const_players().at( bIndex );

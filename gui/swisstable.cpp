@@ -1,5 +1,5 @@
 #include <QDebug>
-
+#include <QMessageBox>
 #include "swisstable.h"
 #include "matchres.h"
 #include "global.h"
@@ -67,6 +67,13 @@ void SwissTable::setupCells()
 void SwissTable::editMatchResults( int row, int col )
 {
   int mIndex = row - 1;
+ 
+  if ( _group->readOnly() ) {
+    QMessageBox::information( this, _group->name(), 
+                              "Group cannot be edited!" );
+    qDebug() << __FUNCTION__ << "group cannot be edited!";
+    return;
+  }
 
   Match m = _group->matchList().at( mIndex );
   MatchResDialog dialog( m, this );

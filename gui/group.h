@@ -56,6 +56,9 @@ class Group
     bool completed() const;
     unsigned int stage() const { return _stage; }
 
+    bool readOnly() const { return completed(); }
+    /**< group should not be edited when it is completed */
+
     virtual bool operator< (const Group& gr) const { return _name < gr.name(); }
 };
 

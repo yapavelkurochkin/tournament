@@ -28,6 +28,7 @@ class Tournament : public QObject {
                           { return _groups[ stage ]; }
  
     unsigned int stagesCnt() const { return _stagesCnt; }
+    Match::Type matchType() const { return _matchType; }
  
   signals:
     void newSwissGroupCreated( SwissGroup* g );

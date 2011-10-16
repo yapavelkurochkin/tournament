@@ -29,6 +29,8 @@ class Tournament : public QObject {
  
     unsigned int stagesCnt() const { return _stagesCnt; }
     Match::Type matchType() const { return _matchType; }
+
+    static Tournament* fromFile( QString fileName );
  
   signals:
     void newSwissGroupCreated( SwissGroup* g );

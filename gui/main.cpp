@@ -26,6 +26,7 @@
 #include "playerlist.h"
 #include "playertable.h"
 #include "tournwidget.h"
+#include "mainwindow.h"
 
 /* This structure mirrors the one found in /usr/include/asm/ucontext.h */
 typedef struct _sig_ucontext {
@@ -115,29 +116,9 @@ int main(int argc, char *argv[])
 /*  PlayerTable table( players );
   table.show();
 */
-  QFile file( "tourn.dat" );
-  Tournament* t = NULL;
-  if ( file.exists() && file.open( QIODevice::ReadOnly ) ) {
-    t = new Tournament();
-    QDataStream ds( &file );
-    
-    ds >> (*t); 
-  } else {
-    t = new Tournament( players, Tournament::M2, Match::BestOf3, 4 );
-  }
-  QObject::connect( &a, SIGNAL( aboutToQuit() ),
-                     t, SLOT( save() ) );
+  LeagueMainWindow * w = new LeagueMainWindow();
 
-  QScrollArea* scrollArea = new QScrollArea();
-  TournamentWidget* tw = new TournamentWidget( t );
-  scrollArea->setWidget( tw );
-  scrollArea->setWidgetResizable( true );
-  scrollArea->show();  
-//  scrollArea->resize( 800, 600 );
-
-//  qDebug() << tw->sizeHint();
-//  tw->show();
-//  tw->setMinimumWidth( 1000 );
+  w->show();
 
   return a.exec();
 }

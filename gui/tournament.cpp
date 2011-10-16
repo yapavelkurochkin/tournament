@@ -1,6 +1,7 @@
 #include <math.h>
 #include <QDebug>
 #include <QFile>
+#include <QApplication>
 
 #include "tournament.h"
 #include "rrgroup.h"
@@ -19,6 +20,8 @@ Tournament::Tournament( PlayerList players, Category category,
   Q_CHECK_PTR( _groups );
 
   breakPlayers( players );
+  
+  connect( qApp, SIGNAL( aboutToQuit() ), this, SLOT( save() ) );
 }
 
 Tournament::Tournament( ) 
@@ -27,6 +30,7 @@ Tournament::Tournament( )
    _matchType( Match::BestOf3 ),
    _category( M2 ) 
 {
+  connect( qApp, SIGNAL( aboutToQuit() ), this, SLOT( save() ) );
 }
 
 void Tournament::groupChanged( Group* g )
@@ -186,6 +190,22 @@ void Tournament::save()
   } 
 }
 
+/** creates and instance of Tournament initialized from specified file.
+ */
+Tournament* Tournament::fromFile( QString fileName )
+{
+  QFile file( fileName );
+  Tournament* t = NULL;
+  if ( file.exists() && file.open( QIODevice::ReadOnly ) ) {
+    t = new Tournament();
+
+    QDataStream ds( &file );
+    
+    ds >> (*t); 
+  } 
+
+  return t;
+}
 /* serialization
  */
 QDataStream &operator>>(QDataStream &s, Tournament& t)

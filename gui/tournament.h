@@ -7,6 +7,8 @@
 
 class SwissGroup;
 
+#define TOURN_MAGIC_NUMBER 0xfaeb1639
+
 class Tournament : public QObject {
   Q_OBJECT;
 
@@ -21,7 +23,6 @@ class Tournament : public QObject {
     Tournament( PlayerList players, Category category,
                 Match::Type matchType = Match::BestOf3, unsigned int groupSize = 3, 
                 unsigned int stagesCnt = 4 );
-    Tournament(  );
 
     void groupChanged( Group* g );
     QList<Group*> groupList( unsigned int stage ) const 
@@ -32,12 +33,18 @@ class Tournament : public QObject {
 
     static Tournament* fromFile( QString fileName );
  
+    unsigned int matchesCount( unsigned int numOfPlayers,
+                               unsigned int rrGroupSize, 
+                               unsigned int stages ) const;
   signals:
     void newSwissGroupCreated( SwissGroup* g );
   public slots:
     void save();
 
   protected:
+    unsigned int _magic;
+    /**< Used for identification of validity of tournament object*/
+
     PlayerList _players; 
     unsigned int _groupSize;
     unsigned int _stagesCnt;
@@ -59,6 +66,9 @@ class Tournament : public QObject {
     void buildGroups( );
     void splitSwissGroup( SwissGroup* g );
 
+    bool isValid() const { return _magic == TOURN_MAGIC_NUMBER; }
+
+    Tournament(  );
     friend QDataStream &operator>>(QDataStream &, Tournament&);
     friend QDataStream &operator<<(QDataStream &, const Tournament&);
 };

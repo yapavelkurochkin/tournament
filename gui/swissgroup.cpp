@@ -81,6 +81,12 @@ QList< Group* > SwissGroup::split( ) const
   return ret; 
 }
 
+/** returns required matches count to play for completion of group */
+unsigned int SwissGroup::matchesCount( unsigned int numOfPlayers )
+{
+  return numOfPlayers / 2; 
+}
+
 /** Serialization operators
   */
 QDataStream &operator<<( QDataStream &s, const SwissGroup &g )

@@ -28,6 +28,8 @@ class SwissGroup : public Group
          { return ( _players.count() == 4 ) && ( _fromPlace == 1 ); }
     bool isQuarterFinal() const  
          { return ( _players.count() == 8 ) && ( _fromPlace == 1 ); }
+
+    static unsigned int matchesCount( unsigned int numOfPlayers );
 };
 
 #endif // SWISSGROUP__H

@@ -2,6 +2,7 @@
 #define MAINWINDOW__H
 
 #include <QMainWindow>
+#include <QAction>
 
 class LeagueMainWindow : public QMainWindow
 {
@@ -11,10 +12,13 @@ class LeagueMainWindow : public QMainWindow
     LeagueMainWindow( );
 
   protected:
-    QAction* loadTourn;
+    QAction *loadT, *newT, *saveT;
 
     void createMenus();
     void createActions();
+    QAction* newAction( QString name, 
+                        QKeySequence::StandardKey shortcuts, 
+                        const char* slot );
 
   protected slots:
     void loadTournament();

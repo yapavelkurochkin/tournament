@@ -30,6 +30,13 @@ void RRGroup::addPlayer( Player player )
   roundRobin();
 }
 
+/** returns required matches count to play for completion of group */
+unsigned int RRGroup::matchesCount( unsigned int numOfPlayers )
+{
+  // todo: formula?
+  return 0; 
+}
+
 /** Serialization operators
   */
 QDataStream &operator<<( QDataStream &s, const RRGroup &g )

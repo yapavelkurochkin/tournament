@@ -10,7 +10,8 @@
 Tournament::Tournament( PlayerList players, Category category,
                         Match::Type matchType, unsigned int groupSize,
                          unsigned int stagesCnt )
- : _players( players ),
+ : _magic( TOURN_MAGIC_NUMBER ),
+   _players( players ),
    _groupSize( groupSize ),
    _stagesCnt( stagesCnt ),
    _matchType( matchType ),
@@ -24,8 +25,11 @@ Tournament::Tournament( PlayerList players, Category category,
   connect( qApp, SIGNAL( aboutToQuit() ), this, SLOT( save() ) );
 }
 
+/** This constructor is only intended for serialization/deserialization
+ */
 Tournament::Tournament( ) 
- : _groupSize( 0 ),
+ : _magic( 0xdeadbeef ), // object is not invalid
+   _groupSize( 0 ),
    _stagesCnt( 0 ),
    _matchType( Match::BestOf3 ),
    _category( M2 ) 
@@ -162,7 +166,7 @@ PlayerList Tournament::roundRobinResults() const
 
   PlayerResultsList list;
   // 3rd and more places
-  for ( int p = 3; p <= _groupSize; p ++ ) {
+  for ( int p = 3; p <= (int)_groupSize; p ++ ) {
     for ( int i = 0; i < _groups[0].count(); i ++ ) {
       const Group* g = _groups[0].at( i );
       if ( p <= g->size() ) {
@@ -177,6 +181,14 @@ PlayerList Tournament::roundRobinResults() const
   bestlist << list;
 
   return toPlayerList( bestlist );
+}
+
+/** calculates the matches count required to complete tournament */
+unsigned int Tournament::matchesCount( unsigned int numOfPlayers,
+                                       unsigned int rrGroupSize, 
+                                       unsigned int stages ) const
+{
+  return 0; 
 }
 
 /** called when app exits by the signal aboutToQuit();
@@ -211,7 +223,14 @@ Tournament* Tournament::fromFile( QString fileName )
 QDataStream &operator>>(QDataStream &s, Tournament& t)
 {
   int mType, cat;
-  
+
+  s >> t._magic; 
+
+  if ( t._magic != TOURN_MAGIC_NUMBER ) {
+    // invalid data source. object is not valid tournament
+    return s;
+  }
+ 
   s >> t._players >> t._groupSize >> t._stagesCnt 
     >> mType >> cat; 
 
@@ -243,7 +262,13 @@ QDataStream &operator>>(QDataStream &s, Tournament& t)
 
 QDataStream &operator<<(QDataStream &s, const Tournament& t)
 {
-  s << t._players << t._groupSize << t._stagesCnt 
+  if ( !t.isValid() ) {
+    qWarning() << __FUNCTION__ << 
+                  "trying to serialize invalid tournament object";
+    return s;
+  }
+  
+  s << t._magic << t._players << t._groupSize << t._stagesCnt 
     << (int) t._matchType << (int) t._category; 
 
   for ( unsigned int i = 0; i < t._stagesCnt; i ++ ) {

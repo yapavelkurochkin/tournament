@@ -228,6 +228,8 @@ QDataStream &operator>>(QDataStream &s, Tournament& t)
 
   if ( t._magic != TOURN_MAGIC_NUMBER ) {
     // invalid data source. object is not valid tournament
+    qWarning() << __FUNCTION__ << "invalid datastream "
+    "(can't initialize Tournament object from it's contents)";
     return s;
   }
  

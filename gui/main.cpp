@@ -5,14 +5,17 @@
 #define __USE_GNU
 #endif
 
-#include <execinfo.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ucontext.h>
 #include <unistd.h>
 #include <cxxabi.h>
+
+#ifndef WIN32
+#  include <execinfo.h>
+#  include <ucontext.h>
+#endif
 
 #include <QProcess>
 #include <QtGui/QApplication>
@@ -28,6 +31,7 @@
 #include "tournwidget.h"
 #include "mainwindow.h"
 
+#ifndef WIN32
 /* This structure mirrors the one found in /usr/include/asm/ucontext.h */
 typedef struct _sig_ucontext {
  unsigned long     uc_flags;
@@ -72,7 +76,7 @@ void crit_err_hdlr(int , siginfo_t * , void * )
 
  exit(EXIT_FAILURE);
 }
-
+#endif
 
 /** Program's entry point. Fisrt, it calls #QTextCodec::setCodecForTr
   to convert inline string literals from source file encodoing to
@@ -88,6 +92,7 @@ void crit_err_hdlr(int , siginfo_t * , void * )
    */
 int main(int argc, char *argv[])
 {
+#ifndef WIN32
  struct sigaction sigact;
 
  sigact.sa_sigaction = crit_err_hdlr;
@@ -100,6 +105,7 @@ int main(int argc, char *argv[])
 
   exit(EXIT_FAILURE);
  }
+#endif
 
   // inline string literals conversion
   QTextCodec* c = QTextCodec::codecForName( "UTF-8" );

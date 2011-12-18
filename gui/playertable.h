@@ -8,6 +8,8 @@ class PlayerTable: public QTableWidget
 {
   public:
     PlayerTable( PlayerList pl, QWidget* parent = NULL );
+
+    void setPlayerList( PlayerList pl );
 };
 
 #endif // PLAYERTABLE__H

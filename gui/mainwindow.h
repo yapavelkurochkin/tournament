@@ -22,6 +22,7 @@ class LeagueMainWindow : public QMainWindow
 
   protected slots:
     void loadTournament();
+    void newTournament();
 };
 
 #endif // MAINWINDOW__H

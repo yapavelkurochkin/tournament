@@ -7,6 +7,7 @@
 #include "mainwindow.h"
 #include "tournament.h"
 #include "tournwidget.h"
+#include "newtourndialog.h"
 
 LeagueMainWindow::LeagueMainWindow()
 : QMainWindow()
@@ -53,7 +54,7 @@ void LeagueMainWindow::loadTournament( )
                   tr("Tournament Files (*.trn)"));
 
   if ( !fName.isNull() ) {
-    Tournament* t = Tournament::fromFile( "tourn.dat" );
+    Tournament* t = Tournament::fromFile( fName );
   
     QScrollArea* scrollArea = new QScrollArea( this );
     TournamentWidget* tw = new TournamentWidget( t );
@@ -63,3 +64,14 @@ void LeagueMainWindow::loadTournament( )
   }
 }
 
+/** shows dialog with new tournament properties. if user accepts
+ * entered data then created tournament becomes active
+ */
+void LeagueMainWindow::newTournament( )
+{
+  NewTournDialog d( this );
+
+  if ( QDialog::Accepted == d.exec() ) {
+     
+  }  
+}

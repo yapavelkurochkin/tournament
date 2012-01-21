@@ -11,4 +11,3 @@ HEADERS=playerlist.h player.h playertable.h rrgroup.h\
         playerscores.h group.h swissgroup.h grouptable.h swisstable.h\
         mainwindow.h newtourndialog.h
 
-FORMS  =newtourn.ui

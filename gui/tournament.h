@@ -13,14 +13,7 @@ class Tournament : public QObject {
   Q_OBJECT;
 
   public:
-    typedef enum {
-      M1, 
-      M2, 
-      M3,
-      Elite
-    } Category;
-
-    Tournament( PlayerList players, Category category,
+    Tournament( PlayerList players, QString category,
                 Match::Type matchType = Match::BestOf3, unsigned int groupSize = 3, 
                 unsigned int stagesCnt = 4 );
 
@@ -54,7 +47,7 @@ class Tournament : public QObject {
     /*<< one list of groups per one stage */
 
     Match::Type _matchType;
-    Category _category;
+    QString _category;
 
     void breakPlayers( PlayerList players );
     bool roundRobinCompleted() const;

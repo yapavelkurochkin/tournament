@@ -1,15 +1,21 @@
 #ifndef PLAYERTABLE__H
 #define PLAYERTABLE__H
 
-#include <QTableWidget>
+#include <QListWidget>
 #include "playerlist.h"
 
-class PlayerTable: public QTableWidget 
+class PlayerTable: public QListWidget
 {
   public:
-    PlayerTable( PlayerList pl, QWidget* parent = NULL );
+    PlayerTable( QWidget* parent = NULL );
 
-    void setPlayerList( PlayerList pl );
+    void setPlayerList( PlayerList pl ); 
+    PlayerList playerList() const { return _players; }
+
+  protected:
+    PlayerList _players;
+
+    virtual void mouseDoubleClickEvent( QMouseEvent * event );
 };
 
 #endif // PLAYERTABLE__H

@@ -72,6 +72,18 @@ void LeagueMainWindow::newTournament( )
   NewTournDialog d( this );
 
   if ( QDialog::Accepted == d.exec() ) {
-     
+    QString cat = d.category();
+    Match::Type mtype = d.matchType();
+    unsigned int gsize = d.groupSize();
+    PlayerList players = d.players();
+
+    Tournament* t = new Tournament( players, cat, mtype, gsize );
+  
+    QScrollArea* scrollArea = new QScrollArea( this );
+    TournamentWidget* tw = new TournamentWidget( t );
+    scrollArea->setWidget( tw );
+    scrollArea->setWidgetResizable( true );
+    setCentralWidget( scrollArea );
   }  
 }
+

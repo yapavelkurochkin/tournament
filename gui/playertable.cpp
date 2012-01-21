@@ -1,19 +1,52 @@
+#include <QDir>
+#include <QFileDialog>
+#include <QMessageBox>
 #include "playertable.h"
 
-PlayerTable::PlayerTable( PlayerList pl, QWidget* parent )
-: QTableWidget( pl.count(), 2, parent )
+PlayerTable::PlayerTable( QWidget* parent )
+: QListWidget( parent )
 {
-  setPlayerList( pl );
+  setViewMode( QListView::ListMode );
+
+  setSelectionMode( QAbstractItemView::NoSelection );
+  setSelectionRectVisible( false );
+
+  setFrameStyle( QFrame::Panel | QFrame::Sunken );
 }
 
 void PlayerTable::setPlayerList( PlayerList pl )
 {
-  for ( int i = 0; i < rowCount(); i ++ ) {
-    QTableWidgetItem *name = new QTableWidgetItem( pl.at( i ).name() );
-    QTableWidgetItem *rating = new QTableWidgetItem( 
-                        QString::number( pl.at( i ).rating(), 'f', 1 ) );
+  _players = pl;
+  qSort( _players );
 
-    setItem( i, 0, name );
-    setItem( i, 1, rating );
+  clear();
+
+  for ( int i = 0; i < _players.count(); i ++ ) {
+    QString text = QString::number( _players.at( i ).rating(), 'f', 1 ) + 
+                   + " " + _players.at( i ).name();
+
+    addItem( text );
+  }
+}
+
+/**
+ * Asks user to select a file with players in a plain text format:
+ * Player, rating\nPlayer2, rating\n etc...
+ */
+void PlayerTable::mouseDoubleClickEvent( QMouseEvent * )
+{
+  QString fName = QFileDialog::getOpenFileName(this,
+                  tr("Open players list file"), QDir::homePath(), 
+                  tr("Txt Files (*.txt)"));
+
+  if ( !fName.isNull() ) {
+    PlayerList players = loadPlayerList( fName );
+    if ( players.count() > 0 ) {
+      setPlayerList( players );
+    } else {
+      QMessageBox msg;
+      msg.setText( tr( "I cannot find any player in '" ) + fName + "'" );
+      msg.exec();
+    } 
   }
 }

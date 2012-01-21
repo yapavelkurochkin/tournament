@@ -7,7 +7,7 @@
 #include "rrgroup.h"
 #include "swissgroup.h"
 
-Tournament::Tournament( PlayerList players, Category category,
+Tournament::Tournament( PlayerList players, QString category,
                         Match::Type matchType, unsigned int groupSize,
                          unsigned int stagesCnt )
  : _magic( TOURN_MAGIC_NUMBER ),
@@ -32,7 +32,7 @@ Tournament::Tournament( )
    _groupSize( 0 ),
    _stagesCnt( 0 ),
    _matchType( Match::BestOf3 ),
-   _category( M2 ) 
+   _category( "M2" ) 
 {
   connect( qApp, SIGNAL( aboutToQuit() ), this, SLOT( save() ) );
 }
@@ -222,7 +222,8 @@ Tournament* Tournament::fromFile( QString fileName )
  */
 QDataStream &operator>>(QDataStream &s, Tournament& t)
 {
-  int mType, cat;
+  int mType;
+  QString cat;
 
   s >> t._magic; 
 
@@ -236,7 +237,7 @@ QDataStream &operator>>(QDataStream &s, Tournament& t)
   s >> t._players >> t._groupSize >> t._stagesCnt 
     >> mType >> cat; 
 
-  t._category = (Tournament::Category) cat;
+  t._category = cat;
   t._matchType = (Match::Type) mType;
   t._groups = new QList<Group*>[ t._stagesCnt ];
 
@@ -271,7 +272,7 @@ QDataStream &operator<<(QDataStream &s, const Tournament& t)
   }
   
   s << t._magic << t._players << t._groupSize << t._stagesCnt 
-    << (int) t._matchType << (int) t._category; 
+    << (int) t._matchType << t._category; 
 
   for ( unsigned int i = 0; i < t._stagesCnt; i ++ ) {
     int count = t._groups[ i ].count();

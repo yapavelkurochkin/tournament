@@ -3,6 +3,9 @@
 
 #include <QMainWindow>
 #include <QAction>
+#include <QScrollArea>
+
+#include "tournament.h"
 
 class LeagueMainWindow : public QMainWindow
 {
@@ -13,6 +16,7 @@ class LeagueMainWindow : public QMainWindow
 
   protected:
     QAction *loadT, *newT, *saveT;
+    Tournament* tourn;
 
     void createMenus();
     void createActions();
@@ -22,6 +26,7 @@ class LeagueMainWindow : public QMainWindow
 
   protected slots:
     void loadTournament();
+    void saveTournament();
     void newTournament();
 };
 

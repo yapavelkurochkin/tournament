@@ -25,14 +25,23 @@ TournamentWidget::TournamentWidget( Tournament* tourn, QWidget* parent )
            this, SLOT( newSwissGroupCreated( SwissGroup* ) ) );
 }
 
+TournamentWidget::~TournamentWidget()
+{
+  delete _tourn;
+}
+
 /** initializes necessary number of columns in horizontal layout
  *  and adds vertical layout into each column.
  *  column count = number of stages in tournament
  */
 void TournamentWidget::setupLayout( QHBoxLayout* hLayout )
 {
+  hLayout->setSizeConstraint( QLayout::SetMinimumSize );
+
   for ( unsigned int i = 0; i < _tourn->stagesCnt(); i ++ ) {
     QVBoxLayout* l = new QVBoxLayout( ); 
+    l->setSizeConstraint( QLayout::SetMinimumSize );
+
     hLayout->addLayout( l );
 
     _groupLayouts << l;
@@ -104,10 +113,5 @@ void TournamentWidget::newSwissGroupCreated( SwissGroup* g )
   }
 
   l->insertWidget( i, newst ); 
-/*  if ( i < l->count() ) {
-    l->insertWidget( i, newst ); 
-  } else {
-    l->addWidget( newst );
-  }*/
 }
 

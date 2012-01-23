@@ -25,6 +25,7 @@ class Tournament : public QObject {
     Match::Type matchType() const { return _matchType; }
 
     static Tournament* fromFile( QString fileName );
+    void save( QString fname );
  
     unsigned int matchesCount( unsigned int numOfPlayers,
                                unsigned int rrGroupSize, 

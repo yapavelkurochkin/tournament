@@ -1,6 +1,7 @@
 #include <math.h>
 #include <QDebug>
 #include <QFile>
+#include <QDir>
 #include <QApplication>
 
 #include "tournament.h"
@@ -195,7 +196,12 @@ unsigned int Tournament::matchesCount( unsigned int numOfPlayers,
  */
 void Tournament::save()
 {
-  QFile file( "tourn.dat" );
+  save( QDir::toNativeSeparators( QDir::homePath() + "/lasttourn.dat" ) );
+}
+
+void Tournament::save( QString fname )
+{
+  QFile file( fname );
   if ( file.open( QIODevice::WriteOnly ) ) {
     QDataStream stream( & file );
     stream << (*this);

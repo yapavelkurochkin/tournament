@@ -1,16 +1,15 @@
 #include <QMenu>
 #include <QMenuBar>
-#include <QScrollArea>
 #include <QFileDialog>
 #include <QDir>
 
 #include "mainwindow.h"
-#include "tournament.h"
 #include "tournwidget.h"
 #include "newtourndialog.h"
 
 LeagueMainWindow::LeagueMainWindow()
-: QMainWindow()
+: QMainWindow(),
+  tourn( NULL )
 {
   createActions();
   createMenus();
@@ -54,13 +53,26 @@ void LeagueMainWindow::loadTournament( )
                   tr("Tournament Files (*.trn)"));
 
   if ( !fName.isNull() ) {
-    Tournament* t = Tournament::fromFile( fName );
+    tourn = Tournament::fromFile( fName );
   
     QScrollArea* scrollArea = new QScrollArea( this );
-    TournamentWidget* tw = new TournamentWidget( t );
+    TournamentWidget* tw = new TournamentWidget( tourn );
     scrollArea->setWidget( tw );
-    scrollArea->setWidgetResizable( true );
+    scrollArea->setWidgetResizable( false );
     setCentralWidget( scrollArea );
+  }
+}
+
+void LeagueMainWindow::saveTournament( )
+{
+  QString fName = QFileDialog::getOpenFileName(this,
+                  tr("Save tournament"), QDir::homePath(), 
+                  tr("Tournament Files (*.trn)"));
+
+  if ( !fName.isNull() ) {
+    if ( tourn ) {
+      tourn->save( fName );
+    }
   }
 }
 
@@ -77,12 +89,12 @@ void LeagueMainWindow::newTournament( )
     unsigned int gsize = d.groupSize();
     PlayerList players = d.players();
 
-    Tournament* t = new Tournament( players, cat, mtype, gsize );
+    tourn = new Tournament( players, cat, mtype, gsize );
   
     QScrollArea* scrollArea = new QScrollArea( this );
-    TournamentWidget* tw = new TournamentWidget( t );
+    TournamentWidget* tw = new TournamentWidget( tourn );
     scrollArea->setWidget( tw );
-    scrollArea->setWidgetResizable( true );
+    scrollArea->setWidgetResizable( false );
     setCentralWidget( scrollArea );
   }  
 }

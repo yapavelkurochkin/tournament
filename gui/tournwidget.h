@@ -24,6 +24,7 @@ protected slots:
 
 public:
   TournamentWidget( Tournament* tourn, QWidget* parent = NULL );
+  ~TournamentWidget( );
 };
 
 #endif // TOURNWIDGET__H

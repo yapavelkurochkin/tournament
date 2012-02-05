@@ -45,11 +45,13 @@ void RRTable::setupCells()
           text = _group->name();
         }
         item->setFlags( Qt::NoItemFlags );
-      } else if ( i == 0 ) {
+      } else if ( i == 0 ) { // 0th row
         text = _group->const_players().at( j - 1 ).name();
         item->setFlags( Qt::NoItemFlags );
-      } else if ( j == 0 ) {
-        text = _group->const_players().at( i - 1 ).name();
+      } else if ( j == 0 ) { // 0th column
+        Player p = _group->const_players().at( i - 1 );
+        text = p.name();
+        text += " (" + QString::number( p.rating(), 'f', 1 ) + ")";
         item->setFlags( Qt::NoItemFlags );
       } else {
         item->setFlags( Qt::ItemIsSelectable | Qt::ItemIsEnabled );

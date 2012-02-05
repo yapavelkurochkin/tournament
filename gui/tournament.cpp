@@ -205,10 +205,11 @@ void Tournament::save( QString fname )
   if ( file.open( QIODevice::WriteOnly ) ) {
     QDataStream stream( & file );
     stream << (*this);
+    setFileName( fname );
   } 
 }
 
-/** creates and instance of Tournament initialized from specified file.
+/** creates an instance of Tournament initialized from specified file.
  */
 Tournament* Tournament::fromFile( QString fileName )
 {
@@ -219,11 +220,13 @@ Tournament* Tournament::fromFile( QString fileName )
 
     QDataStream ds( &file );
     
-    ds >> (*t); 
+    ds >> (*t);
+    t->_fileName = fileName; 
   } 
 
   return t;
 }
+
 /* serialization
  */
 QDataStream &operator>>(QDataStream &s, Tournament& t)

@@ -7,6 +7,7 @@
 NewTournDialog::NewTournDialog( QWidget* parent )
 : QDialog( parent )
 {
+  setWindowTitle( tr( "New tournament" ) );
   matchCombo = new QComboBox();
   matchCombo->addItems( QStringList() << tr( "Best of 3" ) 
                                       << tr( "Best of 5" ) );

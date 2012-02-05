@@ -23,9 +23,13 @@ class Tournament : public QObject {
  
     unsigned int stagesCnt() const { return _stagesCnt; }
     Match::Type matchType() const { return _matchType; }
+    QString category() const { return _category; }
 
     static Tournament* fromFile( QString fileName );
     void save( QString fname );
+
+    void setFileName( QString fn ) { _fileName = fn; }
+    QString fileName( ) const { return _fileName; }
  
     unsigned int matchesCount( unsigned int numOfPlayers,
                                unsigned int rrGroupSize, 
@@ -49,6 +53,9 @@ class Tournament : public QObject {
 
     Match::Type _matchType;
     QString _category;
+
+    QString _fileName;
+    /*<< file which corresponds to this tournament */
 
     void breakPlayers( PlayerList players );
     bool roundRobinCompleted() const;

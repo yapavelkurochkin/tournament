@@ -6,11 +6,14 @@
 #include "mainwindow.h"
 #include "tournwidget.h"
 #include "newtourndialog.h"
+#include "about.h"
 
 LeagueMainWindow::LeagueMainWindow()
 : QMainWindow(),
   tourn( NULL )
 {
+  progName = tr( "Tournament" );
+  setWindowTitle( progName );
   createActions();
   createMenus();
 }
@@ -23,6 +26,8 @@ void LeagueMainWindow::createActions()
                          SLOT( newTournament() ) );
   saveT = newAction( tr("&Save"), QKeySequence::Save,
                          SLOT( saveTournament() ) );
+  about = newAction( tr("&About"), QKeySequence::HelpContents,
+                         SLOT( showAboutDialog() ) );
 }
 
 /** Action creation helper.
@@ -44,6 +49,9 @@ void LeagueMainWindow::createMenus()
   fileMenu->addAction( loadT );
   fileMenu->addAction( newT );
   fileMenu->addAction( saveT );
+
+  QMenu* iMenu = menuBar()->addMenu(tr("&Information"));
+  iMenu->addAction( about );
 }
 
 void LeagueMainWindow::loadTournament( )
@@ -60,18 +68,20 @@ void LeagueMainWindow::loadTournament( )
     scrollArea->setWidget( tw );
     scrollArea->setWidgetResizable( false );
     setCentralWidget( scrollArea );
+    setWindowName();
   }
 }
 
 void LeagueMainWindow::saveTournament( )
 {
-  QString fName = QFileDialog::getOpenFileName(this,
+  QString fName = QFileDialog::getSaveFileName(this,
                   tr("Save tournament"), QDir::homePath(), 
                   tr("Tournament Files (*.trn)"));
 
   if ( !fName.isNull() ) {
     if ( tourn ) {
       tourn->save( fName );
+      setWindowName();
     }
   }
 }
@@ -96,6 +106,30 @@ void LeagueMainWindow::newTournament( )
     scrollArea->setWidget( tw );
     scrollArea->setWidgetResizable( false );
     setCentralWidget( scrollArea );
+    setWindowName();
   }  
 }
 
+/** composes window name from program name and the current tournament name.
+ *  also displays useful information about tournament ( category, for example )
+ */
+void LeagueMainWindow::setWindowName()
+{
+  QString name = progName;
+
+  if ( tourn ) {
+    name += " -- " + tourn->category();
+
+    if ( !tourn->fileName().isEmpty() ) {
+      name += " -- " + QFileInfo( tourn->fileName() ).baseName();
+    }
+  }
+
+  setWindowTitle( name );
+}
+
+void LeagueMainWindow::showAboutDialog()
+{
+  AboutDialog d( this );
+  d.exec();  
+}

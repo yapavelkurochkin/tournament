@@ -9,6 +9,8 @@ MatchResDialog::MatchResDialog( Match match, QWidget* parent )
   _match( match ),
   _okButton( new QPushButton( tr( "Save" ) ) )
 {
+  setWindowTitle( tr( "Match score" ) );
+
   _okButton->setEnabled( false );
 
   QGridLayout* l = new QGridLayout( this );

@@ -12,11 +12,6 @@
 #include <unistd.h>
 #include <cxxabi.h>
 
-#ifndef WIN32
-#  include <execinfo.h>
-#  include <ucontext.h>
-#endif
-
 #include <QProcess>
 #include <QtGui/QApplication>
 #include <QTranslator>
@@ -31,82 +26,8 @@
 #include "tournwidget.h"
 #include "mainwindow.h"
 
-#ifndef WIN32
-/* This structure mirrors the one found in /usr/include/asm/ucontext.h */
-typedef struct _sig_ucontext {
- unsigned long     uc_flags;
- struct ucontext   *uc_link;
- stack_t           uc_stack;
- struct sigcontext uc_mcontext;
- sigset_t          uc_sigmask;
-} sig_ucontext_t;
-
-void crit_err_hdlr(int , siginfo_t * , void * )
-{
- void *             array[50];
- char **            messages;
- int                size, i;
-
- size = backtrace(array, 50);
-
- /* overwrite sigaction with caller's address */
-// array[1] = caller_address;
-
- qDebug() << __PRETTY_FUNCTION__;
- messages = backtrace_symbols(array, size);
-// backtrace_symbols_fd( array, size, 0);
- QRegExp regexp("([^(]+)\\(([^)^+]+)(\\+[^)]+)\\)\\s(\\[[^]]+\\])");
-
- /* skip first stack frame (points here) */
- for (i = 1; i < size && messages != NULL; ++i)
- {
-   if ( regexp.indexIn(messages[i]) != -1 ) {
-   QString symbol = regexp.cap(2);
-
-   int status = 0;
-
-   char* buf = abi::__cxa_demangle( qPrintable(symbol), 0, 0, &status );
-   fprintf(stderr, "[bt]: (%d) %s %s\n", i, messages[i], buf);
-   
-   free(buf);
-   }
- }
-
- free(messages);
-
- exit(EXIT_FAILURE);
-}
-#endif
-
-/** Program's entry point. Fisrt, it calls #QTextCodec::setCodecForTr
-  to convert inline string literals from source file encodoing to
-  UTF16. Then, it adds support for command-line arguments like \e "-h"
-  and \e "-v" using QtArgCmdLine.
-
-  \todo
-  - Link to QtArgCmdLine documentation... if it exists.
-
-  Next, it installs a global StyleOverride to make controls usable on
-  a touchscreen. And last, it hides mouse cursor (no use on
-  touchscreen!), shows LauncherWindow and enters an event loop.
-   */
 int main(int argc, char *argv[])
 {
-#ifndef WIN32
- struct sigaction sigact;
-
- sigact.sa_sigaction = crit_err_hdlr;
- sigact.sa_flags = SA_RESTART | SA_SIGINFO;
-
- if (sigaction(SIGSEGV, &sigact, (struct sigaction *)NULL) != 0)
- {
-  fprintf(stderr, "error setting signal handler for %d (%s)\n",
-    SIGSEGV, strsignal(SIGSEGV));
-
-  exit(EXIT_FAILURE);
- }
-#endif
-
   // inline string literals conversion
   QTextCodec* c = QTextCodec::codecForName( "UTF-8" );
   QTextCodec::setCodecForTr( c );

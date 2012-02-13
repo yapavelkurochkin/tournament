@@ -18,6 +18,9 @@ class RRTable: public GroupTable
     void updateMatchCell( int row, int col );
     void updateMatchCells( );
     void updatePlaces( );
+
+    void mousePressEvent( QMouseEvent* event );
+    void openPopupMenu( QTableWidgetItem* item, QPoint pos );
 };
 
 #endif // PLAYERTABLE__H

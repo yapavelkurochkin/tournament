@@ -1,6 +1,9 @@
 #include <QHeaderView>
 #include <QDebug>
+#include <QMouseEvent>
 #include <QMessageBox>
+#include <QMenu>
+#include <QDebug>
 
 #include "playertable.h"
 #include "rrtable.h"
@@ -79,6 +82,8 @@ void RRTable::editMatchResults( int row, int col )
   int bIndex = col - 1;
 
   qDebug() << __FUNCTION__ << row << col;
+
+/* tann asked to comment this.
  
   if ( _group->readOnly() ) {
     QMessageBox::information( this, _group->name(), 
@@ -86,7 +91,7 @@ void RRTable::editMatchResults( int row, int col )
     qDebug() << __FUNCTION__ << "group cannot be edited!";
     return;
   }
-
+*/
   Player a = _group->const_players().at( aIndex );
   Player b = _group->const_players().at( bIndex );
  
@@ -128,6 +133,10 @@ void RRTable::updateMatchCell( int row, int col )
     item( row, col )->setText( m.toString() );
     item( row, col )->setToolTip( m.gamesToString() );
     item( row, col )->setBackground( SPRING_GREEN1 ); 
+  } else {
+    item( row, col )->setText( "" );
+    item( row, col )->setBackground( palette().color( QPalette::Normal, QPalette::Base ) );
+    item( row, col )->setToolTip( "" );
   }
 }
 
@@ -158,6 +167,68 @@ void RRTable::updatePlaces()
       // player already have played at least one match
       item( i + 1, players.count() + 1)
           ->setText( QString::number( _group->playerPlace( p ) ) );
+    }
+  } 
+}
+
+/** Shows pop-up menu over player's name when user clicks left or right mouse
+ *  button.
+ */
+void RRTable::mousePressEvent( QMouseEvent* event )
+{
+  if ( ( event->button() == Qt::LeftButton ) ||
+       ( event->button() == Qt::RightButton ) ) {
+    QTableWidgetItem* item = itemAt( event->pos() );
+    if ( item ) {
+      // only items from 0th column is allowed
+      if ( item->column() == 0 ) {
+        // 0th row is empty, skip this. 
+        if ( item->row() != 0 ) {
+          // minimum group size is 2
+          if ( _group->size() > 2 ) {
+            openPopupMenu( item, event->globalPos() );
+            return;
+          }
+        }
+      }
+    }
+  }
+  QTableWidget::mousePressEvent( event ); 
+}
+
+/** Creates and fills up the player menu. User can remove player,
+ *  move it to another group or do something else. 
+ *  \param item -- table item which contains all neccessary information 
+ *                 about the player
+ *  \param pos -- menu position
+ */
+void RRTable::openPopupMenu( QTableWidgetItem* i, QPoint pos )
+{
+  QMenu* menu = new QMenu( this );
+  QAction* rmAction = menu->addAction( tr( "Delete from group" ) ); 
+  QAction* sel = menu->exec( pos );
+  if ( sel == rmAction ) {
+    qDebug() << "removing player " << i->text();
+    QMessageBox::StandardButton ret =     
+       QMessageBox::question( this, tr( "Removing player..." ),
+                              tr( "Are you sure you want to delete " ) +
+                              i->text() + tr( " from group " ) + 
+                              _group->name() + "?",
+                              QMessageBox::Yes | QMessageBox::No );
+    if ( ret == QMessageBox::Yes ) {
+      int row = i->row();
+
+      // upper row in a table contains exact player name, i.e.
+      // without player's rating.
+      Player p( item( 0, row )->text(), 0.0 ); 
+      
+      _group->removePlayer( p );
+      removeRow( row );
+      removeColumn( row );
+
+      updateMatchCells();
+      updatePlaces();
+      qDebug() << "group size = " << _group->size();
     }
   } 
 }

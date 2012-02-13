@@ -36,6 +36,7 @@ int main(int argc, char *argv[])
   QApplication a( argc, argv, QApplication::GuiServer );
 
   LeagueMainWindow * w = new LeagueMainWindow();
+  w->resize( 600, 400 );
   w->show();
 
   return a.exec();

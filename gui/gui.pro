@@ -1,5 +1,6 @@
 TEMPLATE=app
 QMAKE_CXXFLAGS += -g
+#CONFIG = release
 
 SOURCES=playerlist.cpp player.cpp main.cpp playertable.cpp rrgroup.cpp\
         match.cpp rrtable.cpp tournament.cpp tournwidget.cpp matchres.cpp\

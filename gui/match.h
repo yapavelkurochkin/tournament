@@ -66,3 +66,4 @@ class Match
 typedef QList< Match > MatchList;
 
 #endif // MATCH__H
+

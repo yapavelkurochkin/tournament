@@ -35,6 +35,7 @@ class Group
            unsigned int stage = 0, PlayerList players = PlayerList() );
 
     virtual void addPlayer( Player player );
+    virtual void removePlayer( Player player );
     PlayerList const_players() const { return _players; }
 
     Match& match( Player a, Player b );

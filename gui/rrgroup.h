@@ -13,7 +13,7 @@ class RRGroup: public Group
     RRGroup( QString name = QString(), Tournament* tourn = NULL, 
              PlayerList players = PlayerList() );
 
-    void addPlayer( Player player );
+    virtual void addPlayer( Player player );
 
     static unsigned int matchesCount( unsigned int numOfPlayers );
 

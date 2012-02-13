@@ -16,6 +16,22 @@ void Group::addPlayer( Player player )
   _players << player;
 }
 
+/** removes player from players list and removes
+ *  all matches which he/she had participated
+ */
+void Group::removePlayer( Player player )
+{
+  _players.removeOne( player );
+  QMutableListIterator<Match> i( _matches );
+  while( i.hasNext() ) {
+    Match m = i.next();
+    if ( ( m.playerA() == player ) ||
+         ( m.playerB() == player ) ) {
+      i.remove();
+    }
+  }
+}
+
 /** Find match which corresponds to player 'a' and 'b' pair.
  */
 Match& Group::match( Player a, Player b )

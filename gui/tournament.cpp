@@ -12,7 +12,6 @@ Tournament::Tournament( PlayerList players, QString category,
                         Match::Type matchType, unsigned int groupSize,
                          unsigned int stagesCnt )
  : _magic( TOURN_MAGIC_NUMBER ),
-   _players( players ),
    _groupSize( groupSize ),
    _stagesCnt( stagesCnt ),
    _matchType( matchType ),
@@ -243,7 +242,7 @@ QDataStream &operator>>(QDataStream &s, Tournament& t)
     return s;
   }
  
-  s >> t._players >> t._groupSize >> t._stagesCnt 
+  s >> t._groupSize >> t._stagesCnt 
     >> mType >> cat; 
 
   t._category = cat;
@@ -280,7 +279,7 @@ QDataStream &operator<<(QDataStream &s, const Tournament& t)
     return s;
   }
   
-  s << t._magic << t._players << t._groupSize << t._stagesCnt 
+  s << t._magic << t._groupSize << t._stagesCnt 
     << (int) t._matchType << t._category; 
 
   for ( unsigned int i = 0; i < t._stagesCnt; i ++ ) {

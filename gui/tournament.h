@@ -7,7 +7,7 @@
 
 class SwissGroup;
 
-#define TOURN_MAGIC_NUMBER 0xfaeb1639
+#define TOURN_MAGIC_NUMBER 0xfaeb163a
 
 class Tournament : public QObject {
   Q_OBJECT;
@@ -43,7 +43,6 @@ class Tournament : public QObject {
     unsigned int _magic;
     /**< Used for identification of validity of tournament object*/
 
-    PlayerList _players; 
     unsigned int _groupSize;
     unsigned int _stagesCnt;
     /*<< playing stages including round robin */

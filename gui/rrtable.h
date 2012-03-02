@@ -21,6 +21,9 @@ class RRTable: public GroupTable
 
     void mousePressEvent( QMouseEvent* event );
     void openPopupMenu( QTableWidgetItem* item, QPoint pos );
+
+    void removePlayer( QTableWidgetItem* item );
+    void addNewPlayer( );
 };
 
 #endif // PLAYERTABLE__H

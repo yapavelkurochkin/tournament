@@ -9,6 +9,7 @@
 #include "rrtable.h"
 #include "matchres.h"
 #include "global.h"
+#include "newplayerdialog.h"
 
 /** Round-robin table. Represents one round-robin group of players.
  */
@@ -179,19 +180,7 @@ void RRTable::mousePressEvent( QMouseEvent* event )
   if ( ( event->button() == Qt::LeftButton ) ||
        ( event->button() == Qt::RightButton ) ) {
     QTableWidgetItem* item = itemAt( event->pos() );
-    if ( item ) {
-      // only items from 0th column is allowed
-      if ( item->column() == 0 ) {
-        // 0th row is empty, skip this. 
-        if ( item->row() != 0 ) {
-          // minimum group size is 2
-          if ( _group->size() > 2 ) {
-            openPopupMenu( item, event->globalPos() );
-            return;
-          }
-        }
-      }
-    }
+    openPopupMenu( item, event->globalPos() );
   }
   QTableWidget::mousePressEvent( event ); 
 }
@@ -205,31 +194,78 @@ void RRTable::mousePressEvent( QMouseEvent* event )
 void RRTable::openPopupMenu( QTableWidgetItem* i, QPoint pos )
 {
   QMenu* menu = new QMenu( this );
-  QAction* rmAction = menu->addAction( tr( "Delete from group" ) ); 
-  QAction* sel = menu->exec( pos );
-  if ( sel == rmAction ) {
-    qDebug() << "removing player " << i->text();
-    QMessageBox::StandardButton ret =     
-       QMessageBox::question( this, tr( "Removing player..." ),
-                              tr( "Are you sure you want to delete " ) +
-                              i->text() + tr( " from group " ) + 
-                              _group->name() + "?",
-                              QMessageBox::Yes | QMessageBox::No );
-    if ( ret == QMessageBox::Yes ) {
-      int row = i->row();
-
-      // upper row in a table contains exact player name, i.e.
-      // without player's rating.
-      Player p( item( 0, row )->text(), 0.0 ); 
-      
-      _group->removePlayer( p );
-      removeRow( row );
-      removeColumn( row );
-
-      updateMatchCells();
-      updatePlaces();
-      qDebug() << "group size = " << _group->size();
-    }
+  
+  // only items from 0th column is allowed
+  // 0th row is empty, skip this. 
+  // minimum group size is 2
+  bool allowAddition = ( i != NULL ) && ( i->column() == 0 ) 
+                       && ( i->row() != 0 );
+  bool allowRemoval = allowAddition && ( _group->size() > 2 );
+  
+  QAction *rmAction = NULL,
+          *addAction = NULL;
+  if ( allowRemoval ) {
+    rmAction = menu->addAction( tr( "Delete from group" ) ); 
   } 
+
+  if ( allowAddition ) {
+    addAction = menu->addAction( tr( "Add player" ) ); 
+  }
+
+  if ( !allowRemoval && !allowAddition ) {
+    return;
+  }
+  QAction* sel = menu->exec( pos );
+  if ( allowRemoval && ( sel == rmAction ) ) {
+    removePlayer( i );
+  } else if ( allowAddition && ( sel == addAction ) ) {
+    addNewPlayer( );
+  }
 }
 
+/** removes player which corresponds to 'i' table item.
+*   player removal should be confirmed by the user (message box). 
+*/
+void RRTable::removePlayer( QTableWidgetItem* i )
+{
+  qDebug() << "removing player " << i->text();
+  QMessageBox::StandardButton ret =     
+     QMessageBox::question( this, tr( "Removing player..." ),
+                            tr( "Are you sure you want to delete " ) +
+                            i->text() + tr( " from group " ) + 
+                            _group->name() + "?",
+                            QMessageBox::Yes | QMessageBox::No );
+  if ( ret == QMessageBox::Yes ) {
+    int row = i->row();
+
+    // upper row in a table contains exact player name, i.e.
+    // without player's rating.
+    Player p( item( 0, row )->text(), 0.0 ); 
+    
+    _group->removePlayer( p );
+    removeRow( row );
+    removeColumn( row );
+
+    updateMatchCells();
+    updatePlaces();
+  }
+}
+
+/** shows dialog for specifying of player name and his rating.
+ */
+void RRTable::addNewPlayer( )
+{
+  NewPlayerDialog dlg( this );
+  if ( dlg.exec() == QDialog::Accepted ) {
+    Player pl = dlg.newPlayer();
+    qDebug() << "adding new player to the group" << _group->name() 
+             << ":" <<  pl.name() << pl.rating();
+    _group->addPlayer( pl );
+    setupCells();
+    updateMatchCells();
+    updatePlaces(); 
+    
+    resizeColumnsToContents();
+    adjustSize();
+  }
+}

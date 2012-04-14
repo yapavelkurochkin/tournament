@@ -1,4 +1,5 @@
 #include "match.h"
+#include "../rating/rating.h"
 
 /*****************************
  * Game                      *
@@ -152,6 +153,26 @@ QString Match::toString() const
 {
   return QString::number( gamesWon( _a ) ) 
              + " : " + QString::number( gamesWon( _b ) );
+}
+
+/** \return opponent of player.
+ */
+Player Match::opponent( Player p ) const
+{
+  return ( p == playerA() ) ? playerB() : playerA();
+}
+
+/** calculates earned rating points of player p relatively
+ *  to opponent player. 
+ */
+double Match::earnedRating( Player p ) const
+{
+  if ( played() ) {
+    return calcEarnedRating( p.rating(), opponent( p ).rating(),
+                             gamesWon( p ), gamesWon( opponent( p ) ) ); 
+  } else {
+    return 0.0;
+  }
 }
 
 /* serialization operators

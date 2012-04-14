@@ -33,6 +33,8 @@ class Group
   public:
     Group( QString name = QString(), Tournament* tourn = NULL, 
            unsigned int stage = 0, PlayerList players = PlayerList() );
+    Group( QString name = QString(), Tournament* tourn = NULL,
+           MatchList matches = MatchList(), PlayerList players = PlayerList() );
 
     virtual void addPlayer( Player player );
     virtual void removePlayer( Player player );
@@ -49,6 +51,8 @@ class Group
     PlayerResults playerResults( Player p ) const;
     unsigned int playerPlace( Player p ) const;
     Player playerByPlace( unsigned int place ) const;
+
+    double earnedRating( Player p ) const;
 
     void setTournament( Tournament* t ) { _tournament = t; }
 

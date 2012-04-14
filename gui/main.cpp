@@ -18,7 +18,6 @@
 #include <QTextCodec>
 #include <QX11Info>
 #include <QDebug>
-#include <QScrollArea>
 #include <QFile>
 
 #include "playerlist.h"

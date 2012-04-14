@@ -37,10 +37,15 @@ class Match
 
     Player playerA() const { return _a; }
     Player playerB() const { return _b; }
+    Player opponent( Player p ) const;
+    bool participated( Player p ) const 
+         { return ( p == playerA() ) || ( p == playerB() ); };
     Match& swapPlayers();
  
     Player winner() const;
     Player looser() const;
+
+    double earnedRating( Player ) const;
 
     unsigned int gamesWon( Player p ) const;
     unsigned int ballsWon( Player p ) const;

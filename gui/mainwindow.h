@@ -15,7 +15,7 @@ class LeagueMainWindow : public QMainWindow
     LeagueMainWindow( );
 
   protected:
-    QAction *loadT, *newT, *saveT, *about;
+    QAction *loadT, *newT, *saveT, *about, *ratings;
     Tournament* tourn;
     QString progName;
 
@@ -24,13 +24,17 @@ class LeagueMainWindow : public QMainWindow
     QAction* newAction( QString name, 
                         QKeySequence::StandardKey shortcuts, 
                         const char* slot );
+    QAction* newAction( QString name, 
+                        const char* slot );
 
+    void closeEvent(QCloseEvent *event);
   protected slots:
     void setWindowName();
     void loadTournament();
     void saveTournament();
     void newTournament();
     void showAboutDialog();
+    void showRatingsTable();
 };
 
 #endif // MAINWINDOW__H

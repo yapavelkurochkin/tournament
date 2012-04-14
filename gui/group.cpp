@@ -11,6 +11,16 @@ Group::Group( QString name, Tournament* t, unsigned int stage, PlayerList player
 {
 }
 
+Group::Group( QString name, Tournament* t,
+               MatchList matches, PlayerList players )
+ : _name( name ),
+   _players( players ),
+   _matches( matches ),
+   _tournament( t ),
+   _stage( 0 )
+{
+}
+
 void Group::addPlayer( Player player )
 {
   _players << player;
@@ -177,6 +187,23 @@ bool Group::completed() const
   }
 
   return true;
+}
+
+/** \return earned rating for 'p' player. i.e. the sum of
+ *          earned points per each match.
+ */
+double Group::earnedRating( Player p ) const
+{
+  double total = 0.0;
+  for ( int i = 0; i < _matches.count(); i++) {
+    Match m = _matches.at( i );
+
+    if ( m.participated( p ) && m.played() ) {
+      total += m.earnedRating( p );
+    }
+  }
+
+  return total;
 }
 
 /** Serialization operators

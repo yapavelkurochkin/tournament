@@ -1,11 +1,14 @@
 #include <QMenu>
 #include <QMenuBar>
 #include <QFileDialog>
+#include <QMessageBox>
+#include <QCloseEvent>
 #include <QDir>
 
 #include "mainwindow.h"
 #include "tournwidget.h"
 #include "newtourndialog.h"
+#include "ratingsdialog.h"
 #include "about.h"
 
 LeagueMainWindow::LeagueMainWindow()
@@ -26,6 +29,8 @@ void LeagueMainWindow::createActions()
                          SLOT( newTournament() ) );
   saveT = newAction( tr("&Save"), QKeySequence::Save,
                          SLOT( saveTournament() ) );
+  ratings = newAction( tr("&Ratings"), 
+                         SLOT( showRatingsTable() ) );
   about = newAction( tr("&About"), QKeySequence::HelpContents,
                          SLOT( showAboutDialog() ) );
 }
@@ -43,12 +48,24 @@ QAction* LeagueMainWindow::newAction( QString name,
   return a;
 }
 
+/** Action creation helper.
+ */
+QAction* LeagueMainWindow::newAction( QString name, 
+                                      const char* slot )
+{
+  QAction* a = new QAction( name, this);
+
+  connect( a, SIGNAL(triggered()), this, slot ); 
+  return a;
+}
+
 void LeagueMainWindow::createMenus()
 {
   QMenu* fileMenu = menuBar()->addMenu(tr("&Tournament"));
   fileMenu->addAction( loadT );
   fileMenu->addAction( newT );
   fileMenu->addAction( saveT );
+  fileMenu->addAction( ratings );
 
   QMenu* iMenu = menuBar()->addMenu(tr("&Information"));
   iMenu->addAction( about );
@@ -128,8 +145,30 @@ void LeagueMainWindow::setWindowName()
   setWindowTitle( name );
 }
 
+void LeagueMainWindow::closeEvent(QCloseEvent *event)
+{
+  QMessageBox::StandardButton ret =     
+     QMessageBox::question( this, tr( "Closing the tournament..." ),
+                            tr( "Are you sure you want to quit? " ),
+                            QMessageBox::Yes | QMessageBox::No );
+  if ( ret == QMessageBox::Yes ) {
+    event->accept();
+  } else {
+    event->ignore();
+  }
+}
+
 void LeagueMainWindow::showAboutDialog()
 {
   AboutDialog d( this );
   d.exec();  
+}
+
+void LeagueMainWindow::showRatingsTable()
+{
+  if ( tourn ) {
+    Group g( tr("Total"), tourn, tourn->matchList(), tourn->players() ); 
+    RatingsDialog d( &g, this );
+    d.exec(); 
+  } 
 }

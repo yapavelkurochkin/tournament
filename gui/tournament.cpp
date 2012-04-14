@@ -11,7 +11,8 @@
 Tournament::Tournament( PlayerList players, QString category,
                         Match::Type matchType, unsigned int groupSize,
                          unsigned int stagesCnt )
- : _magic( TOURN_MAGIC_NUMBER ),
+ : _players( players ),
+   _magic( TOURN_MAGIC_NUMBER ),
    _groupSize( groupSize ),
    _stagesCnt( stagesCnt ),
    _matchType( matchType ),
@@ -226,6 +227,21 @@ Tournament* Tournament::fromFile( QString fileName )
   return t;
 }
 
+/** \return total matches list
+ */
+MatchList Tournament::matchList() const 
+{
+  MatchList ml;
+  for ( unsigned int i = 0; i < stagesCnt(); i ++ ) {
+    QList<Group*> gl = groupList( i );
+    for ( int j = 0; j < gl.count(); j ++ ) {
+      ml << gl.at( j )->matchList();
+    }   
+  }
+
+  return ml;
+}
+
 /* serialization
  */
 QDataStream &operator>>(QDataStream &s, Tournament& t)
@@ -242,7 +258,7 @@ QDataStream &operator>>(QDataStream &s, Tournament& t)
     return s;
   }
  
-  s >> t._groupSize >> t._stagesCnt 
+  s >> t._players >> t._groupSize >> t._stagesCnt 
     >> mType >> cat; 
 
   t._category = cat;
@@ -279,7 +295,7 @@ QDataStream &operator<<(QDataStream &s, const Tournament& t)
     return s;
   }
   
-  s << t._magic << t._groupSize << t._stagesCnt 
+  s << t._magic << t._players << t._groupSize << t._stagesCnt 
     << (int) t._matchType << t._category; 
 
   for ( unsigned int i = 0; i < t._stagesCnt; i ++ ) {

@@ -3,7 +3,7 @@
 #include <errno.h>
 #include "polycoeff.h"
 
-/** Program calculates the rating value earned by 
+/** calculates the rating value earned by 
  *  player in 1 match.
  *  Match could be played as 'best of 5' or 'best of 3'.
  *
@@ -12,21 +12,12 @@
  *  param 3 -- scores of first player
  *  param 4 -- scores of second player
  *
- *  Program automatically detects the type of game ('best of 3'
+ *  automatically detects the type of game ('best of 3'
  *  or 'best of 5')
  */
-int main( int argc, char** argv )
+double calcEarnedRating( double ratingA, double ratingB,
+                         unsigned long scoresA, unsigned long scoresB )
 {
-  if ( argc != 5 ) {
-    fprintf( stderr, "Usage: %s ratingA ratingB scoreA scoreB\n", argv[0] );
-    return -EINVAL;
-  }
-
-  double ratingA = strtod( argv[1], NULL );
-  double ratingB = strtod( argv[2], NULL );
-  long scoresA = strtol( argv[3], NULL, 10 );
-  long scoresB = strtol( argv[4], NULL, 10 );
-
   long scoresDiff = scoresA - scoresB;
   double ratingDiff = ratingB - ratingA;
 
@@ -65,8 +56,7 @@ int main( int argc, char** argv )
   }
  
   double resRating = polyval( poly, ratingDiff );
-  printf( "%f\n", ( resRating < 0 ) ? 0.0 : resRating );
 
-  return 0;
+  return ( resRating < 0 ) ? 0.0 : resRating;
 }
 

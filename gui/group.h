@@ -42,8 +42,10 @@ class Group
 
     Match& match( Player a, Player b );
     MatchList matchList( Player p ) const;
+    MatchList matchList( Player p, Player b ) const;
     MatchList matchList( ) const { return _matches; };
     MatchList playedMatchList( Player p ) const;
+
     void setMatchResults( Player a, Player b, QList< Game > res );
     void setMatchResults( Match m );
 

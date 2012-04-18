@@ -21,8 +21,8 @@ double calcEarnedRating( double ratingA, double ratingB,
   long scoresDiff = scoresA - scoresB;
   double ratingDiff = ratingB - ratingA;
 
-  printf( "rating difference = %f\n", ratingDiff );
-  printf( "scores difference = %ld\n", scoresDiff );
+//  printf( "rating difference = %f\n", ratingDiff );
+//  printf( "scores difference = %ld\n", scoresDiff );
 
   struct polynom *poly;
   unsigned poly_idx = 0;

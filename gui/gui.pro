@@ -1,6 +1,7 @@
 TEMPLATE=app
 QMAKE_CXXFLAGS += -g
-#CONFIG = release
+CONFIG += release
+TARGET = tournament
 
 OBJECTS_DIR=.o
 MOC_DIR=.moc

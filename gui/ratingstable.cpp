@@ -11,9 +11,6 @@
 RatingsTable::RatingsTable( Group* group, QWidget* parent )
 : GroupTable( group, parent ) 
 {
-  verticalHeader()->show();
-  horizontalHeader()->show();
-
   setupCells();
   updateMatchCells();
   updateTotalRatings();
@@ -86,19 +83,30 @@ void RatingsTable::updateMatchCell( int row, int col )
   Player a = players.at( aIndex );
   Player b = players.at( bIndex );
  
-  const Match& m = _group->match( a, b );
+  MatchList matches = _group->matchList( a, b );
+  QString text = item( row, col )->text();
+  QString toolTip = item( row, col )->toolTip();
   
-  if ( m.played() ) {
-    QString text = m.toString();
-    text += " (+" + QString().setNum( m.earnedRating( a ), 'g', 2 ) + ")";
-    item( row, col )->setText( text );
-    item( row, col )->setToolTip( m.gamesToString() );
-    item( row, col )->setBackground( SPRING_GREEN1 ); 
-  } else {
-    item( row, col )->setText( "" );
-    item( row, col )->setBackground( palette().color( QPalette::Normal, QPalette::Base ) );
-    item( row, col )->setToolTip( "" );
+  foreach( Match m, matches ) {
+    if ( m.played() ) {
+       if ( !text.isEmpty() ) {
+         text += " ";
+       }
+       text += m.toString();
+       text += " (+" + QString().setNum( m.earnedRating( a ), 'g', 2 ) + ")";
+       item( row, col )->setBackground( SPRING_GREEN1 ); 
+ 
+       if ( !toolTip.isEmpty() ) {
+         toolTip += "\n\n";
+       }
+       toolTip += m.gamesToString(); 
+    } else {
+      item( row, col )->setBackground( palette().color( QPalette::Normal, QPalette::Base ) );
+    }
   }
+   
+  item( row, col )->setToolTip( toolTip );
+  item( row, col )->setText( text );
 }
 
 /** calls updateMatchCell for each match cell ;)

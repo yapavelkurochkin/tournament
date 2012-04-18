@@ -71,12 +71,31 @@ MatchList Group::matchList( Player p ) const
   for ( int i = 0; i < _matches.count(); i ++ ) { 
     Match m = _matches.at( i );
 
-    if ( ( m.playerA() == p ) || ( m.playerB() == p ) ) {
+    if ( m.participated( p ) ) {
       ml << m;
     } 
   }
  
   return ml; 
+}
+
+MatchList Group::matchList( Player a, Player b ) const
+{
+  MatchList ml;
+
+  for ( int i = 0; i < _matches.count(); i ++ ) { 
+    Match m = _matches.at( i );
+
+    if ( m.participated( a ) && m.participated( b ) ) {
+      if ( !( m.playerA() == a ) ) {
+        // right player order required
+        m.swapPlayers();
+      }
+      ml << m;
+    } 
+  }
+
+  return ml;
 }
 
 MatchList Group::playedMatchList( Player p ) const

@@ -4,6 +4,7 @@
 #include <QMessageBox>
 #include <QCloseEvent>
 #include <QDir>
+#include <math.h>
 
 #include "mainwindow.h"
 #include "tournwidget.h"
@@ -113,8 +114,10 @@ void LeagueMainWindow::newTournament( )
   if ( QDialog::Accepted == d.exec() ) {
     QString cat = d.category();
     Match::Type mtype = d.matchType();
-    unsigned int gsize = d.groupSize();
+    unsigned int groups = d.groupCount();
     PlayerList players = d.players();
+
+    unsigned int gsize = ceil( (double) players.count() / groups );
 
     tourn = new Tournament( players, cat, mtype, gsize );
   

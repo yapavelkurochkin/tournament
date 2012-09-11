@@ -16,13 +16,13 @@ class NewTournDialog : public QDialog
 
     QString category() const;
     Match::Type matchType() const;
-    unsigned int groupSize() const;
+    unsigned int groupCount() const;
     PlayerList players() const;
 
   protected:
     QComboBox *matchCombo, 
               *catCombo,
-              *gsCombo;
+              *gCombo;
     PlayerTable *table;
 };
 

@@ -14,14 +14,14 @@ class Tournament : public QObject {
 
   public:
     Tournament( PlayerList players, QString category,
-                Match::Type matchType = Match::BestOf3, unsigned int groupSize = 3, 
-                unsigned int stagesCnt = 4 );
+                Match::Type matchType = Match::BestOf3, unsigned int groupSize = 3); 
 
     void groupChanged( Group* g );
     QList<Group*> groupList( unsigned int stage ) const 
                           { return _groups[ stage ]; }
  
     unsigned int stagesCnt() const { return _stagesCnt; }
+    unsigned int groupCount() const; 
     Match::Type matchType() const { return _matchType; }
     QString category() const { return _category; }
     PlayerList players() const { return _players; }

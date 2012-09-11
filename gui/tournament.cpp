@@ -8,16 +8,31 @@
 #include "rrgroup.h"
 #include "swissgroup.h"
 
+
+unsigned int log2( unsigned int x )
+{
+  unsigned int ans = 0 ;
+  while( x>>=1 ) ans++;
+  return ans ;
+}
+
 Tournament::Tournament( PlayerList players, QString category,
-                        Match::Type matchType, unsigned int groupSize,
-                         unsigned int stagesCnt )
+                        Match::Type matchType, unsigned int groupSize )
+                        
  : _players( players ),
    _magic( TOURN_MAGIC_NUMBER ),
    _groupSize( groupSize ),
-   _stagesCnt( stagesCnt ),
+   _stagesCnt( 0 ),
    _matchType( matchType ),
    _category( category ) 
 {
+  // emperical formula, I can't describe it..
+	// groupCnt = 2 -> stagesCnt = 4
+	// groupCnt = 4 -> stagesCnt = 5
+	// groupCnt = 8 -> stagesCnt = 6
+  _stagesCnt = log2( groupCount() * 4 ) + 1;
+
+  qDebug() << groupSize << groupCount() << _stagesCnt << players.count(); 
   _groups = new QList<Group*>[ _stagesCnt ];
   Q_CHECK_PTR( _groups );
 
@@ -36,6 +51,11 @@ Tournament::Tournament( )
    _category( "M2" ) 
 {
   connect( qApp, SIGNAL( aboutToQuit() ), this, SLOT( save() ) );
+}
+
+unsigned int Tournament::groupCount() const 
+{
+	return ceil( (double) _players.count() / _groupSize ); 
 }
 
 void Tournament::groupChanged( Group* g )
@@ -59,30 +79,20 @@ void Tournament::groupChanged( Group* g )
 void Tournament::buildGroups( )
 {
   // 1st stage group size.
-  // stages = 4 => gs(1) = 8
-  // stages = 3 => gs(1) = 4
-  int gs = 1 << ( _stagesCnt - 1 ); 
+  // groupCnt = 2 => gs(1) = 4
+  // groupCnt = 4 => gs(1) = 8
+  // groupCnt = 8 => gs(1) = 16
+	//
+	// first gs players are playing 1-2 2-1 1-2 2-1
+  int gs = groupCount() * 2; 
   PlayerList players = roundRobinResults( );
 
   newSwissGroup( 1, 1, players.mid( 0, gs ) );
 
-  int nloosers = players.count() - gs;
-  if ( nloosers <= 1 ) {
-    nloosers = 0;
-  } else {
-    int size = gs;
-    // finding such nloosers that log2( nloosers ) is integer.
-    while ( size != 1 ) {
-      if ( nloosers >= size ) {
-        // finding such nloosers that is not greater than gs
-        nloosers = size;
-        break;
-      }
-      size = size/2;
-    } 
-  } 
-
-  newSwissGroup( gs + 1, 1, players.mid( gs, nloosers ) ); 
+	// next gs/2 players are playing 3-3 4-4 5-5, etc..
+  for ( int i = gs; i <= ( players.count() - gs/2 ); i+= gs/2 ) {
+    newSwissGroup( i + 1, 1, players.mid( i, gs/2 ) );
+  }
 }
 
 /** splits groups for two groups - group of winners and group of loosers.
@@ -119,7 +129,7 @@ SwissGroup* Tournament::newSwissGroup( unsigned int fromPlace, unsigned int stag
  */
 void Tournament::breakPlayers( PlayerList players )
 {
-  int groupCnt = ceil( (double) players.count() / _groupSize );
+  int groupCnt = groupCount(); 
   
   _groups[0].clear(); 
 
@@ -152,36 +162,21 @@ bool Tournament::roundRobinCompleted( ) const
  */
 PlayerList Tournament::roundRobinResults() const
 {
-  PlayerResultsList bestlist;
-
-  // 1st and 2nd places
-  for ( int p = 1; p <= (int)2; p ++ ) {
-    for ( int i = 0; i < _groups[0].count(); i ++ ) {
-      const Group* g = _groups[0].at( i );
-      if ( p <= g->size() ) {
-        Player player = g->playerByPlace( p );
-        bestlist << g->playerResults( player );
-      }
-    }
-  }
-
   PlayerResultsList list;
-  // 3rd and more places
-  for ( int p = 3; p <= (int)_groupSize; p ++ ) {
+
+  // TODO: PlayerResultsList is not needed here anymore?
+
+  for ( int p = 1; p <= (int)_groupSize; p ++ ) {
     for ( int i = 0; i < _groups[0].count(); i ++ ) {
       const Group* g = _groups[0].at( i );
       if ( p <= g->size() ) {
         Player player = g->playerByPlace( p );
-        bestlist << g->playerResults( player );
+        list << g->playerResults( player );
       }
     }
   }
 
-  qSort( list.begin(), list.end(), qGreater< PlayerResults >() );
-
-  bestlist << list;
-
-  return toPlayerList( bestlist );
+  return toPlayerList( list );
 }
 
 /** calculates the matches count required to complete tournament */

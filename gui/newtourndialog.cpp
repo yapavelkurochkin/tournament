@@ -19,15 +19,14 @@ NewTournDialog::NewTournDialog( QWidget* parent )
                                       << tr( "W" )
                                       << tr( "Elite" ) );
 
-  gsCombo = new QComboBox();
-  gsCombo->addItems( QStringList()    << "2" << "3"
-                                      << "4" << "5"
-                                      << "6" << "7" );
+  gCombo = new QComboBox();
+  gCombo->addItems( QStringList()    << "2" << "4"
+                                      << "8" << "16" );
 
   QFormLayout *fl = new QFormLayout;
   fl->addRow( tr("&Match"), matchCombo );
   fl->addRow( tr("&Category"), catCombo );
-  fl->addRow( tr("&Group size"), gsCombo );
+  fl->addRow( tr("&Groups"), gCombo );
 
   table = new PlayerTable( this );
   fl->addRow( table ); 
@@ -55,9 +54,9 @@ Match::Type NewTournDialog::matchType() const
   return ( matchCombo->currentIndex() == 0 ) ? Match::BestOf3 : Match::BestOf5; 
 }
 
-unsigned int NewTournDialog::groupSize() const
+unsigned int NewTournDialog::groupCount() const
 {
-  return gsCombo->currentText().toUInt();
+  return gCombo->currentText().toUInt();
 }
 
 PlayerList NewTournDialog::players() const 

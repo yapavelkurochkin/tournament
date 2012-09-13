@@ -200,7 +200,7 @@ void RRTable::openPopupMenu( QTableWidgetItem* i, QPoint pos )
   // minimum group size is 2
   bool allowAddition = ( i != NULL ) && ( i->column() == 0 ) 
                        && ( i->row() != 0 );
-  bool allowRemoval = allowAddition && ( _group->size() > 2 );
+  bool allowRemoval = allowAddition && ( _group->size() > 1 );
   
   QAction *rmAction = NULL,
           *addAction = NULL;

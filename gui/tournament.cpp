@@ -17,11 +17,10 @@ unsigned int log2( unsigned int x )
 }
 
 Tournament::Tournament( PlayerList players, QString category,
-                        Match::Type matchType, unsigned int groupSize )
+                        Match::Type matchType, unsigned int groupCnt )
                         
- : _players( players ),
-   _magic( TOURN_MAGIC_NUMBER ),
-   _groupSize( groupSize ),
+ : _magic( TOURN_MAGIC_NUMBER ),
+   _groupCnt( groupCnt ),
    _stagesCnt( 0 ),
    _matchType( matchType ),
    _category( category ) 
@@ -32,7 +31,6 @@ Tournament::Tournament( PlayerList players, QString category,
 	// groupCnt = 8 -> stagesCnt = 6
   _stagesCnt = log2( groupCount() * 4 ) + 1;
 
-  qDebug() << groupSize << groupCount() << _stagesCnt << players.count(); 
   _groups = new QList<Group*>[ _stagesCnt ];
   Q_CHECK_PTR( _groups );
 
@@ -45,7 +43,7 @@ Tournament::Tournament( PlayerList players, QString category,
  */
 Tournament::Tournament( ) 
  : _magic( 0xdeadbeef ), // object is not invalid
-   _groupSize( 0 ),
+   _groupCnt( 0 ),
    _stagesCnt( 0 ),
    _matchType( Match::BestOf3 ),
    _category( "M2" ) 
@@ -55,7 +53,7 @@ Tournament::Tournament( )
 
 unsigned int Tournament::groupCount() const 
 {
-	return ceil( (double) _players.count() / _groupSize ); 
+	return _groupCnt; 
 }
 
 void Tournament::groupChanged( Group* g )
@@ -86,6 +84,8 @@ void Tournament::buildGroups( )
 	// first gs players are playing 1-2 2-1 1-2 2-1
   int gs = groupCount() * 2; 
   PlayerList players = roundRobinResults( );
+
+  qDebug() << __PRETTY_FUNCTION__ << players.count();
 
   newSwissGroup( 1, 1, players.mid( 0, gs ) );
 
@@ -162,21 +162,43 @@ bool Tournament::roundRobinCompleted( ) const
  */
 PlayerList Tournament::roundRobinResults() const
 {
-  PlayerResultsList list;
+  PlayerList list;
+
+  int maxGroupSize = 0;
+  for ( int i = 0; i < _groups[0].count(); i ++ ) {
+    const Group* g = _groups[0].at( i );
+    if ( g->size() > maxGroupSize ) {
+      maxGroupSize = g->size(); 
+    }
+  }
 
   // TODO: PlayerResultsList is not needed here anymore?
-
-  for ( int p = 1; p <= (int)_groupSize; p ++ ) {
+  for ( int p = 1; p <= maxGroupSize; p ++ ) {
     for ( int i = 0; i < _groups[0].count(); i ++ ) {
       const Group* g = _groups[0].at( i );
       if ( p <= g->size() ) {
-        Player player = g->playerByPlace( p );
-        list << g->playerResults( player );
+        list << g->playerByPlace( p );
       }
     }
   }
 
-  return toPlayerList( list );
+  return list;
+}
+
+/** build actual player list. note, tha playerlist can be changed
+ *  by user (rrtable allows to add or remove user via menu).
+ *  that is why Tournament class does not store player list but builds it 
+ *  on demand.
+ */
+PlayerList Tournament::players() const
+{
+  PlayerList list;
+  for ( int i = 0; i < _groups[0].count(); i ++ ) {
+    const Group* g = _groups[0].at( i );
+    list << g->const_players();
+	}
+   
+  return list;
 }
 
 /** calculates the matches count required to complete tournament */
@@ -253,8 +275,7 @@ QDataStream &operator>>(QDataStream &s, Tournament& t)
     return s;
   }
  
-  s >> t._players >> t._groupSize >> t._stagesCnt 
-    >> mType >> cat; 
+  s >> t._groupCnt >> t._stagesCnt >> mType >> cat; 
 
   t._category = cat;
   t._matchType = (Match::Type) mType;
@@ -290,7 +311,7 @@ QDataStream &operator<<(QDataStream &s, const Tournament& t)
     return s;
   }
   
-  s << t._magic << t._players << t._groupSize << t._stagesCnt 
+  s << t._magic << t._groupCnt << t._stagesCnt 
     << (int) t._matchType << t._category; 
 
   for ( unsigned int i = 0; i < t._stagesCnt; i ++ ) {

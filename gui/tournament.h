@@ -7,14 +7,14 @@
 
 class SwissGroup;
 
-#define TOURN_MAGIC_NUMBER 0xfaeb163b
+#define TOURN_MAGIC_NUMBER 0xfaeb163d
 
 class Tournament : public QObject {
   Q_OBJECT;
 
   public:
     Tournament( PlayerList players, QString category,
-                Match::Type matchType = Match::BestOf3, unsigned int groupSize = 3); 
+                Match::Type matchType = Match::BestOf3, unsigned int groupCnt = 4); 
 
     void groupChanged( Group* g );
     QList<Group*> groupList( unsigned int stage ) const 
@@ -24,7 +24,7 @@ class Tournament : public QObject {
     unsigned int groupCount() const; 
     Match::Type matchType() const { return _matchType; }
     QString category() const { return _category; }
-    PlayerList players() const { return _players; }
+    PlayerList players() const;
 
     static Tournament* fromFile( QString fileName );
     void save( QString fname );
@@ -42,12 +42,10 @@ class Tournament : public QObject {
     void save();
 
   protected:
-    PlayerList _players;
-
     unsigned int _magic;
     /**< Used for identification of validity of tournament object*/
 
-    unsigned int _groupSize;
+    unsigned int _groupCnt;
     unsigned int _stagesCnt;
     /*<< playing stages including round robin */
 

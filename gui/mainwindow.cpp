@@ -117,9 +117,7 @@ void LeagueMainWindow::newTournament( )
     unsigned int groups = d.groupCount();
     PlayerList players = d.players();
 
-    unsigned int gsize = ceil( (double) players.count() / groups );
-
-    tourn = new Tournament( players, cat, mtype, gsize );
+    tourn = new Tournament( players, cat, mtype, groups );
   
     QScrollArea* scrollArea = new QScrollArea( this );
     TournamentWidget* tw = new TournamentWidget( tourn );

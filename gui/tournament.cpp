@@ -89,10 +89,16 @@ void Tournament::buildGroups( )
 
   newSwissGroup( 1, 1, players.mid( 0, gs ) );
 
+  players = players.mid( gs ); 
 	// next gs/2 players are playing 3-3 4-4 5-5, etc..
-  for ( int i = gs; i <= ( players.count() - gs/2 ); i+= gs/2 ) {
-    newSwissGroup( i + 1, 1, players.mid( i, gs/2 ) );
-  }
+  int fromPlace = gs;
+  while ( ( gs = ( gs / 2 ) ) >= 2 ) {
+	  while ( gs < players.count() ) {
+      newSwissGroup( fromPlace + 1, 1, players.mid( 0, gs ) );
+			players = players.mid( gs );
+			fromPlace += gs;
+		}
+  } 
 }
 
 /** splits groups for two groups - group of winners and group of loosers.

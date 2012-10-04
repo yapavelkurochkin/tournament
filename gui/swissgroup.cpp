@@ -23,12 +23,28 @@ SwissGroup::SwissGroup( unsigned int fromPlace, Tournament* tourn,
   if ( isFinal() || is34 ) {
     type = Match::BestOf5;
   }
+ 
+  // i did not found pretty algorithm for that :(
+	// so, it is partially hardcoded
+  if ( cnt == 2 ) {
+	  _matches << Match( _players.at( 0 ), _players.at( 1 ), type );
+	} else if ( cnt == 4 ) {
+	  _matches << Match( _players.at( 0 ), _players.at( 1 ), type );
+	  _matches << Match( _players.at( 2 ), _players.at( 3 ), type );
+	} else {
+	  // first with last
+		// second with last - 1
+		// and so on.. to the center
+	  for ( int i = 0; i < cnt / 2; i ++ ) {
+	    Player a = _players.at( i );
+	    Player b = _players.at( cnt - 1 - i );
+	    _matches << Match( a, b, type );
+    }
+  }
 
-  for ( int i = 0; i < cnt / 2; i ++ ) {
-    Player a = _players.at( i );
-    Player b = _players.at( cnt - 1 - i );
-    qDebug() << __FUNCTION__ << a.name() << b.name(); 
-    _matches << Match( a, b, type );
+  for ( int i = 0; i < _matches.count(); i ++ ) {
+    qDebug() << __FUNCTION__ << _matches.at( i ).playerA().name()
+		                         << _matches.at( i ).playerB().name(); 
   }
 
   initGroupName( );

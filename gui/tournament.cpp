@@ -178,7 +178,6 @@ PlayerList Tournament::roundRobinResults() const
     }
   }
 
-  // TODO: PlayerResultsList is not needed here anymore?
   for ( int p = 1; p <= maxGroupSize; p ++ ) {
     for ( int i = 0; i < _groups[0].count(); i ++ ) {
       const Group* g = _groups[0].at( i );

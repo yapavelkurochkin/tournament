@@ -25,11 +25,14 @@ SwissGroup::SwissGroup( unsigned int fromPlace, Tournament* tourn,
   }
  
   // i did not found pretty algorithm for that :(
-	// so, it is partially hardcoded
+	// so, it is partially hardcoded. i hate this.
   if ( cnt == 2 ) {
 	  _matches << Match( _players.at( 0 ), _players.at( 1 ), type );
-	} else if ( cnt == 4 ) {
-	  _matches << Match( _players.at( 0 ), _players.at( 1 ), type );
+	} else if ( ( cnt == 4 ) && ( stage != 1 ) && ( tourn->groupCount() != 2 ) ) {
+		// here I hate this much more.
+		// I know that in case of groupCount() == 2 only 2 best players from each group 
+		// will participate semi-final. so, they should not use this algorithm of breaking.
+    _matches << Match( _players.at( 0 ), _players.at( 1 ), type );
 	  _matches << Match( _players.at( 2 ), _players.at( 3 ), type );
 	} else {
 	  // first with last
@@ -50,7 +53,7 @@ SwissGroup::SwissGroup( unsigned int fromPlace, Tournament* tourn,
   initGroupName( );
 }
 
-/** Should be used only whe serializing/deserializing
+/** Should be used only during serializing/deserializing
  */
 SwissGroup::SwissGroup()
 : Group( QString( "" ), NULL, 2, PlayerList() ),

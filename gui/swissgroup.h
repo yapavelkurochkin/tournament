@@ -18,6 +18,7 @@ class SwissGroup : public Group
     
     friend QDataStream &operator<<( QDataStream &s, const SwissGroup &g );
     friend QDataStream &operator>>( QDataStream &s, SwissGroup &g );
+    QString csvResult( QChar sep ) const;
 
     QList< Group* > split() const;
     unsigned int fromPlace() const { return _fromPlace; }

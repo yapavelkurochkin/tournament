@@ -337,3 +337,59 @@ QDataStream &operator<<(QDataStream &s, const Tournament& t)
   }
   return s;
 }
+
+/** prints the results to csv file,
+ * '|' is the separator
+ */
+void Tournament::saveAsCSV( QString file )
+{
+  if ( !isValid() ) {
+    qWarning() << __FUNCTION__ << 
+                  "trying to save a results of invalid tournament object";
+    return;
+	}
+ 
+
+	QFile csv( file );
+	QChar sep( '|' );
+
+	if (csv.open(QFile::WriteOnly | QFile::Truncate)) {
+		QTextStream out(&csv);
+  
+	  for ( unsigned int i = 0; i < _stagesCnt; i ++ ) {
+      int count = _groups[ i ].count();
+      for ( int j = 0; j < count; j ++ ) {
+        const Group* g = _groups[ i ].at( j );
+				out << g->csvResult( sep ) << endl;
+      }
+			out << endl;
+    }
+
+		out << totalRatingAsCSV( sep ) << endl;
+  }
+}
+
+/** prints total ratings as CSV. there are 4 columns:
+ *   player name, last rating, earned rating, total rating.
+ *   list is sorted by last rating (from higher to lower)
+ */
+QString Tournament::totalRatingAsCSV( QChar sep )
+{
+  QString ret;
+	QTextStream out( &ret );
+
+  PlayerList pls = players();
+	qSort( pls.end(), pls.begin() );
+
+  Group fake( "unused", this, matchList(), pls );
+  for ( int i = 0; i < pls.count(); i ++ ) {
+	  Player p = pls.at( i );
+		double earned = fake.earnedRating( p ); 
+		double total = p.rating() + earned;
+		out << p.name() << sep << p.ratingAsStr() << sep
+		    << "+" + QString::number( earned, 'f', 1 ) << sep
+		    << QString::number( total , 'f', 1 ) << endl;
+	}
+
+	return ret;
+}

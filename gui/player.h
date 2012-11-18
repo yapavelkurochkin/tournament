@@ -17,6 +17,8 @@ class Player {
 
     QString name() const { return _name; }
     double rating() const { return _rating; }
+    QString ratingAsStr() const 
+		   { return QString::number( _rating, 'f', 1 ); }
 
     bool operator< ( const Player& pl ) const;
     bool operator== ( const Player& pl ) const;

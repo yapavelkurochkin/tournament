@@ -41,6 +41,7 @@ class Group
     PlayerList const_players() const { return _players; }
 
     Match& match( Player a, Player b );
+    Match const_match( Player a, Player b ) const;
     MatchList matchList( Player p ) const;
     MatchList matchList( Player p, Player b ) const;
     MatchList matchList( ) const { return _matches; };
@@ -67,6 +68,7 @@ class Group
     /**< group should not be edited when it is completed */
 
     virtual bool operator< (const Group& gr) const { return _name < gr.name(); }
+    virtual QString csvResult( QChar ) const { return ""; }
 };
 
 #endif // GROUP__H

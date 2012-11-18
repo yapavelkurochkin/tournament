@@ -19,6 +19,7 @@ class RRGroup: public Group
 
     friend QDataStream &operator<<( QDataStream &s, const RRGroup &g );
     friend QDataStream &operator>>( QDataStream &s, RRGroup &g );
+    QString csvResult( QChar sep ) const;
 };
 
 typedef QList< RRGroup > RRGroupList;

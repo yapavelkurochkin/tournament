@@ -124,3 +124,26 @@ QDataStream &operator>>( QDataStream &s, SwissGroup &g )
   return s;
 }
 
+/** print a group results into table in CSV format
+ *
+ * \sep -- separator character
+ */
+QString SwissGroup::csvResult( QChar sep ) const
+{
+  QString ret;
+  QTextStream out( &ret );
+
+  out << name() << sep << sep << endl;
+
+  // number of players = row count
+  for ( int i = 0; i < _matches.count(); i ++ ) {
+	  Match m = _matches.at( i );
+	  if ( m.played() ) {
+      out << m.playerA().name() << "-" << m.playerB().name() << sep;
+      out << m.toString() << endl;
+    }
+	}
+
+	return ret;
+}
+

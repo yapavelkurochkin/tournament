@@ -28,6 +28,8 @@ class Tournament : public QObject {
 
     static Tournament* fromFile( QString fileName );
     void save( QString fname );
+    void saveAsCSV( QString fname );
+    QString totalRatingAsCSV( QChar sep );
 
     void setFileName( QString fn ) { _fileName = fn; }
     QString fileName( ) const { return _fileName; }
@@ -40,7 +42,7 @@ class Tournament : public QObject {
     void newSwissGroupCreated( SwissGroup* g );
   public slots:
     void save();
-
+    
   protected:
     unsigned int _magic;
     /**< Used for identification of validity of tournament object*/

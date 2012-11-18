@@ -59,3 +59,41 @@ QDataStream &operator>>( QDataStream &s, RRGroup &g )
   return s;
 }
 
+/** print a group results into table in CSV format
+ */
+QString RRGroup::csvResult( QChar sep ) const
+{
+  QString ret;
+  QTextStream out( &ret );
+
+  out << name() << sep;
+	for ( int i = 0; i < _players.count(); i ++ ) {
+    out << QString::number( i + 1 ) << sep;
+  }
+
+  // TODO: translate
+  out << "Place" << endl;
+
+  // number of players = row count
+  for ( int i = 0; i < _players.count(); i ++ ) { 
+    Player a = _players.at( i );
+		out << a.name() << sep;
+		for ( int j = 0; j < _players.count(); j ++ ) {
+		  if ( i == j ) {
+        out << sep; 
+			} else {
+			  Player b = _players.at( j );
+			  Match m = matchList( a, b ).at( 0 );
+				if ( ! ( m.playerA() == a ) ) {
+				  m.swapPlayers(); 
+				}
+			  out << m.toString() << sep; 
+			}
+		}
+
+    out << QString::number( playerPlace( a ) ) << endl;  
+  }
+
+	return ret;
+}
+

@@ -30,6 +30,8 @@ void LeagueMainWindow::createActions()
                          SLOT( newTournament() ) );
   saveT = newAction( tr("&Save"), QKeySequence::Save,
                          SLOT( saveTournament() ) );
+  exportT = newAction( tr("&Export"), QKeySequence::UnknownKey,
+                         SLOT( exportTournament() ) );
   ratings = newAction( tr("&Ratings"), 
                          SLOT( showRatingsTable() ) );
   about = newAction( tr("&About"), QKeySequence::HelpContents,
@@ -66,6 +68,7 @@ void LeagueMainWindow::createMenus()
   fileMenu->addAction( loadT );
   fileMenu->addAction( newT );
   fileMenu->addAction( saveT );
+  fileMenu->addAction( exportT );
   fileMenu->addAction( ratings );
 
   QMenu* iMenu = menuBar()->addMenu(tr("&Information"));
@@ -100,6 +103,19 @@ void LeagueMainWindow::saveTournament( )
     if ( tourn ) {
       tourn->save( fName );
       setWindowName();
+    }
+  }
+}
+
+void LeagueMainWindow::exportTournament( )
+{
+  QString fName = QFileDialog::getSaveFileName(this,
+                  tr("Export tournament results"), QDir::homePath(), 
+                  tr("CSV Files (*.csv)"));
+
+  if ( !fName.isNull() ) {
+    if ( tourn ) {
+      tourn->saveAsCSV( fName );
     }
   }
 }

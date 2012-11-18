@@ -246,3 +246,4 @@ QDataStream &operator>>( QDataStream &s, Group &g )
   
   return s;
 }
+    

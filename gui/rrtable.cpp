@@ -55,7 +55,7 @@ void RRTable::setupCells()
       } else if ( j == 0 ) { // 0th column
         Player p = _group->const_players().at( i - 1 );
         text = p.name();
-        text += " (" + QString::number( p.rating(), 'f', 1 ) + ")";
+        text += " (" + p.ratingAsStr() + ")";
         item->setFlags( Qt::NoItemFlags );
       } else {
         item->setFlags( Qt::ItemIsSelectable | Qt::ItemIsEnabled );

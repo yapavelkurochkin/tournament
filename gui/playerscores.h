@@ -3,12 +3,7 @@
 
 #include "player.h"
 #include "match.h"
-
-typedef unsigned long IntegralScores;
-
-extern IntegralScores integralScores( unsigned int matchesWon, 
-                                      unsigned int gamesWon,
-                                      unsigned int ballsDiff );
+#include "integralscores.h"
 
 class PlayerResults {
     Player _player;
@@ -25,7 +20,6 @@ class PlayerResults {
     MatchList matches() const { return _matches; }
 
     IntegralScores scores() const { return _scores; }
-    IntegralScores new_rating() const;
 
     Player player() const { return _player; }
 

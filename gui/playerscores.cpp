@@ -1,21 +1,14 @@
 #include "playerscores.h"
 
-IntegralScores integralScores( unsigned int matchesWon, 
-                               unsigned int gamesWon,
-                               unsigned int ballsWon )
-{
-  return ( matchesWon << 16 ) + ( gamesWon << 8 ) + ballsWon;
-}
-
 PlayerResults::PlayerResults( Player p )
 : _player( p ),
-  _scores( 0 )
+  _scores( )
 {
 }
 
 PlayerResults::PlayerResults( Player p, MatchList matches )
 : _player( p ),
-  _scores( 0 )
+  _scores( )
 {
   addMatches( matches );
 }
@@ -26,30 +19,30 @@ void PlayerResults::addMatches( MatchList matches )
   calcScores();
 }
 
+/** calculates a scores earned by player.
+ *  scores are calculated on the count of games won and games lost. 
+ */
 void PlayerResults::calcScores( )
 {
-  unsigned int matchesWon = 0,
-               gamesWon = 0,
-               ballsWon = 0;
+  int matchesDiff = 0, gamesDiff = 0, ballsDiff = 0;
 
   for ( int i = 0; i < _matches.count(); i ++ ) {
     Match m = _matches.at( i );
-    if ( m.winner() == _player ) {
-      matchesWon ++;
-    }
+    if ( m.winner() == _player )   matchesDiff ++;
+		else                           matchesDiff --;
 
     for ( int j = 0; j < m.games_const().count(); j ++ ) {
       Game g = m.games_const().at( j );
 
-      if ( g.winner() == _player ) {
-        gamesWon ++;
-      }
+      if ( g.winner() == _player )  gamesDiff ++;
+      else                          gamesDiff --;
 
-      ballsWon += g.balls( _player ); 
+      ballsDiff += g.balls( _player );
+			ballsDiff -= g.lostBalls( _player ); 
     }
   }
 
-  _scores = integralScores( matchesWon, gamesWon, ballsWon );
+  _scores = IntegralScores( matchesDiff, gamesDiff, ballsDiff );
 }
 
 

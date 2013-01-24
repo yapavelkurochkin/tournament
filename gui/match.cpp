@@ -40,11 +40,17 @@ Player Game::winner() const
   return ( aBalls > bBalls ) ? a : b;
 }
 
+// number of balls won by player
 unsigned int Game::balls( Player p ) const
 {
   return ( p == a ) ? aBalls : bBalls;
 }
 
+// number of balls won by an alternate player
+unsigned int Game::lostBalls( Player p ) const
+{
+  return ( p == a ) ? bBalls : aBalls;
+}
 QDataStream &operator>>(QDataStream &s, Game &g)
 {
   s >> g.a >> g.b >> g.aBalls >> g.bBalls;

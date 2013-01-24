@@ -16,6 +16,7 @@ struct Game
   Game& swap();
   Player winner() const;
   unsigned int balls( Player p ) const;
+  unsigned int lostBalls( Player p ) const;
 
   friend QDataStream &operator>>(QDataStream &s, Game &g);
   friend QDataStream &operator<<(QDataStream &s, const Game &g);

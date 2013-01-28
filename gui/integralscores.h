@@ -2,36 +2,26 @@
 #define INTEGRALSCORES__H
 
 struct IntegralScores {
-  int matchesDiff;
-	int gamesDiff;
-	int ballsDiff;
+  // total power of player. calculated as sum
+	// of won matches, games and balls built with corresponding weights
+  int scores;
 
   // for sorting purposes
   bool operator< ( const IntegralScores& s ) const
-	{
-	  if ( matchesDiff < s.matchesDiff ) return true;
-		if ( gamesDiff < s.gamesDiff )     return true;
-		if ( ballsDiff < s.ballsDiff )     return true;
-	  return false;
+  {
+	  return ( scores < s.scores );
 	}
 
   bool operator> ( const IntegralScores& s ) const
 	{
-	  if ( matchesDiff > s.matchesDiff ) return true;
-		if ( gamesDiff > s.gamesDiff )     return true;
-		if ( ballsDiff > s.ballsDiff )     return true;
-	  return false;
+	  return ( scores > s.scores );
 	}
 
 	IntegralScores()
-	: matchesDiff( 0 ),
-	  gamesDiff( 0 ),
-		ballsDiff( 0 ) {};
+	: scores( 0 ) {} 
 	
 	IntegralScores( int mDiff, int gDiff, int bDiff )
-	: matchesDiff( mDiff ),
-	  gamesDiff( gDiff ),
-		ballsDiff( bDiff ) {};
+	{ scores = mDiff * 1024 * 1024 + gDiff * 1024 + bDiff; };
 };
 
 #endif // INTEGRALSCORES__H

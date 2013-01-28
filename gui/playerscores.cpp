@@ -1,3 +1,4 @@
+#include <qDebug.h>
 #include "playerscores.h"
 
 PlayerResults::PlayerResults( Player p )
@@ -28,20 +29,23 @@ void PlayerResults::calcScores( )
 
   for ( int i = 0; i < _matches.count(); i ++ ) {
     Match m = _matches.at( i );
-    if ( m.winner() == _player )   matchesDiff ++;
-		else                           matchesDiff --;
+    if ( m.participated( _player ) ) {
+      if ( m.winner() == _player )   matchesDiff ++;
+	  	else                           matchesDiff --;
 
-    for ( int j = 0; j < m.games_const().count(); j ++ ) {
-      Game g = m.games_const().at( j );
+      for ( int j = 0; j < m.games_const().count(); j ++ ) {
+        Game g = m.games_const().at( j );
 
-      if ( g.winner() == _player )  gamesDiff ++;
-      else                          gamesDiff --;
+        if ( g.winner() == _player )  gamesDiff ++;
+        else                          gamesDiff --;
 
-      ballsDiff += g.balls( _player );
-			ballsDiff -= g.lostBalls( _player ); 
-    }
+        ballsDiff += g.balls( _player );
+		  	ballsDiff -= g.lostBalls( _player ); 
+      }
+	  }
   }
 
+  qDebug() << _player.name() << matchesDiff << gamesDiff << ballsDiff;
   _scores = IntegralScores( matchesDiff, gamesDiff, ballsDiff );
 }
 

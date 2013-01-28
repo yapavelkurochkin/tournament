@@ -17,6 +17,6 @@ HEADERS=playerlist.h player.h playertable.h rrgroup.h\
         match.h rrtable.h tournament.h tournwidget.h matchres.h\
         playerscores.h group.h swissgroup.h grouptable.h swisstable.h\
         mainwindow.h newtourndialog.h about.h version.h newplayerdialog.h\
-        ratingsdialog.h ratingstable.h\
+        ratingsdialog.h ratingstable.h integralscores.h  \
         ../rating/rating.h ../rating/polynom.h ../rating/polycoeff.h
 

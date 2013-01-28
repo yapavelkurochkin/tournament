@@ -93,7 +93,7 @@ void Tournament::buildGroups( )
 	// next gs/2 players are playing 3-3 4-4 5-5, etc..
   int fromPlace = gs;
   while ( ( gs = ( gs / 2 ) ) >= 2 ) {
-	  while ( gs < players.count() ) {
+	  while ( gs <= players.count() ) {
       newSwissGroup( fromPlace + 1, 1, players.mid( 0, gs ) );
 			players = players.mid( gs );
 			fromPlace += gs;

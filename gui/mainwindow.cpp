@@ -1,9 +1,12 @@
 #include <QMenu>
+#include <QApplication>
 #include <QMenuBar>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QCloseEvent>
+#include <QTemporaryFile>
 #include <QDir>
+#include <QDebug>
 #include <math.h>
 
 #include "mainwindow.h"
@@ -14,18 +17,22 @@
 
 LeagueMainWindow::LeagueMainWindow()
 : QMainWindow(),
-  tourn( NULL )
+  tourn( NULL ),
+  _history( new TournamentHistory() )
 {
   progName = tr( "Tournament" );
   setWindowTitle( progName );
   createActions();
   createMenus();
+ 
+  connect( qApp, SIGNAL( aboutToQuit() ), this, SLOT( saveLast() ) );
+  loadTournament( QDir::toNativeSeparators( QDir::homePath() + "/lasttourn.dat" ) );
 }
 
 void LeagueMainWindow::createActions()
 {
   loadT = newAction( tr("&Load"), QKeySequence::Open, 
-                         SLOT( loadTournament() ) );
+                         SLOT( loadTournamentInteractive() ) );
   newT = newAction( tr("&New"), QKeySequence::New, 
                          SLOT( newTournament() ) );
   saveT = newAction( tr("&Save"), QKeySequence::Save,
@@ -36,6 +43,11 @@ void LeagueMainWindow::createActions()
                          SLOT( showRatingsTable() ) );
   about = newAction( tr("&About"), QKeySequence::HelpContents,
                          SLOT( showAboutDialog() ) );
+  undoT= newAction( tr("&Undo"), QKeySequence::Undo,
+	                       SLOT( undo() ) );
+  redoT= newAction( tr("&Redo"), QKeySequence::Redo,
+	                       SLOT( redo() ) );
+
 }
 
 /** Action creation helper.
@@ -70,27 +82,47 @@ void LeagueMainWindow::createMenus()
   fileMenu->addAction( saveT );
   fileMenu->addAction( exportT );
   fileMenu->addAction( ratings );
+	fileMenu->addAction( undoT );
+	fileMenu->addAction( redoT );
 
   QMenu* iMenu = menuBar()->addMenu(tr("&Information"));
   iMenu->addAction( about );
 }
 
-void LeagueMainWindow::loadTournament( )
+void LeagueMainWindow::loadTournament( QString fName )
+{
+  if ( !fName.isNull() ) {
+    tourn = Tournament::fromFile( fName );
+    _history->reset( tourn );
+    newTournamentWidget( tourn );
+  }
+}
+
+void LeagueMainWindow::loadTournamentInteractive( )
 {
   QString fName = QFileDialog::getOpenFileName(this,
                   tr("Open tournament"), QDir::homePath(), 
                   tr("Tournament Files (*.trn)"));
 
-  if ( !fName.isNull() ) {
-    tourn = Tournament::fromFile( fName );
-  
-    QScrollArea* scrollArea = new QScrollArea( this );
-    TournamentWidget* tw = new TournamentWidget( tourn );
-    scrollArea->setWidget( tw );
-    scrollArea->setWidgetResizable( false );
-    setCentralWidget( scrollArea );
-    setWindowName();
-  }
+  loadTournament( fName );
+}
+
+/** creates new tournament widget. old widget is destroyed automatically
+ *  by QScrollArea
+ */
+TournamentWidget* LeagueMainWindow::newTournamentWidget( Tournament *t )
+{
+  QScrollArea* scrollArea = new QScrollArea( this );
+  TournamentWidget* tw = new TournamentWidget( t );
+  scrollArea->setWidget( tw );
+  scrollArea->setWidgetResizable( false );
+  setCentralWidget( scrollArea );
+  setWindowName();
+
+	connect( t, SIGNAL( tournamentChanged( Tournament* ) ),
+	         this, SLOT( pushToHistory( Tournament*) ) );
+
+	return tw;
 }
 
 void LeagueMainWindow::saveTournament( )
@@ -134,13 +166,9 @@ void LeagueMainWindow::newTournament( )
     PlayerList players = d.players();
 
     tourn = new Tournament( players, cat, mtype, groups );
-  
-    QScrollArea* scrollArea = new QScrollArea( this );
-    TournamentWidget* tw = new TournamentWidget( tourn );
-    scrollArea->setWidget( tw );
-    scrollArea->setWidgetResizable( false );
-    setCentralWidget( scrollArea );
-    setWindowName();
+    _history->reset( tourn );
+    
+    newTournamentWidget( tourn );
   }  
 }
 
@@ -187,5 +215,35 @@ void LeagueMainWindow::showRatingsTable()
     Group g( tr("Total"), tourn, tourn->matchList(), tourn->players() ); 
     RatingsDialog d( &g, this );
     d.exec(); 
+  } 
+}
+
+void LeagueMainWindow::undo( )
+{
+  Tournament* t = _history->reward();
+	if ( t ) {
+    tourn = t;
+		newTournamentWidget( tourn ); 
+  }
+}
+
+void LeagueMainWindow::redo( )
+{
+  Tournament* t = _history->forward();
+	if ( t ) {
+    tourn = t;
+		newTournamentWidget( tourn ); 
+  }
+}
+
+void LeagueMainWindow::pushToHistory( Tournament* t )
+{
+  _history->push( t );
+}
+
+void LeagueMainWindow::saveLast()
+{
+  if ( tourn ) {
+    tourn->save( QDir::toNativeSeparators( QDir::homePath() + "/lasttourn.dat" ) );
   } 
 }

@@ -2,7 +2,6 @@
 #include <QDebug>
 #include <QFile>
 #include <QDir>
-#include <QApplication>
 
 #include "tournament.h"
 #include "rrgroup.h"
@@ -23,7 +22,7 @@ Tournament::Tournament( PlayerList players, QString category,
    _groupCnt( groupCnt ),
    _stagesCnt( 0 ),
    _matchType( matchType ),
-   _category( category ) 
+   _category( category )
 {
   // emperical formula, I can't describe it..
 	// groupCnt = 2 -> stagesCnt = 4
@@ -36,7 +35,7 @@ Tournament::Tournament( PlayerList players, QString category,
 
   breakPlayers( players );
   
-  connect( qApp, SIGNAL( aboutToQuit() ), this, SLOT( save() ) );
+  emit tournamentChanged( this );
 }
 
 /** This constructor is only intended for serialization/deserialization
@@ -48,7 +47,6 @@ Tournament::Tournament( )
    _matchType( Match::BestOf3 ),
    _category( "M2" ) 
 {
-  connect( qApp, SIGNAL( aboutToQuit() ), this, SLOT( save() ) );
 }
 
 unsigned int Tournament::groupCount() const 
@@ -68,7 +66,7 @@ void Tournament::groupChanged( Group* g )
     }
   }
 
-  save();
+  emit tournamentChanged( this );
 }
 
 /** build groups by results of round-robin stage 
@@ -214,21 +212,23 @@ unsigned int Tournament::matchesCount( unsigned int numOfPlayers,
   return 0; 
 }
 
-/** called when app exits by the signal aboutToQuit();
- */
-void Tournament::save()
-{
-  save( QDir::toNativeSeparators( QDir::homePath() + "/lasttourn.dat" ) );
-}
-
-void Tournament::save( QString fname )
+bool Tournament::save( QString fname )
 {
   QFile file( fname );
-  if ( file.open( QIODevice::WriteOnly ) ) {
-    QDataStream stream( & file );
+  return save( &file );
+}
+
+bool Tournament::save( QFile* f )
+{
+  if ( f->open( QIODevice::WriteOnly ) ) {
+    QDataStream stream( f );
     stream << (*this);
-    setFileName( fname );
+    setFileName( f->fileName() );
+    f->close();
+    return true;
   } 
+
+  return false;
 }
 
 /** creates an instance of Tournament initialized from specified file.
@@ -271,6 +271,10 @@ QDataStream &operator>>(QDataStream &s, Tournament& t)
   int mType;
   QString cat;
 
+  if ( s.atEnd() ) {
+	  return s;
+	}
+ 
   s >> t._magic; 
 
   if ( t._magic != TOURN_MAGIC_NUMBER ) {
@@ -305,6 +309,7 @@ QDataStream &operator>>(QDataStream &s, Tournament& t)
       }
     }   
   }
+ 
   return s;
 }
 
@@ -335,6 +340,7 @@ QDataStream &operator<<(QDataStream &s, const Tournament& t)
       }
     }   
   }
+
   return s;
 }
 

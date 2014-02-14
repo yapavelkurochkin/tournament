@@ -45,7 +45,6 @@ void PlayerResults::calcScores( )
 	  }
   }
 
-  qDebug() << _player.name() << matchesDiff << gamesDiff << ballsDiff;
   _scores = IntegralScores( matchesDiff, gamesDiff, ballsDiff );
 }
 

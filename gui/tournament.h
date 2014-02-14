@@ -6,8 +6,9 @@
 #include "rrgroup.h"
 
 class SwissGroup;
+class QFile;
 
-#define TOURN_MAGIC_NUMBER 0xfaeb163d
+#define TOURN_MAGIC_NUMBER 0xfaeb163e
 
 class Tournament : public QObject {
   Q_OBJECT;
@@ -15,6 +16,7 @@ class Tournament : public QObject {
   public:
     Tournament( PlayerList players, QString category,
                 Match::Type matchType = Match::BestOf3, unsigned int groupCnt = 4); 
+    Tournament(  );
 
     void groupChanged( Group* g );
     QList<Group*> groupList( unsigned int stage ) const 
@@ -27,7 +29,8 @@ class Tournament : public QObject {
     PlayerList players() const;
 
     static Tournament* fromFile( QString fileName );
-    void save( QString fname );
+    bool save( QString fname );
+    bool save( QFile* f );
     void saveAsCSV( QString fname );
     QString totalRatingAsCSV( QChar sep );
 
@@ -38,10 +41,12 @@ class Tournament : public QObject {
     unsigned int matchesCount( unsigned int numOfPlayers,
                                unsigned int rrGroupSize, 
                                unsigned int stages ) const;
+    
   signals:
     void newSwissGroupCreated( SwissGroup* g );
+    void tournamentChanged( Tournament* t );
+
   public slots:
-    void save();
     
   protected:
     unsigned int _magic;
@@ -72,7 +77,6 @@ class Tournament : public QObject {
 
     bool isValid() const { return _magic == TOURN_MAGIC_NUMBER; }
 
-    Tournament(  );
     friend QDataStream &operator>>(QDataStream &, Tournament&);
     friend QDataStream &operator<<(QDataStream &, const Tournament&);
 };

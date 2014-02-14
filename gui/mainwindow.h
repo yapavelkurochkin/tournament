@@ -5,7 +5,10 @@
 #include <QAction>
 #include <QScrollArea>
 
+#include "tournhist.h"
 #include "tournament.h"
+
+class TournamentWidget;
 
 class LeagueMainWindow : public QMainWindow
 {
@@ -15,9 +18,11 @@ class LeagueMainWindow : public QMainWindow
     LeagueMainWindow( );
 
   protected:
-    QAction *loadT, *newT, *saveT, *about, *ratings, *exportT;
+    QAction *loadT, *newT, *saveT, *about, 
+		        *ratings, *exportT, *undoT, *redoT;
     Tournament* tourn;
     QString progName;
+    TournamentHistory* _history;
 
     void createMenus();
     void createActions();
@@ -27,15 +32,23 @@ class LeagueMainWindow : public QMainWindow
     QAction* newAction( QString name, 
                         const char* slot );
 
+    TournamentWidget* newTournamentWidget( Tournament* t );
     void closeEvent(QCloseEvent *event);
+
+    void loadTournament( QString fName );
+
   protected slots:
+    void pushToHistory( Tournament* t );
     void setWindowName();
-    void loadTournament();
+    void loadTournamentInteractive();
     void saveTournament();
     void exportTournament();
     void newTournament();
     void showAboutDialog();
     void showRatingsTable();
+    void undo();
+    void redo();
+    void saveLast();
 };
 
 #endif // MAINWINDOW__H

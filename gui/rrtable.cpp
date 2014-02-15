@@ -166,8 +166,10 @@ void RRTable::updatePlaces()
     Player p = players.at( i );
     if ( _group->playedMatchList( p ).count() > 0 ) { 
       // player already have played at least one match
-      item( i + 1, players.count() + 1)
-          ->setText( QString::number( _group->playerPlace( p ) ) );
+      unsigned place = _group->playerPlace( p );
+      int row = i + 1;
+      int col = players.count() + 1;
+      item( row, col )->setText( QString::number( place ) );
     }
   } 
 }

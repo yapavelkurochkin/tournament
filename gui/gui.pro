@@ -20,3 +20,5 @@ HEADERS=playerlist.h player.h playertable.h rrgroup.h\
         ratingsdialog.h ratingstable.h integralscores.h tournhist.h \
         ../rating/rating.h ../rating/polynom.h ../rating/polycoeff.h
 
+RESOURCES=tournament.qrc
+

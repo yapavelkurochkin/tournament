@@ -14,6 +14,7 @@
 
 #include <QProcess>
 #include <QtGui/QApplication>
+#include <QCleanlooksStyle>
 #include <QTranslator>
 #include <QTextCodec>
 #include <QX11Info>
@@ -33,9 +34,11 @@ int main(int argc, char *argv[])
   QTextCodec::setCodecForTr( c );
 
   QApplication a( argc, argv, QApplication::GuiServer );
+  a.setStyle( new QCleanlooksStyle() );
 
   LeagueMainWindow * w = new LeagueMainWindow();
-  w->resize( 600, 400 );
+  w->setWindowIcon( QIcon( ":/images/ball.png" ) );
+  w->resize( 600, 600 );
   w->show();
 
   return a.exec();

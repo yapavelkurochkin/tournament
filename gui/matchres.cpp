@@ -95,7 +95,7 @@ void MatchResDialog::textChanged( )
 
   // all games are correct at this time.
 
-  _match = Match( _match.playerA(), _match.playerB(), _match.type() );
+  _match = Match( _match.playerA(), _match.playerB() );
   _match.games() << res;
  
   _okButton->setEnabled( _match.validate() );

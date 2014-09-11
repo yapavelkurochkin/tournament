@@ -66,10 +66,9 @@ QDataStream &operator<<(QDataStream &s, const Game &g)
 /******************************
  * Match                      *
  *****************************/
-Match::Match( Player a, Player b, Type type )
+Match::Match( Player a, Player b )
 : _a( a ),
-  _b ( b ),
-  _type( type )
+  _b ( b )
 {
 }
 
@@ -101,28 +100,14 @@ bool Match::validate() const
 {
   unsigned int aGames = gamesWon( _a );
   unsigned int bGames = gamesWon( _b );
+  unsigned int totalGames = aGames + bGames;
 
-  if ( ( aGames + bGames ) > maxGames() ) {
+  if ( totalGames > maxGames() ) {
     return false;
   }
 
-  if ( aGames == bGames ) {
-    return false;
-  }
-
-  if ( _type == BestOf3 ) {
-    if ( ( aGames == 2 ) || ( bGames == 2 ) ) {
-      return true;
-    }
-  }
-  
-  if ( _type == BestOf5 ) {
-    if ( ( aGames == 3 ) || ( bGames == 3 ) ) {
-      return true;
-    }
-  }
-
-  return false;
+  // it does not matter whether it bestOf3 or bestOf5
+  return ( totalGames >= 2 ) && ( aGames != bGames );
 }
 
 Match& Match::swapPlayers()
@@ -185,16 +170,13 @@ double Match::earnedRating( Player p ) const
  */
 QDataStream &operator >> ( QDataStream &s, Match &m )
 {
-  qint32 type;
-  s >> m._a >> m._b >> m._results >> type;
-  m._type = (Match::Type) type;
+  s >> m._a >> m._b >> m._results;
   return s;
 }
 
 QDataStream &operator << ( QDataStream &s, const Match &m )
 {
-  qint32 type = (Match::Type) m._type;
-  s << m._a << m._b << m._results << type;
+  s << m._a << m._b << m._results;
   return s;
 }
 

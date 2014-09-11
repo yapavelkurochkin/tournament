@@ -22,6 +22,8 @@ struct Game
   friend QDataStream &operator<<(QDataStream &s, const Game &g);
 };
 
+#define MAX_GAMES_PER_MATCH 5
+
 class Match 
 {
   public:
@@ -30,7 +32,7 @@ class Match
       BestOf5
     } Type;
     
-    Match( Player a = Player(), Player b = Player(), Type type = BestOf3 );
+    Match( Player a = Player(), Player b = Player() );
 
     QList< Game > games_const( ) const { return _results; }
     QList< Game >& games( ) { return _results; }
@@ -53,8 +55,8 @@ class Match
 
     QString toString() const;
 
-    Type type() const { return _type; }
-    unsigned int maxGames() const { return ( _type == BestOf3 ) ? 3 : 5; }
+    unsigned int maxGames() const { return MAX_GAMES_PER_MATCH;
+                                     /*real number of games depends from admin */}
     bool played() const { return validate(); }
 
     bool validate() const;

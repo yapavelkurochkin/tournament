@@ -24,7 +24,7 @@ NewTournDialog::NewTournDialog( QWidget* parent )
                                       << "8" << "16" );
 
   QFormLayout *fl = new QFormLayout;
-  fl->addRow( tr("&Match"), matchCombo );
+  fl->addRow( tr("Default &Match"), matchCombo );
   fl->addRow( tr("&Category"), catCombo );
   fl->addRow( tr("&Groups"), gCombo );
 

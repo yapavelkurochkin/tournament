@@ -17,23 +17,16 @@ SwissGroup::SwissGroup( unsigned int fromPlace, Tournament* tourn,
                << cnt;
   }
 
-  // final games are always best of 5
-  Match::Type type = tourn->matchType();
-  bool is34 = ( _players.count() == 2 ) && ( _fromPlace == 3 );
-  if ( isFinal() || is34 ) {
-    type = Match::BestOf5;
-  }
- 
   // i did not found pretty algorithm for that :(
 	// so, it is partially hardcoded. i hate this.
   if ( cnt == 2 ) {
-	  _matches << Match( _players.at( 0 ), _players.at( 1 ), type );
+	  _matches << Match( _players.at( 0 ), _players.at( 1 ) );
 	} else if ( ( cnt == 4 ) && ( stage != 1 ) && ( tourn->groupCount() != 2 ) ) {
 		// here I hate this much more.
 		// I know that in case of groupCount() == 2 only 2 best players from each group 
 		// will participate semi-final. so, they should not use this algorithm of breaking.
-    _matches << Match( _players.at( 0 ), _players.at( 1 ), type );
-	  _matches << Match( _players.at( 2 ), _players.at( 3 ), type );
+    _matches << Match( _players.at( 0 ), _players.at( 1 ) );
+	  _matches << Match( _players.at( 2 ), _players.at( 3 ) );
 	} else {
 	  // first with last
 		// second with last - 1
@@ -41,7 +34,7 @@ SwissGroup::SwissGroup( unsigned int fromPlace, Tournament* tourn,
 	  for ( int i = 0; i < cnt / 2; i ++ ) {
 	    Player a = _players.at( i );
 	    Player b = _players.at( cnt - 1 - i );
-	    _matches << Match( a, b, type );
+	    _matches << Match( a, b );
     }
   }
 

@@ -41,7 +41,15 @@ class Tournament : public QObject {
     unsigned int matchesCount( unsigned int numOfPlayers,
                                unsigned int rrGroupSize, 
                                unsigned int stages ) const;
-    
+
+    typedef enum {
+      ABCD = 1,
+      ADBC,
+      ACBD
+    } RRBreakAlgorithm; // algorithm of breaking of RR players to swiss groups
+    RRBreakAlgorithm rrBreakAlgo() const { return _rrBreakAlgo; }
+    void setRRBreakAlgo( RRBreakAlgorithm a ) { _rrBreakAlgo = a; }
+ 
   signals:
     void newSwissGroupCreated( SwissGroup* g );
     void tournamentChanged( Tournament* t );
@@ -55,6 +63,9 @@ class Tournament : public QObject {
     unsigned int _groupCnt;
     unsigned int _stagesCnt;
     /*<< playing stages including round robin */
+
+    RRBreakAlgorithm _rrBreakAlgo;
+    /*<< algorithm of breaking of RR players to swiss groups */
 
     QList<Group*>* _groups;
     /*<< one list of groups per one stage */

@@ -3,7 +3,7 @@
 
 #include <QString>
 
-const QString gl_version = "0.0.9-0";
+const QString gl_version = "0.0.9-1";
 
 #endif // VERSION__H
 

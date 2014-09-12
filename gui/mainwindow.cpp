@@ -37,7 +37,7 @@ void LeagueMainWindow::createActions()
                          SLOT( newTournament() ) );
   saveT = newAction( tr("&Save"), QKeySequence::Save,
                          SLOT( saveTournament() ) );
-  exportT = newAction( tr("&Export"), QKeySequence::UnknownKey,
+  exportT = newAction( tr("&Export to CSV"), QKeySequence::UnknownKey,
                          SLOT( exportTournament() ) );
   ratings = newAction( tr("&Ratings"), 
                          SLOT( showRatingsTable() ) );
@@ -47,7 +47,24 @@ void LeagueMainWindow::createActions()
 	                       SLOT( undo() ) );
   redoT= newAction( tr("&Redo"), QKeySequence::Redo,
 	                       SLOT( redo() ) );
+  breakADBC = newAction( "A-D, B-C",
+	                       SLOT( selectBreakADBC() ) );
+  breakABCD = newAction( "A-B, C-D",
+	                       SLOT( selectBreakABCD() ) );
+  breakACBD = newAction( "A-C, B-D",
+	                       SLOT( selectBreakACBD() ) );
 
+  QList< QAction* > actions;
+  actions << breakADBC << breakABCD << breakACBD;
+  QActionGroup *ag = new QActionGroup( this );
+  ag->setExclusive( true ); 
+  
+  foreach( QAction *a, actions ) {
+    a->setCheckable( true );
+    ag->addAction( a );
+  }
+  
+  breakADBC->setChecked( true );
 }
 
 /** Action creation helper.
@@ -77,16 +94,24 @@ QAction* LeagueMainWindow::newAction( QString name,
 void LeagueMainWindow::createMenus()
 {
   QMenu* fileMenu = menuBar()->addMenu(tr("&Tournament"));
-  fileMenu->addAction( loadT );
   fileMenu->addAction( newT );
+  fileMenu->addAction( loadT );
   fileMenu->addAction( saveT );
   fileMenu->addAction( exportT );
+  fileMenu->addSeparator();
   fileMenu->addAction( ratings );
-	fileMenu->addAction( undoT );
-	fileMenu->addAction( redoT );
 
   QMenu* iMenu = menuBar()->addMenu(tr("&Information"));
   iMenu->addAction( about );
+
+  QMenu* editMenu = menuBar()->addMenu(tr("&Edit"));
+	editMenu->addAction( undoT );
+	editMenu->addAction( redoT );
+
+  QMenu* bmMenu = menuBar()->addMenu(tr("&Breaking"));
+  bmMenu->addAction( breakADBC );
+  bmMenu->addAction( breakACBD );
+  bmMenu->addAction( breakABCD );
 }
 
 void LeagueMainWindow::loadTournament( QString fName )
@@ -95,6 +120,11 @@ void LeagueMainWindow::loadTournament( QString fName )
     tourn = Tournament::fromFile( fName );
     _history->reset( tourn );
     newTournamentWidget( tourn );
+    switch ( tourn->rrBreakAlgo() ) {
+      case Tournament::ABCD: breakABCD->setChecked( true ); break;
+      case Tournament::ACBD: breakACBD->setChecked( true ); break;
+      case Tournament::ADBC: breakADBC->setChecked( true ); break;
+    }
   }
 }
 
@@ -246,4 +276,19 @@ void LeagueMainWindow::saveLast()
   if ( tourn ) {
     tourn->save( QDir::toNativeSeparators( QDir::homePath() + "/lasttourn.dat" ) );
   } 
+}
+
+void LeagueMainWindow::selectBreakADBC( )
+{ 
+  if ( tourn ) tourn->setRRBreakAlgo( Tournament::ADBC );  
+}
+
+void LeagueMainWindow::selectBreakABCD( )
+{ 
+  if ( tourn ) tourn->setRRBreakAlgo( Tournament::ABCD );  
+}
+
+void LeagueMainWindow::selectBreakACBD( )
+{ 
+  if ( tourn ) tourn->setRRBreakAlgo( Tournament::ACBD );  
 }

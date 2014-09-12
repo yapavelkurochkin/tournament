@@ -21,6 +21,7 @@ Tournament::Tournament( PlayerList players, QString category,
  : _magic( TOURN_MAGIC_NUMBER ),
    _groupCnt( groupCnt ),
    _stagesCnt( 0 ),
+   _rrBreakAlgo( ADBC ),
    _matchType( matchType ),
    _category( category )
 {
@@ -161,26 +162,70 @@ bool Tournament::roundRobinCompleted( ) const
   return true;
 }
 
-/** \return player list built by cyclic principle: 1st from 1 group,
- *          1st from 2 group, 1st from Nth group; 2nd from 1 group etc...
+/** \return player list built by magic principles. 
+ *          They depend from the breaking algorithm selected by admin (ABCD, ADBC, ACBD) 
+ *          Firsts plays with seconds, Seconds with firsts.
+ *          Third plays with third, and so on.
+ *
+ *          Resulting list should be used simply: first item plays with second, third 
+ *          with fourth and so on.
  */
 PlayerList Tournament::roundRobinResults() const
 {
   PlayerList list;
 
   int maxGroupSize = 0;
-  for ( int i = 0; i < _groups[0].count(); i ++ ) {
+  unsigned cnt = _groups[0].count();
+  for ( unsigned i = 0; i < cnt; i ++ ) {
     const Group* g = _groups[0].at( i );
     if ( g->size() > maxGroupSize ) {
       maxGroupSize = g->size(); 
     }
   }
 
+  // we know that groups count is always even. 
+  
+  QList<unsigned> indexes;
+
+  if ( rrBreakAlgo() == Tournament::ABCD ) {
+    for ( unsigned i = 0; i < cnt; i++ ) {
+      indexes << i;
+    }
+  }
+
+  if ( rrBreakAlgo() == Tournament::ADBC ) {
+    // ABCD -> ADBC
+    // ABCDEFGH -> AHBGCFDE
+    for ( unsigned i = 0; i < cnt / 2; i++ ) {
+      indexes << i;
+      indexes << cnt - 1 - i;
+    }
+  }
+
+  if ( rrBreakAlgo() == Tournament::ACBD ) {
+    // ABCD -> ACBD
+    // ABCDEFGH -> AEBFCGDH
+    for ( unsigned i = 0; i < cnt / 2; i++ ) {
+      indexes << i;
+      indexes << cnt/2 + i;
+    }
+  }
+
   for ( int p = 1; p <= maxGroupSize; p ++ ) {
-    for ( int i = 0; i < _groups[0].count(); i ++ ) {
-      const Group* g = _groups[0].at( i );
-      if ( p <= g->size() ) {
-        list << g->playerByPlace( p );
+    for ( unsigned i = 0; i < cnt; i ++ ) {
+      const Group* g = _groups[0].at( indexes.at( i ) );
+
+      int place = p;
+      if ( i & 0x1 ) { // odd groups
+        if ( p == 1 ) // swapping first and second players in odd groups
+          place = 2;
+        if ( p == 2 )
+          place = 1;
+        // third and fourth players stays unswapped
+      } 
+
+      if ( place <= g->size() ) {
+        list << g->playerByPlace( place );
       }
     }
   }
@@ -202,14 +247,6 @@ PlayerList Tournament::players() const
 	}
    
   return list;
-}
-
-/** calculates the matches count required to complete tournament */
-unsigned int Tournament::matchesCount( unsigned int numOfPlayers,
-                                       unsigned int rrGroupSize, 
-                                       unsigned int stages ) const
-{
-  return 0; 
 }
 
 bool Tournament::save( QString fname )
@@ -283,9 +320,11 @@ QDataStream &operator>>(QDataStream &s, Tournament& t)
     "(can't initialize Tournament object from it's contents)";
     return s;
   }
- 
-  s >> t._groupCnt >> t._stagesCnt >> mType >> cat; 
+  
+  int rrBreakAlgo = Tournament::ADBC;
+  s >> t._groupCnt >> t._stagesCnt >> mType >> cat >> rrBreakAlgo; 
 
+  t._rrBreakAlgo = (Tournament::RRBreakAlgorithm) rrBreakAlgo;
   t._category = cat;
   t._matchType = (Match::Type) mType;
   t._groups = new QList<Group*>[ t._stagesCnt ];
@@ -322,7 +361,7 @@ QDataStream &operator<<(QDataStream &s, const Tournament& t)
   }
   
   s << t._magic << t._groupCnt << t._stagesCnt 
-    << (int) t._matchType << t._category; 
+    << (int) t._matchType << t._category << (int)t._rrBreakAlgo; 
 
   for ( unsigned int i = 0; i < t._stagesCnt; i ++ ) {
     int count = t._groups[ i ].count();

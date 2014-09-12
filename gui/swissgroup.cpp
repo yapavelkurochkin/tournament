@@ -13,29 +13,15 @@ SwissGroup::SwissGroup( unsigned int fromPlace, Tournament* tourn,
 {
   int cnt = _players.count();
   if ( cnt & 0x1 ) {
-    qWarning() << __FUNCTION__ << "players count should be even instead of"
-               << cnt;
+    qWarning() << __FUNCTION__ << "players count should be even instead of" << cnt;
   }
 
-  // i did not found pretty algorithm for that :(
-	// so, it is partially hardcoded. i hate this.
-  if ( cnt == 2 ) {
-	  _matches << Match( _players.at( 0 ), _players.at( 1 ) );
-	} else if ( ( cnt == 4 ) && ( stage != 1 ) && ( tourn->groupCount() != 2 ) ) {
-		// here I hate this much more.
-		// I know that in case of groupCount() == 2 only 2 best players from each group 
-		// will participate semi-final. so, they should not use this algorithm of breaking.
-    _matches << Match( _players.at( 0 ), _players.at( 1 ) );
-	  _matches << Match( _players.at( 2 ), _players.at( 3 ) );
-	} else {
-	  // first with last
-		// second with last - 1
-		// and so on.. to the center
-	  for ( int i = 0; i < cnt / 2; i ++ ) {
-	    Player a = _players.at( i );
-	    Player b = _players.at( cnt - 1 - i );
-	    _matches << Match( a, b );
-    }
+  Player a,b;
+  for ( int i = 0; i < cnt/2; i ++ ) {
+    a = _players.at( 2*i );
+    b = _players.at( 2*i + 1);
+
+    _matches << Match( a, b );
   }
 
   for ( int i = 0; i < _matches.count(); i ++ ) {

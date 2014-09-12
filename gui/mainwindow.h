@@ -19,8 +19,9 @@ class LeagueMainWindow : public QMainWindow
 
   protected:
     QAction *loadT, *newT, *saveT, *about, 
-		        *ratings, *exportT, *undoT, *redoT;
-    Tournament* tourn;
+		        *ratings, *exportT, *undoT, *redoT,
+            *breakADBC, *breakACBD, *breakABCD;
+  Tournament* tourn;
     QString progName;
     TournamentHistory* _history;
 
@@ -49,6 +50,9 @@ class LeagueMainWindow : public QMainWindow
     void undo();
     void redo();
     void saveLast();
+    void selectBreakADBC( );
+    void selectBreakABCD( );
+    void selectBreakACBD( );
 };
 
 #endif // MAINWINDOW__H

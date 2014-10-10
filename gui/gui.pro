@@ -22,3 +22,8 @@ HEADERS=playerlist.h player.h playertable.h rrgroup.h\
 
 RESOURCES=tournament.qrc
 
+deploy.depends = all 
+deploy.commands = /usr/local/Trolltech/Qt-4.8.0/bin/macdeployqt tournament.app
+
+QMAKE_EXTRA_TARGETS += deploy
+

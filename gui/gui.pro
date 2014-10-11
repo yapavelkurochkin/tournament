@@ -2,6 +2,7 @@ TEMPLATE=app
 QMAKE_CXXFLAGS += -g
 CONFIG += release
 TARGET = tournament
+QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.9.5
 
 OBJECTS_DIR=.o
 MOC_DIR=.moc
@@ -26,4 +27,5 @@ deploy.depends = all
 deploy.commands = /usr/local/Trolltech/Qt-4.8.0/bin/macdeployqt tournament.app
 
 QMAKE_EXTRA_TARGETS += deploy
+
 

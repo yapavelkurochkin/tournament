@@ -118,12 +118,14 @@ void LeagueMainWindow::loadTournament( QString fName )
 {
   if ( !fName.isNull() ) {
     tourn = Tournament::fromFile( fName );
-    _history->reset( tourn );
-    newTournamentWidget( tourn );
-    switch ( tourn->rrBreakAlgo() ) {
-      case Tournament::ABCD: breakABCD->setChecked( true ); break;
-      case Tournament::ACBD: breakACBD->setChecked( true ); break;
-      case Tournament::ADBC: breakADBC->setChecked( true ); break;
+    if ( tourn ) {
+      _history->reset( tourn );
+      newTournamentWidget( tourn );
+      switch ( tourn->rrBreakAlgo() ) {
+        case Tournament::ABCD: breakABCD->setChecked( true ); break;
+        case Tournament::ACBD: breakACBD->setChecked( true ); break;
+        case Tournament::ADBC: breakADBC->setChecked( true ); break;
+      }
     }
   }
 }

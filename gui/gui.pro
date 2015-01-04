@@ -2,6 +2,7 @@ TEMPLATE=app
 QMAKE_CXXFLAGS += -g
 CONFIG += release
 TARGET = tournament
+QT += widgets
 QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.9.5
 
 OBJECTS_DIR=.o

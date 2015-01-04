@@ -12,12 +12,10 @@
 #include <unistd.h>
 #include <cxxabi.h>
 
+#include <QtWidgets/QApplication>
 #include <QProcess>
-#include <QtGui/QApplication>
-#include <QCleanlooksStyle>
 #include <QTranslator>
 #include <QTextCodec>
-#include <QX11Info>
 #include <QDebug>
 #include <QFile>
 
@@ -29,12 +27,7 @@
 
 int main(int argc, char *argv[])
 {
-  // inline string literals conversion
-  QTextCodec* c = QTextCodec::codecForName( "UTF-8" );
-  QTextCodec::setCodecForTr( c );
-
-  QApplication a( argc, argv, QApplication::GuiServer );
-  a.setStyle( new QCleanlooksStyle() );
+  QApplication a( argc, argv );
 
   LeagueMainWindow * w = new LeagueMainWindow();
   w->setWindowIcon( QIcon( ":/images/ball.png" ) );

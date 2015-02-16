@@ -142,11 +142,34 @@ void Tournament::breakPlayers( PlayerList players )
     _groups[0] << new RRGroup( QChar( 'A' + i ), this );
   }
 
+  int snake = 1;
+  int dir = 1; // +1 - up direction, -1 - down direction 
+
   while ( players.count() ) {
-    for ( int i = 0; ( i < groupCnt ) && players.count(); i ++ ) {
+    int i_start = 0, i_end = 0;
+
+    if ( dir < 0 ) { // up -> down
+      i_start = groupCnt - 1;
+      i_end = -1;
+    } else { // down -> up
+      i_start = 0;
+      i_end = groupCnt;
+    }
+
+    int i = i_start;
+
+    do {
       Player player = players.takeLast();
-     
       _groups[0][i]->addPlayer( player );
+      
+      qDebug() << player.name() << player.rating() << i;
+    
+      i += dir;
+
+    } while ( ( i != i_end ) && players.count() ); 
+    
+    if ( snake ) { // change iteration direction 
+      dir = ( dir < 0 ) ? 1 : -1;
     }
   }
 }

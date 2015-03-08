@@ -8,9 +8,6 @@ NewTournDialog::NewTournDialog( QWidget* parent )
 : QDialog( parent )
 {
   setWindowTitle( tr( "New tournament" ) );
-  matchCombo = new QComboBox();
-  matchCombo->addItems( QStringList() << tr( "Best of 3" ) 
-                                      << tr( "Best of 5" ) );
 
   catCombo = new QComboBox();
   catCombo->addItems( QStringList()   << tr( "M1" ) 
@@ -24,7 +21,6 @@ NewTournDialog::NewTournDialog( QWidget* parent )
                                       << "8" << "16" );
 
   QFormLayout *fl = new QFormLayout;
-  fl->addRow( tr("Default &Match"), matchCombo );
   fl->addRow( tr("&Category"), catCombo );
   fl->addRow( tr("&Groups"), gCombo );
 
@@ -47,11 +43,6 @@ NewTournDialog::NewTournDialog( QWidget* parent )
 QString NewTournDialog::category() const
 {
   return catCombo->currentText();
-}
-
-Match::Type NewTournDialog::matchType() const
-{
-  return ( matchCombo->currentIndex() == 0 ) ? Match::BestOf3 : Match::BestOf5; 
 }
 
 unsigned int NewTournDialog::groupCount() const

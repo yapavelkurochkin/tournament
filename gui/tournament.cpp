@@ -16,13 +16,14 @@ unsigned int log2( unsigned int x )
 }
 
 Tournament::Tournament( PlayerList players, QString category,
-                        Match::Type matchType, unsigned int groupCnt )
+                        unsigned int groupCnt )
                         
  : _magic( TOURN_MAGIC_NUMBER ),
    _groupCnt( groupCnt ),
    _stagesCnt( 0 ),
    _rrBreakAlgo( ADBC ),
-   _matchType( matchType ),
+   _matchType( Match::BestOf3 ), // saved just for historical reasons. Now user is able 
+                                 // to decide bestof3 or bestof5 in runtime.
    _category( category )
 {
   // emperical formula, I can't describe it..

@@ -15,7 +15,7 @@ class Tournament : public QObject {
 
   public:
     Tournament( PlayerList players, QString category,
-                Match::Type matchType = Match::BestOf3, unsigned int groupCnt = 4); 
+                unsigned int groupCnt = 4); 
     Tournament(  );
 
     void groupChanged( Group* g );

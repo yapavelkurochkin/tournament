@@ -15,7 +15,6 @@ class NewTournDialog : public QDialog
     NewTournDialog( QWidget* parent );
 
     QString category() const;
-    Match::Type matchType() const;
     unsigned int groupCount() const;
     PlayerList players() const;
 

@@ -193,11 +193,10 @@ void LeagueMainWindow::newTournament( )
 
   if ( QDialog::Accepted == d.exec() ) {
     QString cat = d.category();
-    Match::Type mtype = d.matchType();
     unsigned int groups = d.groupCount();
     PlayerList players = d.players();
 
-    tourn = new Tournament( players, cat, mtype, groups );
+    tourn = new Tournament( players, cat, groups );
     _history->reset( tourn );
     
     newTournamentWidget( tourn );

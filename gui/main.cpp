@@ -29,6 +29,8 @@ int main(int argc, char *argv[])
 {
   QApplication a( argc, argv );
 
+  QLocale::setDefault( QLocale::C );
+
   LeagueMainWindow * w = new LeagueMainWindow();
   w->setWindowIcon( QIcon( ":/images/ball.png" ) );
   w->resize( 600, 600 );

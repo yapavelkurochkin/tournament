@@ -128,9 +128,12 @@ SwissGroup* Tournament::newSwissGroup( unsigned int fromPlace, unsigned int stag
   return sg;
 }
 
-/** Sorts player list and pushes cool players into first places
- * of groups. Less cool players into second places and so on.
- * Function assumes that 'players' is sorted list.
+/** Function assumes that 'players' is sorted list.
+ *  Breaking is done in 'snake' manner (up->down, down->up, etc...):
+ *   1 8 9  16
+ *   2 7 10 15
+ *   3 6 11 14
+ *   4 5 12 13
  */
 void Tournament::breakPlayers( PlayerList players )
 {

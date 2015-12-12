@@ -133,7 +133,7 @@ void LeagueMainWindow::loadTournament( QString fName )
 void LeagueMainWindow::loadTournamentInteractive( )
 {
   QString fName = QFileDialog::getOpenFileName(this,
-                  tr("Open tournament"), QDir::homePath(), 
+                  tr("Open tournament"), "", 
                   tr("Tournament Files (*.trn)"));
 
   loadTournament( fName );
@@ -160,7 +160,7 @@ TournamentWidget* LeagueMainWindow::newTournamentWidget( Tournament *t )
 void LeagueMainWindow::saveTournament( )
 {
   QString fName = QFileDialog::getSaveFileName(this,
-                  tr("Save tournament"), QDir::homePath(), 
+                  tr("Save tournament"), "", 
                   tr("Tournament Files (*.trn)"));
 
   if ( !fName.isNull() ) {
@@ -174,7 +174,7 @@ void LeagueMainWindow::saveTournament( )
 void LeagueMainWindow::exportTournament( )
 {
   QString fName = QFileDialog::getSaveFileName(this,
-                  tr("Export tournament results"), QDir::homePath(), 
+                  tr("Export tournament results"), "", 
                   tr("CSV Files (*.csv)"));
 
   if ( !fName.isNull() ) {

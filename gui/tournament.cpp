@@ -189,6 +189,22 @@ bool Tournament::roundRobinCompleted( ) const
   return true;
 }
 
+/** scans all groups and calculates a maximum group size 
+ */
+unsigned Tournament::calcMaxGroupSize( QList< Group* > groups ) const
+{
+  int max = 0;
+  unsigned cnt = groups.count();
+  for ( unsigned i = 0; i < cnt; i ++ ) {
+    const Group* g = groups.at( i );
+    if ( g->size() > max ) {
+      max = g->size(); 
+    }
+  }
+
+  return max;
+}
+
 /** \return player list built by magic principles. 
  *          They depend from the breaking algorithm selected by admin (ABCD, ADBC, ACBD) 
  *          Firsts plays with seconds, Seconds with firsts.
@@ -201,14 +217,7 @@ PlayerList Tournament::roundRobinResults() const
 {
   PlayerList list;
 
-  int maxGroupSize = 0;
   unsigned cnt = _groups[0].count();
-  for ( unsigned i = 0; i < cnt; i ++ ) {
-    const Group* g = _groups[0].at( i );
-    if ( g->size() > maxGroupSize ) {
-      maxGroupSize = g->size(); 
-    }
-  }
 
   // we know that groups count is always even. 
   
@@ -238,21 +247,57 @@ PlayerList Tournament::roundRobinResults() const
     }
   }
 
-  for ( int p = 1; p <= maxGroupSize; p ++ ) {
-    for ( unsigned i = 0; i < cnt; i ++ ) {
-      const Group* g = _groups[0].at( indexes.at( i ) );
+  unsigned maxGroupSize = calcMaxGroupSize( _groups[0] );
+  if ( cnt == 8 ) {
+    QList< Group* > g = _groups[ 0 ];
+    #define GROUP( symb ) g.at( symb - 'A' )
+    // we use special algorithm by Ehab Aljamal ;)
+    // first sixteen players are built into pairs so:
+    // A1-H2, E2-G1, B2-E1, C2-D1, C1-D2, F1-A2, F2-H1, G2-B1
+    // other players plays 'place to place' accordingly to 
+    // rrBreakAlgo() selected
+    list << GROUP( 'A' )->playerByPlace( 1 );
+    list << GROUP( 'H' )->playerByPlace( 2 );
+    list << GROUP( 'E' )->playerByPlace( 2 );
+    list << GROUP( 'G' )->playerByPlace( 1 );
+    list << GROUP( 'B' )->playerByPlace( 2 );
+    list << GROUP( 'E' )->playerByPlace( 1 );
+    list << GROUP( 'C' )->playerByPlace( 2 );
+    list << GROUP( 'D' )->playerByPlace( 1 );
+    list << GROUP( 'C' )->playerByPlace( 1 );
+    list << GROUP( 'D' )->playerByPlace( 2 );
+    list << GROUP( 'F' )->playerByPlace( 1 );
+    list << GROUP( 'A' )->playerByPlace( 2 );
+    list << GROUP( 'F' )->playerByPlace( 2 );
+    list << GROUP( 'H' )->playerByPlace( 1 );
+    list << GROUP( 'G' )->playerByPlace( 2 );
+    list << GROUP( 'B' )->playerByPlace( 1 );
 
-      int place = p;
-      if ( i & 0x1 ) { // odd groups
-        if ( p == 1 ) // swapping first and second players in odd groups
-          place = 2;
-        if ( p == 2 )
-          place = 1;
-        // third and fourth players stays unswapped
-      } 
-
-      if ( place <= g->size() ) {
-        list << g->playerByPlace( place );
+    for ( unsigned p = 3; p <= maxGroupSize; p ++ ) {
+      for ( unsigned i = 0; i < cnt; i ++ ) {
+        const Group* group = _groups[0].at( indexes.at( i ) );
+        if ( p <= (unsigned) group->size() ) {
+          list << group->playerByPlace( p );
+        }
+      }
+    }
+  } else {
+    for ( unsigned p = 1; p <= maxGroupSize; p ++ ) {
+      for ( unsigned i = 0; i < cnt; i ++ ) {
+        const Group* g = _groups[0].at( indexes.at( i ) );
+  
+        int place = p;
+        if ( i & 0x1 ) { // odd groups
+          if ( p == 1 ) // swapping first and second players in odd groups
+            place = 2;
+          if ( p == 2 )
+            place = 1;
+          // third and fourth players stays unswapped
+        } 
+  
+        if ( place <= g->size() ) {
+          list << g->playerByPlace( place );
+        }
       }
     }
   }

@@ -79,6 +79,7 @@ class Tournament : public QObject {
     void breakPlayers( PlayerList players );
     bool roundRobinCompleted() const;
     PlayerList roundRobinResults() const;
+    unsigned calcMaxGroupSize( QList< Group* > groups ) const;
 
     SwissGroup* newSwissGroup( unsigned int fromPlace, unsigned int stage, 
                                PlayerList players );

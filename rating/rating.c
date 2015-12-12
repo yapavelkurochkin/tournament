@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <math.h>
 #include "polycoeff.h"
 
 /** calculates the rating value earned by 
@@ -36,7 +37,7 @@ double calcEarnedRating( double ratingA, double ratingB,
       case -3: poly_idx = 5; break; // 0:3
       default: 
                fprintf( stderr, "invalid match result\n" );
-               break;
+               return NAN;
     }
     
     poly = &bestof5[ poly_idx ];
@@ -49,7 +50,7 @@ double calcEarnedRating( double ratingA, double ratingB,
       case -2: poly_idx = 3; break; // 0:2
       default: 
                fprintf( stderr, "invalid match result\n" );
-               break;
+               return NAN;
     }
     
     poly = &bestof3[ poly_idx ];

@@ -66,62 +66,33 @@ NewTournDialog::NewTournDialog( QWidget* parent )
   typeChanged( 0 );
 }
 
-QString NewTournDialog::category() const
+TournProps NewTournDialog::tournProps() const
 {
-  return catCombo->currentText();
-}
-
-unsigned int NewTournDialog::groupCount() const
-{
-  return gCombo->currentText().toUInt();
-}
-
-PlayerList NewTournDialog::players() const 
-{
-  return table->playerList(); 
-}
-
-unsigned int NewTournDialog::playoffSize() const
-{
-  return sizeCombo->currentText().toInt();
-}
-
-unsigned int NewTournDialog::skipQualification() const
-{
-  return noQualEdit->text().toInt();
-}
-
-// warning: I assume that index of item in combobox corresponds 
-// to correct value in enum type
-TournType NewTournDialog::type() const 
-{
-  return (TournType) typeCombo->currentIndex();
+  // warning: It is assumed that index of item in combobox corresponds 
+  // to correct value in enum type
+  if ( (TournType) typeCombo->currentIndex() == RRPlayOff ) {
+    return TournProps( table->playerList(), 
+                       catCombo->currentText(),
+                       gCombo->currentText().toUInt() );
+  } else {
+    return TournProps( table->playerList(), 
+                       catCombo->currentText(),
+                       sizeCombo->currentText().toInt(),
+                       noQualEdit->text().toInt() );
+  } 
 }
 
 /** \brief Checking whether entered values are valid.
  */
 void NewTournDialog::tryToAccept() 
 {
-  if ( (TournType) type() == QualifPlayOff ) {
-    if ( (unsigned int) players().count() < playoffSize() ) {
-  		QMessageBox::information( this, "Incorrect parameters",
-                                      "Playoff size could not be greater\n"
-                                      "than number of players" );
-      return;
-    }
+  QString msg;
 
-    if ( playoffSize() < skipQualification() ) {
-	  	QMessageBox::information( this, "Incorrect parameters",
-                                      "Number of players skipping qualification\n"
-                                      "Could not be greater than playoff size" );
-      return;
-    }
-  
-    // TODO: there can be situation with big number of players, small playoff size
-    //       and small skipQual number.
+  if ( tournProps().validate( msg ) ) {
+    accept();
+  } else {
+	  QMessageBox::information( this, "Incorrect parameters", msg );
   }
-
-  accept();
 }
 
 void NewTournDialog::typeChanged( int index )

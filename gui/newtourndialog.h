@@ -7,7 +7,7 @@
 
 #include "playertable.h"
 #include "match.h" 
-#include "tourntype.h"
+#include "tournprops.h"
 
 class NewTournDialog : public QDialog
 {
@@ -16,12 +16,7 @@ class NewTournDialog : public QDialog
   public:
     NewTournDialog( QWidget* parent );
 
-    QString category() const;
-    unsigned int groupCount() const;
-    PlayerList players() const;
-    unsigned int playoffSize() const;
-    unsigned int skipQualification() const;
-    TournType type()  const;
+    TournProps tournProps() const;
 
   protected slots:
     void tryToAccept();

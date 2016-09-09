@@ -4,6 +4,9 @@
 #include <QObject>
 #include "playerlist.h"
 #include "rrgroup.h"
+#include "tournprops.h"
+#include "tournalgo.h"
+#include "tourndata.h"
 
 class SwissGroup;
 class QFile;
@@ -16,18 +19,11 @@ class Tournament : public QObject {
   public:
     Tournament( PlayerList players, QString category,
                 unsigned int groupCnt = 4); 
+    Tournament( TournProps props ); 
     Tournament(  );
 
     void groupChanged( Group* g );
-    QList<Group*> groupList( unsigned int stage ) const 
-                          { return _groups[ stage ]; }
  
-    unsigned int stagesCnt() const { return _stagesCnt; }
-    unsigned int groupCount() const; 
-    Match::Type defaultMatchType() const { return _matchType; }
-    QString category() const { return _category; }
-    PlayerList players() const;
-
     static Tournament* fromFile( QString fileName );
     bool save( QString fname );
     bool save( QFile* f );
@@ -37,19 +33,11 @@ class Tournament : public QObject {
     void setFileName( QString fn ) { _fileName = fn; }
     QString fileName( ) const { return _fileName; }
 
-    MatchList matchList() const;
-    unsigned int matchesCount( unsigned int numOfPlayers,
-                               unsigned int rrGroupSize, 
-                               unsigned int stages ) const;
+    const TournAlgo * algo_const() const { return _algo; }
+    const TournData * data_const() const { return _data; }
+    TournAlgo * algo() const { return _algo; }
+    TournData * data() const { return _data; }
 
-    typedef enum {
-      ABCD = 1,
-      ADBC,
-      ACBD
-    } RRBreakAlgorithm; // algorithm of breaking of RR players to swiss groups
-    RRBreakAlgorithm rrBreakAlgo() const { return _rrBreakAlgo; }
-    void setRRBreakAlgo( RRBreakAlgorithm a ) { _rrBreakAlgo = a; }
- 
   signals:
     void newSwissGroupCreated( SwissGroup* g );
     void tournamentChanged( Tournament* t );
@@ -60,32 +48,11 @@ class Tournament : public QObject {
     unsigned int _magic;
     /**< Used for identification of validity of tournament object*/
 
-    unsigned int _groupCnt;
-    unsigned int _stagesCnt;
-    /*<< playing stages including round robin */
-
-    RRBreakAlgorithm _rrBreakAlgo;
-    /*<< algorithm of breaking of RR players to swiss groups */
-
-    QList<Group*>* _groups;
-    /*<< one list of groups per one stage */
-
-    Match::Type _matchType;
-    QString _category;
+    TournAlgo *_algo;
+    TournData *_data;
 
     QString _fileName;
     /*<< file which corresponds to this tournament */
-
-    void breakPlayers( PlayerList players );
-    bool roundRobinCompleted() const;
-    PlayerList roundRobinResults() const;
-    unsigned calcMaxGroupSize( QList< Group* > groups ) const;
-
-    SwissGroup* newSwissGroup( unsigned int fromPlace, unsigned int stage, 
-                               PlayerList players );
-
-    void buildGroups( );
-    void splitSwissGroup( SwissGroup* g );
 
     bool isValid() const { return _magic == TOURN_MAGIC_NUMBER; }
 

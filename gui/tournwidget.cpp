@@ -38,7 +38,7 @@ void TournamentWidget::setupLayout( QHBoxLayout* hLayout )
 {
   hLayout->setSizeConstraint( QLayout::SetMinimumSize );
 
-  for ( unsigned int i = 0; i < _tourn->stagesCnt(); i ++ ) {
+  for ( unsigned int i = 0; i < _tourn->algo_const()->stagesCnt(); i ++ ) {
     QVBoxLayout* l = new QVBoxLayout( ); 
     l->setSizeConstraint( QLayout::SetMinimumSize );
 
@@ -63,9 +63,9 @@ bool swissGroupLessThen(const Group* g1, const Group* g2)
  */
 void TournamentWidget::createTablesForGroups( )
 {
-  for ( unsigned int gr = 0; gr < _tourn->stagesCnt(); gr ++ ) {
+  for ( unsigned int gr = 0; gr < _tourn->algo_const()->stagesCnt(); gr ++ ) {
     // todo: may be groupList should return sorted list?
-    QList< Group* > groups = _tourn->groupList( gr );
+    QList< Group* > groups = _tourn->data_const()->groupList( gr );
 
     if ( gr > 0 ) {
       // there are swiss groups in list

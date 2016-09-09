@@ -12,7 +12,12 @@
 #include <unistd.h>
 #include <cxxabi.h>
 
-#include <QtWidgets/QApplication>
+#if QT_VERSION >= 0x050000
+#  include <QtWidgets/QApplication>
+#else
+#  include <QApplication>
+#endif
+
 #include <QProcess>
 #include <QTranslator>
 #include <QTextCodec>

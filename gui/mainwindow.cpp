@@ -121,10 +121,10 @@ void LeagueMainWindow::loadTournament( QString fName )
     if ( tourn ) {
       _history->reset( tourn );
       newTournamentWidget( tourn );
-      switch ( tourn->rrBreakAlgo() ) {
-        case Tournament::ABCD: breakABCD->setChecked( true ); break;
-        case Tournament::ACBD: breakACBD->setChecked( true ); break;
-        case Tournament::ADBC: breakADBC->setChecked( true ); break;
+      switch ( tourn->algo_const()->rrBreakAlgo() ) {
+        case RRPlayoffAlgo::ABCD: breakABCD->setChecked( true ); break;
+        case RRPlayoffAlgo::ACBD: breakACBD->setChecked( true ); break;
+        case RRPlayoffAlgo::ADBC: breakADBC->setChecked( true ); break;
       }
     }
   }
@@ -192,11 +192,9 @@ void LeagueMainWindow::newTournament( )
   NewTournDialog d( this );
 
   if ( QDialog::Accepted == d.exec() ) {
-    QString cat = d.category();
-    unsigned int groups = d.groupCount();
-    PlayerList players = d.players();
-
-    tourn = new Tournament( players, cat, groups );
+    TournProps p = d.tournProps();
+    
+    tourn = new Tournament( p );
     _history->reset( tourn );
     
     newTournamentWidget( tourn );
@@ -281,15 +279,15 @@ void LeagueMainWindow::saveLast()
 
 void LeagueMainWindow::selectBreakADBC( )
 { 
-  if ( tourn ) tourn->setRRBreakAlgo( Tournament::ADBC );  
+  if ( tourn ) tourn->algo()->setRRBreakAlgo( RRPlayoffAlgo::ADBC );  
 }
 
 void LeagueMainWindow::selectBreakABCD( )
 { 
-  if ( tourn ) tourn->setRRBreakAlgo( Tournament::ABCD );  
+  if ( tourn ) tourn->algo()->setRRBreakAlgo( RRPlayoffAlgo::ABCD );  
 }
 
 void LeagueMainWindow::selectBreakACBD( )
 { 
-  if ( tourn ) tourn->setRRBreakAlgo( Tournament::ACBD );  
+  if ( tourn ) tourn->algo()->setRRBreakAlgo( RRPlayoffAlgo::ACBD );  
 }

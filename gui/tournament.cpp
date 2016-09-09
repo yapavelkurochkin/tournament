@@ -6,7 +6,7 @@
 #include "tournament.h"
 #include "rrgroup.h"
 #include "swissgroup.h"
-
+#include "tournalgofactory.h"
 
 unsigned int log2( unsigned int x )
 {
@@ -15,310 +15,42 @@ unsigned int log2( unsigned int x )
   return ans ;
 }
 
-Tournament::Tournament( PlayerList players, QString category,
-                        unsigned int groupCnt )
-                        
+Tournament::Tournament( TournProps props ) 
  : _magic( TOURN_MAGIC_NUMBER ),
-   _groupCnt( groupCnt ),
-   _stagesCnt( 0 ),
-   _rrBreakAlgo( ADBC ),
-   _matchType( Match::BestOf3 ), // saved just for historical reasons. Now user is able 
-                                 // to decide bestof3 or bestof5 in runtime.
-   _category( category )
+   _algo( TournAlgoFactory::algo( props ) ),
+   _data( new TournData( _algo ) )
 {
-  // emperical formula, I can't describe it..
-	// groupCnt = 2 -> stagesCnt = 4
-	// groupCnt = 4 -> stagesCnt = 5
-	// groupCnt = 8 -> stagesCnt = 6
-  _stagesCnt = log2( groupCount() * 4 ) + 1;
-
-  _groups = new QList<Group*>[ _stagesCnt ];
-  Q_CHECK_PTR( _groups );
-
-  breakPlayers( players );
-  
-  emit tournamentChanged( this );
+  Q_CHECK_PTR( _algo );
+  if ( _algo->stagesCnt() > 0 ) {
+    _data->groups()[ 0 ] = _algo->buildGroups( 0 );
+    emit tournamentChanged( this );
+  }  
 }
 
 /** This constructor is only intended for serialization/deserialization
  */
 Tournament::Tournament( ) 
- : _magic( 0xdeadbeef ), // object is not invalid
-   _groupCnt( 0 ),
-   _stagesCnt( 0 ),
-   _matchType( Match::BestOf3 ),
-   _category( "M2" ) 
+ : _magic( 0xdeadbeef ), // object is not valid
+   _algo( NULL ),
+   _data( NULL )
 {
-}
-
-unsigned int Tournament::groupCount() const 
-{
-	return _groupCnt; 
 }
 
 void Tournament::groupChanged( Group* g )
 {
   if ( g->stage() == 0 ) {
-    if ( roundRobinCompleted() ) {
-      buildGroups( ); 
+    // 0th stage is always qualification (RoundRobin or another one).
+    // it should be fully completed before next stage.
+    if ( _algo->stageCompleted( _data->groups()[0] ) ) {
+      _data->groups()[1] = _algo->buildGroups( 1, _data->groups()[0] );
     }
   } else {
-    if ( g->completed() && ( g->stage() != ( _stagesCnt - 1 ) ) ) {
-      splitSwissGroup( dynamic_cast< SwissGroup* >( g ) ); 
+    if ( g->completed() && ( !_algo->isStageLast( g->stage() ) ) ) {
+      _data->groups()[ g->stage() + 1 ] << dynamic_cast< SwissGroup* >( g )->split(); 
     }
   }
 
   emit tournamentChanged( this );
-}
-
-/** build groups by results of round-robin stage 
- *   \todo this code should be in split() method of RRGroup
- */
-void Tournament::buildGroups( )
-{
-  // 1st stage group size.
-  // groupCnt = 2 => gs(1) = 4
-  // groupCnt = 4 => gs(1) = 8
-  // groupCnt = 8 => gs(1) = 16
-	//
-	// first gs players are playing 1-2 2-1 1-2 2-1
-  int gs = groupCount() * 2; 
-  PlayerList players = roundRobinResults( );
-
-  qDebug() << __PRETTY_FUNCTION__ << players.count();
-
-  newSwissGroup( 1, 1, players.mid( 0, gs ) );
-
-  players = players.mid( gs ); 
-	// next gs/2 players are playing 3-3 4-4 5-5, etc..
-  int fromPlace = gs;
-  while ( ( gs = ( gs / 2 ) ) >= 2 ) {
-	  while ( gs <= players.count() ) {
-      newSwissGroup( fromPlace + 1, 1, players.mid( 0, gs ) );
-			players = players.mid( gs );
-			fromPlace += gs;
-		}
-  } 
-}
-
-/** splits groups for two groups - group of winners and group of loosers.
- */
-void Tournament::splitSwissGroup( SwissGroup* g )
-{
-  QList< Group* > groups = g->split();   
-
-  // if group contains only 1 match then it will not be splitted
-  // and 
-
-  if ( groups.count() ) {
-    _groups[ groups.at( 0 )->stage() ] << groups;
-  }
-
-  for ( int i = 0; i < groups.count(); i ++ ) {
-    emit newSwissGroupCreated( dynamic_cast< SwissGroup* >( groups.at( i ) ) );
-  }
-}
-
-SwissGroup* Tournament::newSwissGroup( unsigned int fromPlace, unsigned int stage, 
-                                       PlayerList players )
-{
-  SwissGroup* sg = new SwissGroup( fromPlace, this, stage, players );
-
-  _groups[ 1 ] << sg;
-  emit newSwissGroupCreated( sg );
-  return sg;
-}
-
-/** Function assumes that 'players' is sorted list.
- *  Breaking is done in 'snake' manner (up->down, down->up, etc...):
- *   1 8 9  16
- *   2 7 10 15
- *   3 6 11 14
- *   4 5 12 13
- */
-void Tournament::breakPlayers( PlayerList players )
-{
-  int groupCnt = groupCount(); 
-  
-  _groups[0].clear(); 
-
-  for ( int i = 0; i < groupCnt; i ++ ) {
-    _groups[0] << new RRGroup( QChar( 'A' + i ), this );
-  }
-
-  int snake = 1;
-  int dir = 1; // +1 - up direction, -1 - down direction 
-
-  while ( players.count() ) {
-    int i_start = 0, i_end = 0;
-
-    if ( dir < 0 ) { // up -> down
-      i_start = groupCnt - 1;
-      i_end = -1;
-    } else { // down -> up
-      i_start = 0;
-      i_end = groupCnt;
-    }
-
-    int i = i_start;
-
-    do {
-      Player player = players.takeLast();
-      _groups[0][i]->addPlayer( player );
-      
-      qDebug() << player.name() << player.rating() << i;
-    
-      i += dir;
-
-    } while ( ( i != i_end ) && players.count() ); 
-    
-    if ( snake ) { // change iteration direction 
-      dir = ( dir < 0 ) ? 1 : -1;
-    }
-  }
-}
-
-bool Tournament::roundRobinCompleted( ) const
-{
-  for ( int i = 0; i < _groups[ 0 ].count(); i ++ ) {
-    if ( ! _groups[ 0 ].at( i )->completed() ) {
-      return false;
-    }
-  }
- 
-  return true;
-}
-
-/** scans all groups and calculates a maximum group size 
- */
-unsigned Tournament::calcMaxGroupSize( QList< Group* > groups ) const
-{
-  int max = 0;
-  unsigned cnt = groups.count();
-  for ( unsigned i = 0; i < cnt; i ++ ) {
-    const Group* g = groups.at( i );
-    if ( g->size() > max ) {
-      max = g->size(); 
-    }
-  }
-
-  return max;
-}
-
-/** \return player list built by magic principles. 
- *          They depend from the breaking algorithm selected by admin (ABCD, ADBC, ACBD) 
- *          Firsts plays with seconds, Seconds with firsts.
- *          Third plays with third, and so on.
- *
- *          Resulting list should be used simply: first item plays with second, third 
- *          with fourth and so on.
- */
-PlayerList Tournament::roundRobinResults() const
-{
-  PlayerList list;
-
-  unsigned cnt = _groups[0].count();
-
-  // we know that groups count is always even. 
-  
-  QList<unsigned> indexes;
-
-  if ( rrBreakAlgo() == Tournament::ABCD ) {
-    for ( unsigned i = 0; i < cnt; i++ ) {
-      indexes << i;
-    }
-  }
-
-  if ( rrBreakAlgo() == Tournament::ADBC ) {
-    // ABCD -> ADBC
-    // ABCDEFGH -> AHBGCFDE
-    for ( unsigned i = 0; i < cnt / 2; i++ ) {
-      indexes << i;
-      indexes << cnt - 1 - i;
-    }
-  }
-
-  if ( rrBreakAlgo() == Tournament::ACBD ) {
-    // ABCD -> ACBD
-    // ABCDEFGH -> AEBFCGDH
-    for ( unsigned i = 0; i < cnt / 2; i++ ) {
-      indexes << i;
-      indexes << cnt/2 + i;
-    }
-  }
-
-  unsigned maxGroupSize = calcMaxGroupSize( _groups[0] );
-  if ( cnt == 8 ) {
-    QList< Group* > g = _groups[ 0 ];
-    #define GROUP( symb ) g.at( symb - 'A' )
-    // we use special algorithm by Ehab Aljamal ;)
-    // first sixteen players are built into pairs so:
-    // A1-H2, E2-G1, B2-E1, C2-D1, C1-D2, F1-A2, F2-H1, G2-B1
-    // other players plays 'place to place' accordingly to 
-    // rrBreakAlgo() selected
-    list << GROUP( 'A' )->playerByPlace( 1 );
-    list << GROUP( 'H' )->playerByPlace( 2 );
-    list << GROUP( 'E' )->playerByPlace( 2 );
-    list << GROUP( 'G' )->playerByPlace( 1 );
-    list << GROUP( 'B' )->playerByPlace( 2 );
-    list << GROUP( 'E' )->playerByPlace( 1 );
-    list << GROUP( 'C' )->playerByPlace( 2 );
-    list << GROUP( 'D' )->playerByPlace( 1 );
-    list << GROUP( 'C' )->playerByPlace( 1 );
-    list << GROUP( 'D' )->playerByPlace( 2 );
-    list << GROUP( 'F' )->playerByPlace( 1 );
-    list << GROUP( 'A' )->playerByPlace( 2 );
-    list << GROUP( 'F' )->playerByPlace( 2 );
-    list << GROUP( 'H' )->playerByPlace( 1 );
-    list << GROUP( 'G' )->playerByPlace( 2 );
-    list << GROUP( 'B' )->playerByPlace( 1 );
-
-    for ( unsigned p = 3; p <= maxGroupSize; p ++ ) {
-      for ( unsigned i = 0; i < cnt; i ++ ) {
-        const Group* group = _groups[0].at( indexes.at( i ) );
-        if ( p <= (unsigned) group->size() ) {
-          list << group->playerByPlace( p );
-        }
-      }
-    }
-  } else {
-    for ( unsigned p = 1; p <= maxGroupSize; p ++ ) {
-      for ( unsigned i = 0; i < cnt; i ++ ) {
-        const Group* g = _groups[0].at( indexes.at( i ) );
-  
-        int place = p;
-        if ( i & 0x1 ) { // odd groups
-          if ( p == 1 ) // swapping first and second players in odd groups
-            place = 2;
-          if ( p == 2 )
-            place = 1;
-          // third and fourth players stays unswapped
-        } 
-  
-        if ( place <= g->size() ) {
-          list << g->playerByPlace( place );
-        }
-      }
-    }
-  }
-
-  return list;
-}
-
-/** build actual player list. note, tha playerlist can be changed
- *  by user (rrtable allows to add or remove user via menu).
- *  that is why Tournament class does not store player list but builds it 
- *  on demand.
- */
-PlayerList Tournament::players() const
-{
-  PlayerList list;
-  for ( int i = 0; i < _groups[0].count(); i ++ ) {
-    const Group* g = _groups[0].at( i );
-    list << g->const_players();
-	}
-   
-  return list;
 }
 
 bool Tournament::save( QString fname )
@@ -358,26 +90,11 @@ Tournament* Tournament::fromFile( QString fileName )
   return t;
 }
 
-/** \return total matches list
- */
-MatchList Tournament::matchList() const 
-{
-  MatchList ml;
-  for ( unsigned int i = 0; i < stagesCnt(); i ++ ) {
-    QList<Group*> gl = groupList( i );
-    for ( int j = 0; j < gl.count(); j ++ ) {
-      ml << gl.at( j )->matchList();
-    }   
-  }
-
-  return ml;
-}
-
 /* serialization
  */
 QDataStream &operator>>(QDataStream &s, Tournament& t)
 {
-  int mType;
+/*  int mType;
   QString cat;
 
   if ( s.atEnd() ) {
@@ -420,13 +137,13 @@ QDataStream &operator>>(QDataStream &s, Tournament& t)
       }
     }   
   }
- 
+*/
   return s;
 }
 
 QDataStream &operator<<(QDataStream &s, const Tournament& t)
 {
-  if ( !t.isValid() ) {
+/*  if ( !t.isValid() ) {
     qWarning() << __FUNCTION__ << 
                   "trying to serialize invalid tournament object";
     return s;
@@ -451,7 +168,7 @@ QDataStream &operator<<(QDataStream &s, const Tournament& t)
       }
     }   
   }
-
+*/
   return s;
 }
 
@@ -465,7 +182,6 @@ void Tournament::saveAsCSV( QString file )
                   "trying to save a results of invalid tournament object";
     return;
 	}
- 
 
 	QFile csv( file );
 	QChar sep( '|' );
@@ -473,10 +189,10 @@ void Tournament::saveAsCSV( QString file )
 	if (csv.open(QFile::WriteOnly | QFile::Truncate)) {
 		QTextStream out(&csv);
   
-	  for ( unsigned int i = 0; i < _stagesCnt; i ++ ) {
-      int count = _groups[ i ].count();
+	  for ( unsigned int i = 0; i < _algo->stagesCnt(); i ++ ) {
+      int count = _data->groups()[ i ].count();
       for ( int j = 0; j < count; j ++ ) {
-        const Group* g = _groups[ i ].at( j );
+        const Group* g = _data->groups()[ i ].at( j );
 				out << g->csvResult( sep ) << endl;
       }
 			out << endl;
@@ -495,10 +211,10 @@ QString Tournament::totalRatingAsCSV( QChar sep )
   QString ret;
 	QTextStream out( &ret );
 
-  PlayerList pls = players();
+  PlayerList pls = _data->playerList();
 	qSort( pls.end(), pls.begin() );
 
-  Group fake( "unused", this, matchList(), pls );
+  Group fake( "unused", this, _data->matchList(), pls );
   for ( int i = 0; i < pls.count(); i ++ ) {
 	  Player p = pls.at( i );
 		double earned = fake.earnedRating( p ); 

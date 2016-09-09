@@ -1,4 +1,4 @@
-#! /usr/bin/octave -q 
+#! /opt/local/bin/octave -q 
 
 files = { 'bestof3', 'bestof5' };
 
@@ -20,6 +20,7 @@ for f = 1:length(files)
 
     # calculating the error of interpolation
     # y_int = polyval( p, x, [], mu );
+    # plot( y_int );
 
     printf( '{\n .p = { ' ); 
     for j=1:length(p)
@@ -34,5 +35,6 @@ for f = 1:length(files)
   end
 
   printf( '};\n\n' );
+  # pause 
 end
 

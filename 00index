@@ -1,1 +1,5 @@
-rating -- calculation of rating
+rating -- library for calculation of rating
+gui -- Qt application for tournament management
+bin -- pre-build binaries for vaious platforms (Win, Mac)
+
+

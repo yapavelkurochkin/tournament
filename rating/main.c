@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <math.h>
 #include "rating.h"
 
 /** Program calculates the rating value earned by 
@@ -22,6 +23,11 @@ int main( int argc, char** argv )
 
   double resRating = calcEarnedRating( ratingA, ratingB,
                                        scoresA, scoresB );
+  if ( isnan( resRating ) ) {
+    //exit( EINVAL );
+    resRating = 0;
+  }
+
   printf( "%f\n", resRating );
 
   return 0;

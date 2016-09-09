@@ -3,7 +3,7 @@ QMAKE_CXXFLAGS += -g
 CONFIG += release
 TARGET = tournament
 QT += widgets
-QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.9.5
+QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.6
 
 OBJECTS_DIR=.o
 MOC_DIR=.moc
@@ -25,7 +25,7 @@ HEADERS=playerlist.h player.h playertable.h rrgroup.h\
 RESOURCES=tournament.qrc
 
 deploy.depends = all 
-deploy.commands = /usr/local/Trolltech/Qt-4.8.0/bin/macdeployqt tournament.app
+deploy.commands = macdeployqt tournament.app -dmg
 
 QMAKE_EXTRA_TARGETS += deploy
 

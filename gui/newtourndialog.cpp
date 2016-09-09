@@ -17,12 +17,13 @@ NewTournDialog::NewTournDialog( QWidget* parent )
                                       << tr( "Elite" ) );
 
   gCombo = new QComboBox();
-  gCombo->addItems( QStringList()    << "2" << "4"
+  gCombo->addItems( QStringList()     << "2" << "4"
                                       << "8" << "16" );
 
   QFormLayout *fl = new QFormLayout;
   fl->addRow( tr("&Category"), catCombo );
   fl->addRow( tr("&Groups"), gCombo );
+  // TODO: add selector 'Do not play round-robin stage'
 
   table = new PlayerTable( this );
   fl->addRow( table ); 

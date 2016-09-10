@@ -70,7 +70,7 @@ TournProps NewTournDialog::tournProps() const
 {
   // warning: It is assumed that index of item in combobox corresponds 
   // to correct value in enum type
-  if ( (TournType) typeCombo->currentIndex() == RRPlayOff ) {
+  if ( (TournProps::TournType) typeCombo->currentIndex() == TournProps::RRPlayOff ) {
     return TournProps( table->playerList(), 
                        catCombo->currentText(),
                        gCombo->currentText().toUInt() );
@@ -97,13 +97,13 @@ void NewTournDialog::tryToAccept()
 
 void NewTournDialog::typeChanged( int index )
 {
-  switch ( (TournType) index ) {
-    case RRPlayOff: 
+  switch ( (TournProps::TournType) index ) {
+    case TournProps::RRPlayOff: 
       gCombo->setEnabled( true );
       sizeCombo->setEnabled( false );
       noQualEdit->setEnabled( false );
       break; 
-    case QualifPlayOff:
+    case TournProps::QualifPlayOff:
       gCombo->setEnabled( false );
       sizeCombo->setEnabled( true );
       noQualEdit->setEnabled( true );

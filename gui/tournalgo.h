@@ -7,19 +7,21 @@
 class Group;
 
 class TournAlgo {
-  unsigned int _stagesCnt;
-  TournProps   _props;
+
+  protected:
+    unsigned int _stagesCnt;
+    TournProps   _props;
 
   // TODO: make TournAlgoFactory a friend and make constructor protected?
   public:
     TournAlgo( TournProps p );
-    virtual ~TournAlgo();
+    virtual ~TournAlgo(){};
 
     unsigned int stagesCnt() const { return _stagesCnt; }
     TournProps props() const { return _props; }
    
-    bool stageCompleted( QList< Group*> groups );
-    unsigned int maxGroupSize( QList< Group* > groups );
+    bool stageCompleted( QList< Group*> groups ) const;
+    unsigned int maxGroupSize( QList< Group* > groups ) const;
 
     bool isStageLast( unsigned stage ) { return ( stage == ( _stagesCnt - 1 ) ); }
 

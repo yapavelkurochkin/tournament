@@ -13,6 +13,7 @@
 #include "tournwidget.h"
 #include "newtourndialog.h"
 #include "ratingsdialog.h"
+#include "rrplayoff.h"
 #include "about.h"
 
 LeagueMainWindow::LeagueMainWindow()
@@ -121,10 +122,14 @@ void LeagueMainWindow::loadTournament( QString fName )
     if ( tourn ) {
       _history->reset( tourn );
       newTournamentWidget( tourn );
-      switch ( tourn->algo_const()->rrBreakAlgo() ) {
-        case RRPlayoffAlgo::ABCD: breakABCD->setChecked( true ); break;
-        case RRPlayoffAlgo::ACBD: breakACBD->setChecked( true ); break;
-        case RRPlayoffAlgo::ADBC: breakADBC->setChecked( true ); break;
+
+      const RRPlayoffAlgo *algo =dynamic_cast< const RRPlayoffAlgo* > ( tourn->algo_const() );
+      if ( algo ) { 
+				switch ( algo->rrBreakAlgo() ) {
+					case RRPlayoffAlgo::ABCD: breakABCD->setChecked( true ); break;
+					case RRPlayoffAlgo::ACBD: breakACBD->setChecked( true ); break;
+					case RRPlayoffAlgo::ADBC: breakADBC->setChecked( true ); break;
+				}
       }
     }
   }
@@ -209,7 +214,7 @@ void LeagueMainWindow::setWindowName()
   QString name = progName;
 
   if ( tourn ) {
-    name += " -- " + tourn->category();
+    name += " -- " + tourn->algo_const()->props().category;
 
     if ( !tourn->fileName().isEmpty() ) {
       name += " -- " + QFileInfo( tourn->fileName() ).baseName();
@@ -241,7 +246,8 @@ void LeagueMainWindow::showAboutDialog()
 void LeagueMainWindow::showRatingsTable()
 {
   if ( tourn ) {
-    Group g( tr("Total"), tourn, tourn->matchList(), tourn->players() ); 
+    Group g( tr("Total"), tourn, tourn->data_const()->matchList(), 
+                                 tourn->data_const()->playerList() ); 
     RatingsDialog d( &g, this );
     d.exec(); 
   } 
@@ -279,15 +285,30 @@ void LeagueMainWindow::saveLast()
 
 void LeagueMainWindow::selectBreakADBC( )
 { 
-  if ( tourn ) tourn->algo()->setRRBreakAlgo( RRPlayoffAlgo::ADBC );  
+  if ( tourn ) {
+     RRPlayoffAlgo* a = dynamic_cast< RRPlayoffAlgo* > ( tourn->algo() );
+     if ( a ) {
+       a->setRRBreakAlgo( RRPlayoffAlgo::ADBC ); 
+     }
+  } 
 }
 
 void LeagueMainWindow::selectBreakABCD( )
 { 
-  if ( tourn ) tourn->algo()->setRRBreakAlgo( RRPlayoffAlgo::ABCD );  
+  if ( tourn ) {
+     RRPlayoffAlgo* a = dynamic_cast< RRPlayoffAlgo* > ( tourn->algo() );
+     if ( a ) {
+       a->setRRBreakAlgo( RRPlayoffAlgo::ABCD ); 
+     }
+  } 
 }
 
 void LeagueMainWindow::selectBreakACBD( )
 { 
-  if ( tourn ) tourn->algo()->setRRBreakAlgo( RRPlayoffAlgo::ACBD );  
+  if ( tourn ) {
+     RRPlayoffAlgo* a = dynamic_cast< RRPlayoffAlgo* > ( tourn->algo() );
+     if ( a ) {
+       a->setRRBreakAlgo( RRPlayoffAlgo::ACBD ); 
+     }
+  } 
 }

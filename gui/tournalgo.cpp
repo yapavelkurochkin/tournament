@@ -8,7 +8,7 @@ TournAlgo::TournAlgo( TournProps p )
 }
 
 
-bool TournAlgo::stageCompleted( QList< Group*> groups )
+bool TournAlgo::stageCompleted( QList< Group*> groups ) const
 {
   for ( int i = 0; i < groups.count(); i ++ ) {
     if ( groups.at( i ) && ( ! groups.at( i )->completed() ) ) {
@@ -21,7 +21,7 @@ bool TournAlgo::stageCompleted( QList< Group*> groups )
 
 /** \brief searches for biggest group and returns its size
  */
-unsigned int TournAlgo::maxGroupSize( QList< Group* > groups )
+unsigned int TournAlgo::maxGroupSize( QList< Group* > groups ) const
 {
   int max = 0;
   unsigned cnt = groups.count();

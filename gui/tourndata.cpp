@@ -1,10 +1,15 @@
+#include <QList>
 #include "tourndata.h"
+#include "tournalgo.h"
+#include "group.h"
 
-TournData::TournData( const TournAlgo *algo )
+TournData::TournData( const TournAlgo *algo  )
 :_algo( algo )
 {
-  _groups = new QList<Group*>[ _algo->stagesCnt() ];
-  Q_CHECK_PTR( _groups );
+  if ( _algo ) {
+    _groups = new QList<Group*>[ _algo->stagesCnt() ];
+    Q_CHECK_PTR( _groups );
+  }
 }
 
 /** build actual player list. NOTE, that playerlist can be changed
@@ -24,5 +29,25 @@ PlayerList TournData::playerList() const
 	}
    
   return list;
+}
+
+/** \return total matches list
+ */
+MatchList TournData::matchList( int stage ) const 
+{
+  MatchList ml;
+  if ( stage >= 0 ) {
+    for ( int j = 0; ( stage < _algo->stagesCnt() ) && ( j < _groups[ stage ].count() ); j ++ ) {
+      ml << _groups[ stage ].at( j )->matchList();
+    }   
+  } else { 
+		for ( unsigned int i = 0; i < _algo->stagesCnt(); i ++ ) {
+			QList<Group*> gl = _groups[ i ];
+			for ( int j = 0; j < gl.count(); j ++ ) {
+				ml << gl.at( j )->matchList();
+			}   
+		}
+  }
+  return ml;
 }
 

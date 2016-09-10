@@ -1,4 +1,15 @@
+#include <QDebug>
 #include "rrplayoff.h"
+#include "rrgroup.h"
+#include "swissgroup.h"
+#include "tournament.h"
+
+unsigned int log2( unsigned int x )
+{
+  unsigned int ans = 0 ;
+  while( x>>=1 ) ans++;
+  return ans ;
+}
 
 RRPlayoffAlgo::RRPlayoffAlgo( TournProps p )
 : TournAlgo( p ),
@@ -22,11 +33,11 @@ RRPlayoffAlgo::RRPlayoffAlgo( TournProps p )
 QList<Group*> RRPlayoffAlgo::initGroups( )
 {
   QList< Group* > groups;
-  PlayerList players = p.players;
+  PlayerList players = props().players;
   qSort( players );
 
-  for ( int i = 0; i < p.rrGroupNum; i ++ ) {
-    groups << new RRGroup( QChar( 'A' + i ), this );
+  for ( int i = 0; i < props().rrGroupNum; i ++ ) {
+    groups << new RRGroup( QChar( 'A' + i ), NULL );
   }
 
   int snake = 1;
@@ -36,11 +47,11 @@ QList<Group*> RRPlayoffAlgo::initGroups( )
     int i_start = 0, i_end = 0;
 
     if ( dir < 0 ) { // up -> down
-      i_start = p.rrGroupNum - 1;
+      i_start = props().rrGroupNum - 1;
       i_end = -1;
     } else { // down -> up
       i_start = 0;
-      i_end = p.rrGroupNum;
+      i_end = props().rrGroupNum;
     }
 
     int i = i_start;
@@ -85,7 +96,7 @@ QList<Group*> RRPlayoffAlgo::buildGroups( unsigned int stage,
     // groupCnt = 8 => gs(1) = 16
   	//
 	  // first gs players are playing 1-2 2-1 1-2 2-1   
-		int gs = groupCount() * 2; 
+		int gs = props().rrGroupNum * 2; 
 		PlayerList players = roundRobinResults( prevGroups );
 
 		qDebug() << __PRETTY_FUNCTION__ << players.count();
@@ -126,13 +137,13 @@ PlayerList RRPlayoffAlgo::roundRobinResults( QList< Group* > groups ) const
   
   QList<unsigned> indexes;
 
-  if ( rrBreakAlgo() == Tournament::ABCD ) {
+  if ( rrBreakAlgo() == ABCD ) {
     for ( unsigned i = 0; i < cnt; i++ ) {
       indexes << i;
     }
   }
 
-  if ( rrBreakAlgo() == Tournament::ADBC ) {
+  if ( rrBreakAlgo() == ADBC ) {
     // ABCD -> ADBC
     // ABCDEFGH -> AHBGCFDE
     for ( unsigned i = 0; i < cnt / 2; i++ ) {
@@ -141,7 +152,7 @@ PlayerList RRPlayoffAlgo::roundRobinResults( QList< Group* > groups ) const
     }
   }
 
-  if ( rrBreakAlgo() == Tournament::ACBD ) {
+  if ( rrBreakAlgo() == ACBD ) {
     // ABCD -> ACBD
     // ABCDEFGH -> AEBFCGDH
     for ( unsigned i = 0; i < cnt / 2; i++ ) {
@@ -150,7 +161,7 @@ PlayerList RRPlayoffAlgo::roundRobinResults( QList< Group* > groups ) const
     }
   }
 
-  unsigned maxGroupSize = maxGroupSize( groups );
+  unsigned max = maxGroupSize( groups );
   if ( cnt == 8 ) {
     #define GROUP( symb ) groups.at( symb - 'A' )
     // we use special algorithm by Ehab Aljamal ;)
@@ -175,7 +186,7 @@ PlayerList RRPlayoffAlgo::roundRobinResults( QList< Group* > groups ) const
     list << GROUP( 'G' )->playerByPlace( 2 );
     list << GROUP( 'B' )->playerByPlace( 1 );
 
-    for ( unsigned p = 3; p <= maxGroupSize; p ++ ) {
+    for ( unsigned p = 3; p <= max; p ++ ) {
       for ( unsigned i = 0; i < cnt; i ++ ) {
         const Group* group = groups.at( indexes.at( i ) );
         if ( p <= (unsigned) group->size() ) {
@@ -184,7 +195,7 @@ PlayerList RRPlayoffAlgo::roundRobinResults( QList< Group* > groups ) const
       }
     }
   } else {
-    for ( unsigned p = 1; p <= maxGroupSize; p ++ ) {
+    for ( unsigned p = 1; p <= max; p ++ ) {
       for ( unsigned i = 0; i < cnt; i ++ ) {
         const Group* g = groups.at( indexes.at( i ) );
   

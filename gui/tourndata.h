@@ -1,14 +1,20 @@
 #ifndef TOURNDATA__H
 #define TOURNDATA__H
 
+#include <QList>
+#include "player.h"
+#include "playerlist.h"
+#include "match.h"
 
 class TournAlgo;
+class Group;
+
 
 /** Actual matches, player list and all data, which 
  *  is changing during tournament
  */
 class TournData {
-  TournAlgo *_algo;
+  const TournAlgo *_algo;
 
   QList<Group*>* _groups;
   /*<< one list of groups per one stage */
@@ -16,7 +22,7 @@ class TournData {
   void initGroups( );
 
   public:
-    TournData( TournAlgo *algo = NULL );
+    TournData( const TournAlgo *algo = NULL );
 
     void setAlgo( TournAlgo * algo ) { _algo = algo; }
     const TournAlgo *algo() const { return _algo; }

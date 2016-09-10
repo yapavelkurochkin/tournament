@@ -8,13 +8,6 @@
 #include "swissgroup.h"
 #include "tournalgofactory.h"
 
-unsigned int log2( unsigned int x )
-{
-  unsigned int ans = 0 ;
-  while( x>>=1 ) ans++;
-  return ans ;
-}
-
 Tournament::Tournament( TournProps props ) 
  : _magic( TOURN_MAGIC_NUMBER ),
    _algo( TournAlgoFactory::algo( props ) ),
@@ -92,7 +85,7 @@ Tournament* Tournament::fromFile( QString fileName )
 
 /* serialization
  */
-QDataStream &operator>>(QDataStream &s, Tournament& t)
+QDataStream &operator>>(QDataStream &s, Tournament& )
 {
 /*  int mType;
   QString cat;
@@ -141,7 +134,7 @@ QDataStream &operator>>(QDataStream &s, Tournament& t)
   return s;
 }
 
-QDataStream &operator<<(QDataStream &s, const Tournament& t)
+QDataStream &operator<<(QDataStream &s, const Tournament& )
 {
 /*  if ( !t.isValid() ) {
     qWarning() << __FUNCTION__ << 

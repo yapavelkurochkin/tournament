@@ -1,9 +1,10 @@
 #include "tournalgofactory.h"
+#include "rrplayoff.h"
 
-static TournAlgo* TournAlgoFactory::algo( TournProps p ) 
+TournAlgo* TournAlgoFactory::algo( TournProps p ) 
 {
   if ( p.type == TournProps::RRPlayOff ) {
-    return new RRPlayOff( p ); 
+    return new RRPlayoffAlgo( p ); 
   }
 
   return NULL; 

@@ -10,7 +10,7 @@ class RRGroup: public Group
   void roundRobin();
 
   public:
-    RRGroup( QString name = QString(), Tournament* tourn = NULL, 
+    RRGroup( QString name = QString(), 
              PlayerList players = PlayerList() );
 
     virtual void addPlayer( Player player );

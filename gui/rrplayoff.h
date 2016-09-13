@@ -7,9 +7,9 @@ class RRPlayoffAlgo : public TournAlgo {
   public:
     RRPlayoffAlgo( TournProps p );
 
-    QList<Group*> initGroups( );
+    QList<Group*> initGroups( ) const;
     QList<Group*> buildGroups( unsigned int stage, 
-                               QList<Group*> prevGroups );
+                               QList<Group*> prevGroups ) const;
 
 		typedef enum {
 			ABCD = 1,

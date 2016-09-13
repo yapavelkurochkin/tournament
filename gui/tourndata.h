@@ -8,29 +8,31 @@
 
 class TournAlgo;
 class Group;
-
+class Tournament;
 
 /** Actual matches, player list and all data, which 
  *  is changing during tournament
  */
 class TournData {
-  const TournAlgo *_algo;
+  const TournAlgo   *_algo;
 
-  QList<Group*>* _groups;
+  QList<Group*>     *_groups;
   /*<< one list of groups per one stage */
 
-  void initGroups( );
+  Tournament        *_tournament;
 
   public:
     TournData( const TournAlgo *algo = NULL );
+
+    void initGroups( );
+
+    void setTournament( Tournament* t ) { _tournament = t; }
 
     void setAlgo( TournAlgo * algo ) { _algo = algo; }
     const TournAlgo *algo() const { return _algo; }
 
     QList<Group*>* groups() const { return _groups; }
-
-    void setMatchResults( Player a, Player b, QList< Game > res );
-    void setMatchResults( Match m );
+    void groupChanged( Group *g );
 
     QList<Group*> groupList( unsigned int stage ) const 
                           { return _groups[ stage ]; }

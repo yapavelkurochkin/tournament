@@ -11,7 +11,6 @@ class SwissGroup : public Group
 
   public:
     SwissGroup( unsigned int fromPlace,
-                Tournament* tourn,
                 unsigned int stage,
                 PlayerList players );
     SwissGroup(); 

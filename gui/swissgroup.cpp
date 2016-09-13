@@ -6,9 +6,9 @@
  *  player.count() should be even.
  *  \param fromPlace -- means the best place possible for this group
  */
-SwissGroup::SwissGroup( unsigned int fromPlace, Tournament* tourn,
+SwissGroup::SwissGroup( unsigned int fromPlace, 
                         unsigned int stage, PlayerList players ) 
-: Group( QString( "" ), tourn, stage, players ),
+: Group( QString( "" ), stage, players ),
   _fromPlace( fromPlace )
 {
   int cnt = _players.count();
@@ -35,10 +35,9 @@ SwissGroup::SwissGroup( unsigned int fromPlace, Tournament* tourn,
 /** Should be used only during serializing/deserializing
  */
 SwissGroup::SwissGroup()
-: Group( QString( "" ), NULL, 2, PlayerList() ),
+: Group( QString( "" ), 2, PlayerList() ),
   _fromPlace( 1 )
 {
-
 }
 
 void SwissGroup::initGroupName()
@@ -72,9 +71,13 @@ QList< Group* > SwissGroup::split( ) const
   }
 
   QList< Group* > ret;
-  ret << new SwissGroup( _fromPlace, _tournament, _stage + 1, winners );
+  ret << new SwissGroup( _fromPlace, _stage + 1, winners );
   ret << new SwissGroup( _fromPlace + _players.count() / 2, 
-                         _tournament, _stage + 1, loosers );
+                         _stage + 1, loosers );
+
+  foreach( Group *g, ret ) {
+    g->setTournData( _tournData );
+  }
  
   return ret; 
 }

@@ -38,6 +38,8 @@ class Tournament : public QObject {
     TournAlgo * algo() const { return _algo; }
     TournData * data() const { return _data; }
 
+    void update( );
+
   signals:
     void newSwissGroupCreated( SwissGroup* g );
     void tournamentChanged( Tournament* t );

@@ -8,7 +8,7 @@
 #include "playerscores.h"
 #include "match.h"
 
-class Tournament;
+class TournData;
 
 /** represents the group of players. it may be round-robin group or
  * swiss tournament group. group's has a name and a list of players
@@ -24,16 +24,16 @@ class Group
 
     PlayerList _players;
     MatchList _matches;
-    Tournament* _tournament;
+    TournData* _tournData;
     unsigned int _stage;
 
     friend QDataStream &operator>>(QDataStream &, Group&);
     friend QDataStream &operator<<(QDataStream &, const Group&);
 
   public:
-    Group( QString name = QString(), Tournament* tourn = NULL, 
+    Group( QString name = QString(),
            unsigned int stage = 0, PlayerList players = PlayerList() );
-    Group( QString name = QString(), Tournament* tourn = NULL,
+    Group( QString name = QString(), 
            MatchList matches = MatchList(), PlayerList players = PlayerList() );
 
     virtual void addPlayer( Player player );
@@ -57,7 +57,9 @@ class Group
 
     double earnedRating( Player p ) const;
 
-    void setTournament( Tournament* t ) { _tournament = t; }
+    void setTournData( TournData* t ) { _tournData = t; }
+    const TournData* tournData_const( ) { return _tournData; }
+    TournData* tournData( ) { return _tournData; }
 
     QString name() const { return _name; }
     int size() const { return _players.count(); }

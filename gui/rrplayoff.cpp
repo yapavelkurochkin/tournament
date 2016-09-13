@@ -30,14 +30,14 @@ RRPlayoffAlgo::RRPlayoffAlgo( TournProps p )
  *   3 6 11 14
  *   4 5 12 13
  */
-QList<Group*> RRPlayoffAlgo::initGroups( )
+QList<Group*> RRPlayoffAlgo::initGroups( ) const
 {
   QList< Group* > groups;
   PlayerList players = props().players;
   qSort( players );
 
   for ( int i = 0; i < props().rrGroupNum; i ++ ) {
-    groups << new RRGroup( QChar( 'A' + i ), NULL );
+    groups << new RRGroup( QChar( 'A' + i ) );
   }
 
   int snake = 1;
@@ -78,7 +78,7 @@ QList<Group*> RRPlayoffAlgo::initGroups( )
  *   \todo this code should be in split() method of RRGroup
  */
 QList<Group*> RRPlayoffAlgo::buildGroups( unsigned int stage, 
-                                          QList<Group*> prevGroups )
+                                          QList<Group*> prevGroups ) const
 {
   if ( stage >= stagesCnt() ) {
     return QList< Group* >();
@@ -99,20 +99,21 @@ QList<Group*> RRPlayoffAlgo::buildGroups( unsigned int stage,
 		int gs = props().rrGroupNum * 2; 
 		PlayerList players = roundRobinResults( prevGroups );
 
-		qDebug() << __PRETTY_FUNCTION__ << players.count();
+		qDebug() << __PRETTY_FUNCTION__ << "players count:", players.count();
 
-		groups << new SwissGroup( 1, NULL/**FIXME:*/, stage, players.mid( 0, gs ) );
+		groups << new SwissGroup( 1, stage, players.mid( 0, gs ) );
 
 		players = players.mid( gs ); 
 		// next gs/2 players are playing 3-3 4-4 5-5, etc..
 		int fromPlace = gs;
 		while ( ( gs = ( gs / 2 ) ) >= 2 ) {
 			while ( gs <= players.count() ) {
-				groups << new SwissGroup( fromPlace + 1, NULL, stage, players.mid( 0, gs ) );
+				groups << new SwissGroup( fromPlace + 1, stage, players.mid( 0, gs ) );
 				players = players.mid( gs );
 				fromPlace += gs;
 			}
 		}
+
     return groups;
   }
 

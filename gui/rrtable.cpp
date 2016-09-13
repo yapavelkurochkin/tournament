@@ -84,7 +84,7 @@ void RRTable::editMatchResults( int row, int col )
 
   qDebug() << __FUNCTION__ << row << col;
 
-/* tann asked to comment this.
+/* tann asked me to comment this [pk].
  
   if ( _group->readOnly() ) {
     QMessageBox::information( this, _group->name(), 

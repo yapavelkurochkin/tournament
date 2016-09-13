@@ -23,11 +23,11 @@ class TournAlgo {
     bool stageCompleted( QList< Group*> groups ) const;
     unsigned int maxGroupSize( QList< Group* > groups ) const;
 
-    bool isStageLast( unsigned stage ) { return ( stage == ( _stagesCnt - 1 ) ); }
+    bool isStageLast( unsigned stage ) const { return ( stage == ( _stagesCnt - 1 ) ); }
 
-    virtual QList<Group*> initGroups( ) = 0;
+    virtual QList<Group*> initGroups( ) const = 0;
     virtual QList<Group*> buildGroups( unsigned int stage, 
-                                 QList<Group*> prevGroups = QList< Group* >() ) = 0;
+                                 QList<Group*> prevGroups = QList< Group* >() ) const = 0;
 
 };
 

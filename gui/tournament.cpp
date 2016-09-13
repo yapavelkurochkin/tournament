@@ -14,10 +14,11 @@ Tournament::Tournament( TournProps props )
    _data( new TournData( _algo ) )
 {
   Q_CHECK_PTR( _algo );
-  if ( _algo->stagesCnt() > 0 ) {
-    _data->groups()[ 0 ] = _algo->buildGroups( 0 );
-    emit tournamentChanged( this );
-  }  
+  
+  _data->setTournament( this );
+  _data->initGroups();
+
+  update(); 
 }
 
 /** This constructor is only intended for serialization/deserialization
@@ -29,20 +30,8 @@ Tournament::Tournament( )
 {
 }
 
-void Tournament::groupChanged( Group* g )
+void Tournament::update()
 {
-  if ( g->stage() == 0 ) {
-    // 0th stage is always qualification (RoundRobin or another one).
-    // it should be fully completed before next stage.
-    if ( _algo->stageCompleted( _data->groups()[0] ) ) {
-      _data->groups()[1] = _algo->buildGroups( 1, _data->groups()[0] );
-    }
-  } else {
-    if ( g->completed() && ( !_algo->isStageLast( g->stage() ) ) ) {
-      _data->groups()[ g->stage() + 1 ] << dynamic_cast< SwissGroup* >( g )->split(); 
-    }
-  }
-
   emit tournamentChanged( this );
 }
 
@@ -85,9 +74,9 @@ Tournament* Tournament::fromFile( QString fileName )
 
 /* serialization
  */
-QDataStream &operator>>(QDataStream &s, Tournament& )
+QDataStream &operator>>(QDataStream &s, Tournament& t )
 {
-/*  int mType;
+  int mType;
   QString cat;
 
   if ( s.atEnd() ) {
@@ -102,7 +91,7 @@ QDataStream &operator>>(QDataStream &s, Tournament& )
     "(can't initialize Tournament object from it's contents)";
     return s;
   }
-  
+/*  
   int rrBreakAlgo = Tournament::ADBC;
   s >> t._groupCnt >> t._stagesCnt >> mType >> cat >> rrBreakAlgo; 
 
@@ -207,7 +196,7 @@ QString Tournament::totalRatingAsCSV( QChar sep )
   PlayerList pls = _data->playerList();
 	qSort( pls.end(), pls.begin() );
 
-  Group fake( "unused", this, _data->matchList(), pls );
+  Group fake( "unused", _data->matchList(), pls );
   for ( int i = 0; i < pls.count(); i ++ ) {
 	  Player p = pls.at( i );
 		double earned = fake.earnedRating( p ); 

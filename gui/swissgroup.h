@@ -30,7 +30,9 @@ class SwissGroup : public Group
          { return ( _players.count() == 8 ) && ( _fromPlace == 1 ); }
 
     static unsigned int matchesCount( unsigned int numOfPlayers );
+    static bool lessThan(const Group* g1, const Group* g2);
 };
+
 
 #endif // SWISSGROUP__H
 

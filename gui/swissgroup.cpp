@@ -129,3 +129,20 @@ QString SwissGroup::csvResult( QChar sep ) const
 	return ret;
 }
 
+/** Compares swiss groups by their fromPlace field.
+ */
+bool SwissGroup::lessThan(const Group* g1, const Group* g2)
+{
+  Q_ASSERT( g1 );
+  Q_ASSERT( g2 ); 
+
+  if ( g1 && g2 ) {
+    const SwissGroup* sg1 = dynamic_cast< const SwissGroup* >( g1 );
+    const SwissGroup* sg2 = dynamic_cast< const SwissGroup* >( g2 );
+
+    return sg1->fromPlace() < sg2->fromPlace();
+  } else {
+    return false;
+  }
+}
+

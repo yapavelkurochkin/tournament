@@ -21,13 +21,39 @@ TournamentWidget::TournamentWidget( Tournament* tourn, QWidget* parent )
 
   createTablesForGroups( );
 
-  connect( tourn, SIGNAL( newSwissGroupCreated( SwissGroup* ) ),
-           this, SLOT( newSwissGroupCreated( SwissGroup* ) ) );
+  connect( tourn, SIGNAL( tournamentChanged( Tournament * ) ),
+           this, SLOT( syncTables(  ) ) );
 }
 
 TournamentWidget::~TournamentWidget()
 {
   delete _tourn;
+}
+
+/** \brief Looks up new tables in tournament and adds a table for new one to
+ *         layout. 
+ */
+void TournamentWidget::syncTables( )
+{
+  for ( unsigned int gr = 0; gr < _tourn->algo_const()->stagesCnt(); gr ++ ) {
+    // todo: may be groupList should return sorted list?
+    QList< Group* > groups = _tourn->data_const()->groupList( gr );
+
+    for ( int i = 0; i < groups.count(); i ++ ) {
+      Group* g = groups.at( i );
+
+      if ( !_tables.contains( g ) ) {
+        // found new group in tournament
+        SwissGroup *sg = dynamic_cast< SwissGroup* >( g );
+        if ( sg ) {
+          _tables[ g ] = createSwissTable( sg );
+        } else {
+          // TODO: now only swiss groups are created dynamically, but if you read
+          //       this, maybe that's not true.
+        }
+      }
+    }
+  }
 }
 
 /** initializes necessary number of columns in horizontal layout
@@ -48,16 +74,6 @@ void TournamentWidget::setupLayout( QHBoxLayout* hLayout )
   }
 }
 
-/** Compares swiss groups by their fromPlace field.
- */
-bool swissGroupLessThen(const Group* g1, const Group* g2)
-{
-  const SwissGroup* sg1 = dynamic_cast< const SwissGroup* >( g1 );
-  const SwissGroup* sg2 = dynamic_cast< const SwissGroup* >( g2 );
-
-  return sg1->fromPlace() < sg2->fromPlace();
-}
-
 /** scans Tournament for all groups in each stage, creates
  *  proper table and inserts it to corresponding group layout
  */
@@ -68,26 +84,34 @@ void TournamentWidget::createTablesForGroups( )
     QList< Group* > groups = _tourn->data_const()->groupList( gr );
 
     if ( gr > 0 ) {
+      // TODO: 0th stage can contain only swiss groups!
       // there are swiss groups in list
-      qSort( groups.begin(), groups.end(), swissGroupLessThen );
+      qSort( groups.begin(), groups.end(), SwissGroup::lessThan );
     }
 
     for ( int i = 0; i < groups.count(); i ++ ) {
-      GroupTable* t;
-      if ( gr == 0 ) {
-        t = new RRTable( groups[ i ], this );
+      GroupTable *t;
+      Group *g = groups.at( i );
+      SwissGroup *sg = dynamic_cast< SwissGroup* >( g );
+      RRGroup *rrg = dynamic_cast< RRGroup* >( g );
+      if ( rrg ) {
+        t = new RRTable( g, this );
+      } else if ( sg ) {
+        t = new SwissTable( g, this );
       } else {
-        t = new SwissTable( groups[ i ], this );
+        t = NULL;
+        Q_ASSERT( t );
       }
       
       _groupLayouts.at( gr )->addWidget( t );
+      _tables[ g ] = t;
     }
   }
 }
 
 /** creates table for group and inserts it to layout.
  */
-void TournamentWidget::newSwissGroupCreated( SwissGroup* g )
+SwissTable* TournamentWidget::createSwissTable( SwissGroup* g )
 {
   SwissTable* newst = new SwissTable( g, this );
   
@@ -103,15 +127,12 @@ void TournamentWidget::newSwissGroupCreated( SwissGroup* g )
     QWidget* w = l->itemAt( i )->widget();
     SwissTable* st = dynamic_cast< SwissTable* >( w );
     if ( st ) {
-      const SwissGroup* sg = dynamic_cast< const SwissGroup* >( st->group() );
-      const SwissGroup* newsg = dynamic_cast< const SwissGroup* >( newst->group() );
-
-      if ( sg && newsg && ( newsg->fromPlace() < sg->fromPlace() ) ) {
+      if ( SwissGroup::lessThan( newst->group(), st->group() ) )
         break;
-      }
     }
   }
 
   l->insertWidget( i, newst ); 
+  return newst;
 }
 

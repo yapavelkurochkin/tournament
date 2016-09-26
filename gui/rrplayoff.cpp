@@ -4,6 +4,8 @@
 #include "swissgroup.h"
 #include "tournament.h"
 
+/** calculate integer log2. log(9) = 3, log2( 16) = 4. 
+ */
 unsigned int log2( unsigned int x )
 {
   unsigned int ans = 0 ;

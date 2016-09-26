@@ -54,6 +54,8 @@ class Group
     PlayerResults playerResults( Player p ) const;
     unsigned int playerPlace( Player p ) const;
     Player playerByPlace( unsigned int place ) const;
+    PlayerList winners() const;
+    PlayerList loosers() const;
 
     double earnedRating( Player p ) const;
 

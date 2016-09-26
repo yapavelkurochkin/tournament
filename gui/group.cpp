@@ -229,6 +229,30 @@ double Group::earnedRating( Player p ) const
   return total;
 }
 
+/** \return list of players who won at least 1 match
+ */
+PlayerList Group::winners() const
+{
+  PlayerList list;
+  for ( int i = 0; i < _matches.count(); i++) {
+    list << _matches.at( i ).winner();
+  }
+
+  return list;
+}
+
+/** \return list of players who lost at least 1 match
+ */
+PlayerList Group::loosers() const
+{
+  PlayerList list;
+  for ( int i = 0; i < _matches.count(); i++) {
+    list << _matches.at( i ).looser();
+  }
+
+  return list;
+}
+
 /** Serialization operators
   */
 QDataStream &operator<<( QDataStream &s, const Group &g )

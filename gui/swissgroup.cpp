@@ -64,16 +64,10 @@ QList< Group* > SwissGroup::split( ) const
     return QList< Group* >();
   }
 
-  PlayerList winners, loosers;
-  for ( int i = 0; i < _matches.count(); i ++ ) {
-    winners << _matches.at( i ).winner();
-    loosers << _matches.at( i ).looser();
-  }
-
   QList< Group* > ret;
-  ret << new SwissGroup( _fromPlace, _stage + 1, winners );
+  ret << new SwissGroup( _fromPlace, _stage + 1, winners() );
   ret << new SwissGroup( _fromPlace + _players.count() / 2, 
-                         _stage + 1, loosers );
+                         _stage + 1, loosers() );
 
   foreach( Group *g, ret ) {
     g->setTournData( _tournData );

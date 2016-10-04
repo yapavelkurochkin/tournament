@@ -1,0 +1,13 @@
+Source: tournament 
+Section: misc
+Priority: extra
+Maintainer: Pavel Kurochkin <pavel.kurochkin@gmail.com>
+Build-Depends: 
+Standards-Version: 3.9.2
+Homepage: http://github.com/yapavelkurochkin/tournament 
+
+Package: tournament
+Architecture: i386
+Depends: ${misc:Depends}
+Description: Tool for tournament management
+

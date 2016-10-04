@@ -6,6 +6,9 @@
 /** Qualification + Playoff
  */
 class QPlayoffAlgo : public TournAlgo {
+  unsigned int _qualifNum; 
+  /**< number of players in qualification, incl. BYE guys */
+
   public:
     QPlayoffAlgo( TournProps p );
 
@@ -14,7 +17,8 @@ class QPlayoffAlgo : public TournAlgo {
                                QList<Group*> prevGroups ) const;
 
   protected:
-    PlayerList qualificationResults( QList< Group* > groups ) const;
+    PlayerList qualifTopResults( QList< Group* > groups ) const;
+    PlayerList qualifBotResults( QList< Group* > groups ) const;
 };
 
 #endif

@@ -1,6 +1,5 @@
 #include <QDebug>
-#include "rrplayoff.h"
-#include "rrgroup.h"
+#include "qplayoff.h"
 #include "swissgroup.h"
 #include "tournament.h"
 
@@ -12,14 +11,16 @@ QPlayoffAlgo::QPlayoffAlgo( TournProps p )
   _qualifNum = p.players.count() - p.seededNum;
   
   // round qualifNum to the nearest power of 2
-  unsigned int l2 = log( _qualifNum );
+  unsigned int l2 = log2( _qualifNum );
   _qualifNum = ( ( 1 << l2 ) < _qualifNum ) ? ( 1 << ( l2 + 1 ) ) : 1 << l2;  
  
   _stagesCnt = 1 /* qualification */ + log2( p.seededNum + _qualifNum / 2 );
 
+  qDebug() << __FUNCTION__ << "qualifNum:" << _qualifNum << "stages:" << _stagesCnt;
   // EXAMPLE: let p.count() = 20. p.seededNum = 8.
   //              _qualifNum = 16 (4 of them = BYE), 
   //              _stagesCnt = 5
+  // one more EXAMPLE: p.count() = 24, p.seededNum = 8
 }
 
 /**
@@ -32,17 +33,19 @@ QList<Group*> QPlayoffAlgo::initGroups( ) const
   QList< Group* > groups;
   
   PlayerList players = props().players;
-  qSort( players );
+  qSort( players.begin(), players.end(), qGreater< Player >() );
 
   PlayerList pls;
-  for ( i = p.seededNum; i < _qualifNum; i ++ ) { 
-    if ( i < p.players.count() ) {
-      pls << p.players.at( i );
+  for ( unsigned int i = props().seededNum; i < props().seededNum + _qualifNum; i ++ ) { 
+    if ( (int)i < players.count() ) {
+      pls << players.at( i );
     } else { 
 			// create 'BYE' player. this player is fake: everyone wins him and winner
 			// does no earn rating.
       pls << Player( "BYE", 0.0 ); 
     }
+
+    qDebug() << "qualif #" << i << ":" << pls.last().name() << pls.last().rating();
   }
  
   // TODO: 1st should play with last. 2nd with pre-last.
@@ -70,7 +73,8 @@ QList<Group*> QPlayoffAlgo::buildGroups( unsigned int stage,
     PlayerList toppls = qualifTopResults( prevGroups );
     PlayerList botpls = qualifBotResults( prevGroups );
 
-		qDebug() << __PRETTY_FUNCTION__ << "players count:", players.count();
+		qDebug() << __PRETTY_FUNCTION__ << "top players count:", toppls.count();
+		qDebug() << __PRETTY_FUNCTION__ << "bot players count:", botpls.count();
 
 		groups << new SwissGroup( 1, stage, toppls );
 		groups << new SwissGroup( 1 + toppls.count(), stage, botpls );
@@ -86,11 +90,11 @@ PlayerList QPlayoffAlgo::qualifTopResults( QList< Group* > groups ) const
   Q_ASSERT( groups.count() == 1 );
 
   PlayerList players = props().players;
-  qSort( players );
+  qSort( players.begin(), players.end(), qGreater< Player >() );
 
   Group* prev = groups[ 0 ];
   PlayerList winners = prev->winners();
-  qSort( winners );
+  qSort( winners.begin(), winners.end(), qGreater< Player >() );
 
   PlayerList toppls;
   toppls << players.mid( 0, props().seededNum );
@@ -105,7 +109,7 @@ PlayerList QPlayoffAlgo::qualifBotResults( QList< Group* > groups ) const
 
   Group* prev = groups[ 0 ];
   PlayerList loosers = prev->loosers();
-  qSort( winners );
+  qSort( loosers.begin(), loosers.end(), qGreater< Player >() );
 
   // FIXME: should I remove 'BUY' players from list?
 

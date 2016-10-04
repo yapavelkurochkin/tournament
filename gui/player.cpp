@@ -17,6 +17,11 @@ bool Player::operator< ( const Player& pl ) const
   return ( _rating < pl.rating() );
 }
 
+bool Player::operator> ( const Player& pl ) const
+{
+  return ( _rating > pl.rating() );
+}
+
 bool Player::operator== ( const Player& pl ) const
 {
   return _name == pl.name();

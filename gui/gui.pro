@@ -34,6 +34,11 @@ unix {
 
   # for build with qt statically
   QTPLUGIN.platforms = qxcb
+
+  # for building deb-package
+  deb.commands = dpkg-buildpackage -B 
+
+  QMAKE_EXTRA_TARGETS += deb
 }
 
 macx {

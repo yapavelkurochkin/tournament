@@ -47,10 +47,11 @@ QList<Group*> QPlayoffAlgo::initGroups( ) const
 
     qDebug() << "qualif #" << i << ":" << pls.last().name() << pls.last().rating();
   }
- 
-  // TODO: 1st should play with last. 2nd with pre-last.
- 
-  groups << new SwissGroup( 0, 0, pls );
+
+  SwissGroup *sg = new SwissGroup( 0, 0, permutePlayers( pls ) );
+  sg->setName( QObject::tr( "Qualification" ) );
+
+  groups << sg;
 
   return groups;
 }
@@ -76,8 +77,8 @@ QList<Group*> QPlayoffAlgo::buildGroups( unsigned int stage,
 		qDebug() << __PRETTY_FUNCTION__ << "top players count:", toppls.count();
 		qDebug() << __PRETTY_FUNCTION__ << "bot players count:", botpls.count();
 
-		groups << new SwissGroup( 1, stage, toppls );
-		groups << new SwissGroup( 1 + toppls.count(), stage, botpls );
+		groups << new SwissGroup( 1, stage, permutePlayers( toppls ) );
+		groups << new SwissGroup( 1 + toppls.count(), stage, permutePlayers( botpls ) );
 
     return groups;
   }
@@ -115,3 +116,18 @@ PlayerList QPlayoffAlgo::qualifBotResults( QList< Group* > groups ) const
 
   return loosers; 
 }
+  
+/** \brief rebuild player list so that 1st play with last, 2nd with pre-last, and so on.
+ *         assumed that pls.count() is power of 2.
+ * \todo function can be static
+ */
+PlayerList QPlayoffAlgo::permutePlayers( PlayerList pls ) const
+{
+  PlayerList out;
+  for ( int i = 0; i < pls.count() / 2; i ++ ) {
+    out << pls.at( i ) << pls.at( pls.count() - i - 1 );
+  }
+
+  return out;
+}
+ 

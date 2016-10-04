@@ -19,6 +19,8 @@ class QPlayoffAlgo : public TournAlgo {
   protected:
     PlayerList qualifTopResults( QList< Group* > groups ) const;
     PlayerList qualifBotResults( QList< Group* > groups ) const;
+
+    PlayerList permutePlayers( PlayerList pls ) const;
 };
 
 #endif

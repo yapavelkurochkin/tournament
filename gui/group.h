@@ -64,6 +64,8 @@ class Group
     TournData* tournData( ) { return _tournData; }
 
     QString name() const { return _name; }
+    void setName( QString s ) { _name = s; }
+
     int size() const { return _players.count(); }
     bool completed() const;
     unsigned int stage() const { return _stage; }

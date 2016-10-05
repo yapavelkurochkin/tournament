@@ -199,12 +199,14 @@ QString Tournament::totalRatingAsCSV( QChar sep )
   Group fake( "unused", _data->matchList(), pls );
   for ( int i = 0; i < pls.count(); i ++ ) {
 	  Player p = pls.at( i );
-		double earned = fake.earnedRating( p ); 
-		double total = p.rating() + earned;
-		out << p.name() << sep << p.ratingAsStr() << sep
-		    << "+" + QString::number( earned, 'f', 1 ) << sep
-		    << QString::number( total , 'f', 1 ) << endl;
-	}
+    if ( !p.isBye() ) {
+			double earned = fake.earnedRating( p ); 
+			double total = p.rating() + earned;
+			out << p.name() << sep << p.ratingAsStr() << sep
+					<< "+" + QString::number( earned, 'f', 1 ) << sep
+					<< QString::number( total , 'f', 1 ) << endl;
+	  }
+  }
 
 	return ret;
 }

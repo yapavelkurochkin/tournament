@@ -1,5 +1,7 @@
 #include "player.h"
 
+Player byePlayer( "bye", 0.0 );
+
 Player::Player( )
 : _rating( 0.0 )
 {

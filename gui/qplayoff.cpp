@@ -42,7 +42,7 @@ QList<Group*> QPlayoffAlgo::initGroups( ) const
     } else { 
 			// create 'BYE' player. this player is fake: everyone wins him and winner
 			// does no earn rating.
-      pls << Player( "BYE", 0.0 ); 
+      pls << byePlayer;
     }
 
     qDebug() << "qualif #" << i << ":" << pls.last().name() << pls.last().rating();
@@ -73,9 +73,6 @@ QList<Group*> QPlayoffAlgo::buildGroups( unsigned int stage,
 
     PlayerList toppls = qualifTopResults( prevGroups );
     PlayerList botpls = qualifBotResults( prevGroups );
-
-		qDebug() << __PRETTY_FUNCTION__ << "top players count:", toppls.count();
-		qDebug() << __PRETTY_FUNCTION__ << "bot players count:", botpls.count();
 
 		groups << new SwissGroup( 1, stage, permutePlayers( toppls ) );
 		groups << new SwissGroup( 1 + toppls.count(), stage, permutePlayers( botpls ) );

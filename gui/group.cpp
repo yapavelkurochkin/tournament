@@ -241,16 +241,29 @@ PlayerList Group::winners() const
   return list;
 }
 
-/** \return list of players who lost at least 1 match
+/** \return list of players who lost at least 1 match.
+ *          'bye' players are not included in list
  */
 PlayerList Group::loosers() const
 {
   PlayerList list;
   for ( int i = 0; i < _matches.count(); i++) {
-    list << _matches.at( i ).looser();
+    Player p = _matches.at( i ).looser();
+    if ( !p.isBye() ) {
+      list << p;
+    }
   }
 
   return list;
+}
+
+/** \return same as const_players(), but without BYE players.
+ */
+PlayerList Group::const_validPlayers() const
+{ 
+  PlayerList l = const_players();
+  l.removeAll( byePlayer );
+  return l;
 }
 
 /** Serialization operators

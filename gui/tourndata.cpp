@@ -52,7 +52,7 @@ MatchList TournData::matchList( int stage ) const
 {
   MatchList ml;
   if ( stage >= 0 ) {
-    for ( int j = 0; ( stage < _algo->stagesCnt() ) && ( j < _groups[ stage ].count() ); j ++ ) {
+    for ( int j = 0; ( stage < (int)_algo->stagesCnt() ) && ( j < _groups[ stage ].count() ); j ++ ) {
       ml << _groups[ stage ].at( j )->matchList();
     }   
   } else { 

@@ -15,12 +15,10 @@ class QPlayoffAlgo : public TournAlgo {
     QList<Group*> initGroups( ) const;
     QList<Group*> buildGroups( unsigned int stage, 
                                QList<Group*> prevGroups ) const;
-
+  
   protected:
     PlayerList qualifTopResults( QList< Group* > groups ) const;
     PlayerList qualifBotResults( QList< Group* > groups ) const;
-
-    PlayerList permutePlayers( PlayerList pls ) const;
 };
 
 #endif

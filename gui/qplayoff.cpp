@@ -101,6 +101,8 @@ PlayerList QPlayoffAlgo::qualifTopResults( QList< Group* > groups ) const
   return toppls; 
 }
 
+/** loosers list size can be non-even, so, 'bye' guys should be added.
+ */
 PlayerList QPlayoffAlgo::qualifBotResults( QList< Group* > groups ) const
 {
   Q_ASSERT( groups.count() == 1 );
@@ -109,22 +111,10 @@ PlayerList QPlayoffAlgo::qualifBotResults( QList< Group* > groups ) const
   PlayerList loosers = prev->loosers();
   qSort( loosers.begin(), loosers.end(), qGreater< Player >() );
 
-  // FIXME: should I remove 'BUY' players from list?
+  if ( loosers.count() & 1 ) { // odd number of players
+    loosers << byePlayer;
+  }
 
   return loosers; 
 }
   
-/** \brief rebuild player list so that 1st play with last, 2nd with pre-last, and so on.
- *         assumed that pls.count() is power of 2.
- * \todo function can be static
- */
-PlayerList QPlayoffAlgo::permutePlayers( PlayerList pls ) const
-{
-  PlayerList out;
-  for ( int i = 0; i < pls.count() / 2; i ++ ) {
-    out << pls.at( i ) << pls.at( pls.count() - i - 1 );
-  }
-
-  return out;
-}
- 

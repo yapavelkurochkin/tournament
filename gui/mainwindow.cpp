@@ -123,12 +123,11 @@ void LeagueMainWindow::loadTournament( QString fName )
       _history->reset( tourn );
       newTournamentWidget( tourn );
 
-      const RRPlayoffAlgo *algo =dynamic_cast< const RRPlayoffAlgo* > ( tourn->algo_const() );
-      if ( algo ) { 
-				switch ( algo->rrBreakAlgo() ) {
-					case RRPlayoffAlgo::ABCD: breakABCD->setChecked( true ); break;
-					case RRPlayoffAlgo::ACBD: breakACBD->setChecked( true ); break;
-					case RRPlayoffAlgo::ADBC: breakADBC->setChecked( true ); break;
+      if ( tourn->algo_const() ) { 
+				switch ( tourn->algo_const()->breakAlgo() ) {
+					case BreakAlgo::ABCD: breakABCD->setChecked( true ); break;
+					case BreakAlgo::ACBD: breakACBD->setChecked( true ); break;
+					case BreakAlgo::ADBC: breakADBC->setChecked( true ); break;
 				}
       }
     }
@@ -285,30 +284,21 @@ void LeagueMainWindow::saveLast()
 
 void LeagueMainWindow::selectBreakADBC( )
 { 
-  if ( tourn ) {
-     RRPlayoffAlgo* a = dynamic_cast< RRPlayoffAlgo* > ( tourn->algo() );
-     if ( a ) {
-       a->setRRBreakAlgo( RRPlayoffAlgo::ADBC ); 
-     }
+  if ( tourn && tourn->algo() ) {
+    tourn->algo()->setBreakAlgo( BreakAlgo::ADBC); 
   } 
 }
 
 void LeagueMainWindow::selectBreakABCD( )
 { 
-  if ( tourn ) {
-     RRPlayoffAlgo* a = dynamic_cast< RRPlayoffAlgo* > ( tourn->algo() );
-     if ( a ) {
-       a->setRRBreakAlgo( RRPlayoffAlgo::ABCD ); 
-     }
+  if ( tourn && tourn->algo() ) {
+    tourn->algo()->setBreakAlgo( BreakAlgo::ABCD ); 
   } 
 }
 
 void LeagueMainWindow::selectBreakACBD( )
 { 
-  if ( tourn ) {
-     RRPlayoffAlgo* a = dynamic_cast< RRPlayoffAlgo* > ( tourn->algo() );
-     if ( a ) {
-       a->setRRBreakAlgo( RRPlayoffAlgo::ACBD ); 
-     }
+  if ( tourn && tourn->algo() ) {
+    tourn->algo()->setBreakAlgo( BreakAlgo::ACBD ); 
   } 
 }

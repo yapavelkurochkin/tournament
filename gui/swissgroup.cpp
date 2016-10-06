@@ -1,6 +1,7 @@
 #include <QDebug>
 #include "tournament.h"
 #include "swissgroup.h"
+#include "qplayoff.h"
 
 /** first plays with last. second plays with pre-last. and so on.
  *  player.count() should be even.
@@ -50,9 +51,20 @@ void SwissGroup::initGroupName()
   } else if ( isQuarterFinal() ) {
     _name = QObject::tr( "1/4 Final" );
   } else {
-    _name =  QString( "%1 - %2" )
-                  .arg( _fromPlace )
-                  .arg( _fromPlace + cnt - 1 );
+    if ( _players.contains( byePlayer ) ) {
+      cnt --;
+    }
+
+    int begin = _fromPlace;
+    int end = _fromPlace + cnt - 1;
+    if ( begin == end ) {
+		  _name =  QString( "%1" )
+			      					.arg( begin );
+    } else {
+		  _name =  QString( "%1 - %2" )
+			      					.arg( begin )
+						      		.arg( end );
+    }
   }
 }
 
@@ -65,9 +77,19 @@ QList< Group* > SwissGroup::split( ) const
   }
 
   QList< Group* > ret;
-  ret << new SwissGroup( _fromPlace, _stage + 1, winners() );
+  PlayerList w = winners(), l = loosers();
+
+  // number of winnders and loosers can be non-even, when group consists,
+  // for example, from 6 persons. We need to add 'bye' players 
+  if ( w.count() & 1 ) w << byePlayer;
+  if ( l.count() & 1 ) l << byePlayer;
+
+  const TournAlgo *a = _tournData->algo();
+  Q_CHECK_PTR( a );
+
+  ret << new SwissGroup( _fromPlace, _stage + 1, a->permutePlayers( w ) );
   ret << new SwissGroup( _fromPlace + _players.count() / 2, 
-                         _stage + 1, loosers() );
+                         _stage + 1, a->permutePlayers( l ) );
 
   foreach( Group *g, ret ) {
     g->setTournData( _tournData );

@@ -3,7 +3,8 @@
 
 TournAlgo::TournAlgo( TournProps p )
 : _stagesCnt( 0 ),
-   _props( p ) 
+   _props( p ),
+   _break( BreakAlgo::ADBC ) 
 {
 }
 
@@ -35,3 +36,29 @@ unsigned int TournAlgo::maxGroupSize( QList< Group* > groups ) const
   return max;
 }
 
+/** \brief rebuild player list accordingly with break algorithm. 
+ *         assumed that pls.count() is even.
+ */
+PlayerList TournAlgo::permutePlayers( PlayerList pls ) const
+{
+  PlayerList out;
+  
+  if ( _break == BreakAlgo::ADBC ) {
+    // first - last
+    // second - pre-last
+		for ( int i = 0; i < pls.count() / 2; i ++ ) {
+			out << pls.at( i ) << pls.at( pls.count() - i - 1 );
+		}
+  } else if ( _break == BreakAlgo::ACBD ) {
+    // first - middle
+    // second - middle + 1
+		for ( int i = 0; i < pls.count() / 2; i ++ ) {
+			out << pls.at( i ) << pls.at( pls.count() / 2 + i );
+		}
+  } else {
+    // ABCD does not require permutation
+  }
+
+  return out;
+}
+ 

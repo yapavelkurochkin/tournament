@@ -14,8 +14,7 @@ unsigned int log2( unsigned int x )
 }
 
 RRPlayoffAlgo::RRPlayoffAlgo( TournProps p )
-: TournAlgo( p ),
-  _rrBreakAlgo( ABCD )
+: TournAlgo( p )
 {
   // emperical formula, I can't describe it..
 	// groupCnt = 2 -> stagesCnt = 4
@@ -140,13 +139,13 @@ PlayerList RRPlayoffAlgo::roundRobinResults( QList< Group* > groups ) const
   
   QList<unsigned> indexes;
 
-  if ( rrBreakAlgo() == ABCD ) {
+  if ( breakAlgo() == BreakAlgo::ABCD ) {
     for ( unsigned i = 0; i < cnt; i++ ) {
       indexes << i;
     }
   }
 
-  if ( rrBreakAlgo() == ADBC ) {
+  if ( breakAlgo() == BreakAlgo::ADBC ) {
     // ABCD -> ADBC
     // ABCDEFGH -> AHBGCFDE
     for ( unsigned i = 0; i < cnt / 2; i++ ) {
@@ -155,7 +154,7 @@ PlayerList RRPlayoffAlgo::roundRobinResults( QList< Group* > groups ) const
     }
   }
 
-  if ( rrBreakAlgo() == ACBD ) {
+  if ( breakAlgo() == BreakAlgo::ACBD ) {
     // ABCD -> ACBD
     // ABCDEFGH -> AEBFCGDH
     for ( unsigned i = 0; i < cnt / 2; i++ ) {
@@ -171,7 +170,7 @@ PlayerList RRPlayoffAlgo::roundRobinResults( QList< Group* > groups ) const
     // first sixteen players are built into pairs so:
     // A1-H2, E2-G1, B2-E1, C2-D1, C1-D2, F1-A2, F2-H1, G2-B1
     // other players plays 'place to place' accordingly to 
-    // rrBreakAlgo() selected
+    // breakAlgo() selected
     list << GROUP( 'A' )->playerByPlace( 1 );
     list << GROUP( 'H' )->playerByPlace( 2 );
     list << GROUP( 'E' )->playerByPlace( 2 );

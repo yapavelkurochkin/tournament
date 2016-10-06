@@ -42,6 +42,9 @@ class TournData {
                           { return _groups[ stage ].at(i); }
     MatchList matchList( int stage = -1 /* all stages */ ) const;
     PlayerList playerList() const;
+
+    friend QDataStream &operator>>(QDataStream &s, TournData& t );
+    friend QDataStream &operator<<(QDataStream &s, const TournData& t );
 };
 
 #endif // TOURNDATA__H

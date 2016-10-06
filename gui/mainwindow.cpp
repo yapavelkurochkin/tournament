@@ -27,7 +27,7 @@ LeagueMainWindow::LeagueMainWindow()
   createMenus();
  
   connect( qApp, SIGNAL( aboutToQuit() ), this, SLOT( saveLast() ) );
-  // loadTournament( QDir::toNativeSeparators( QDir::homePath() + "/lasttourn.dat" ) );
+  loadTournament( QDir::toNativeSeparators( QDir::homePath() + "/lasttourn.dat" ) );
 }
 
 void LeagueMainWindow::createActions()

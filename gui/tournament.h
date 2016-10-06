@@ -11,7 +11,7 @@
 class SwissGroup;
 class QFile;
 
-#define TOURN_MAGIC_NUMBER 0xfaeb163f
+#define TOURN_MAGIC_NUMBER 0xfaeb1640
 
 class Tournament : public QObject {
   Q_OBJECT;

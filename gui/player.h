@@ -28,6 +28,7 @@ class Player {
 };
 
 extern Player byePlayer;
+extern uint qHash(const Player &p);
 
 #endif // PLAYER__H
 

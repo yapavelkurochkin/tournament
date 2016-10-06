@@ -1,3 +1,4 @@
+#include <QHash>
 #include "player.h"
 
 Player byePlayer( "bye", 0.0 );
@@ -27,6 +28,11 @@ bool Player::operator> ( const Player& pl ) const
 bool Player::operator== ( const Player& pl ) const
 {
   return _name == pl.name();
+}
+
+uint qHash(const Player &p)
+{
+  return qHash( p.name() );
 }
 
 /* serialization operators 

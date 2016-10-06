@@ -1,5 +1,7 @@
 #include <QDebug>
+#include <QDataStream>
 #include "tournprops.h"
+
 
 TournProps::TournProps()
 : type( RRPlayOff ),
@@ -33,7 +35,7 @@ TournProps::TournProps( PlayerList _p, QString _c, unsigned int _rrnum )
 
 }
 
-bool TournProps::validate( QString& errtext )
+bool TournProps::validate( QString& errtext ) const
 {
   errtext = "";
 
@@ -54,4 +56,36 @@ bool TournProps::validate( QString& errtext )
   }
 
   return true;  
+}
+
+QDataStream &operator>>(QDataStream &s, TournProps& t )
+{
+  if ( s.atEnd() ) {
+    return s;
+  }
+
+  int type;
+  s >> type >> t.players >> t.category >> t.playoffNum >> t.seededNum >> t.rrGroupNum; 
+
+  t.type = ( TournProps::TournType )type;
+
+  QString errtext;
+  if ( !t.validate( errtext ) ) {
+    qWarning() << "loaded invalid TournProps object from stream:" << errtext;
+  }
+  
+  return s;
+}
+
+QDataStream &operator<<(QDataStream &s, const TournProps& t )
+{
+  QString errtext;
+  if ( !t.validate( errtext ) ) {
+    qWarning() << "trying to serialize invalid TournProps object:" << errtext;
+    return s;
+  }
+
+  s << (int) t.type << t.players << t.category << t.playoffNum << t.seededNum << t.rrGroupNum; 
+
+  return s;
 }

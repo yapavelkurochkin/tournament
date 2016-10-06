@@ -29,8 +29,11 @@ struct TournProps {
   unsigned int rrGroupNum; // how many round-robin groups should be 
                            // before playoff  
 
-  bool validate( QString& errstr ); // check that properties are correct
+  bool validate( QString& errstr ) const; // check that properties are correct
 };
+
+QDataStream &operator>>(QDataStream &s, TournProps& t );
+QDataStream &operator<<(QDataStream &s, const TournProps& t );
 
 #endif // TOURNPROPS__H
 

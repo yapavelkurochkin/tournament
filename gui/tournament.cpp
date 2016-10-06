@@ -72,85 +72,66 @@ Tournament* Tournament::fromFile( QString fileName )
   return t;
 }
 
-/* serialization
+/* serialization from stream
  */
 QDataStream &operator>>(QDataStream &s, Tournament& t )
 {
-  int mType;
-  QString cat;
-
   if ( s.atEnd() ) {
 	  return s;
 	}
  
   s >> t._magic; 
 
+  qDebug() << __FUNCTION__ << "magic=" << t._magic;
+
   if ( t._magic != TOURN_MAGIC_NUMBER ) {
     // invalid data source. object is not valid tournament
     qWarning() << __FUNCTION__ << "invalid datastream "
-    "(can't initialize Tournament object from it's contents)";
+    "(can't initialize Tournament object from datastream contents)";
     return s;
   }
-/*  
-  int rrBreakAlgo = Tournament::ADBC;
-  s >> t._groupCnt >> t._stagesCnt >> mType >> cat >> rrBreakAlgo; 
 
-  t._rrBreakAlgo = (Tournament::RRBreakAlgorithm) rrBreakAlgo;
-  t._category = cat;
-  t._matchType = (Match::Type) mType;
-  t._groups = new QList<Group*>[ t._stagesCnt ];
-
-  for ( unsigned int i = 0; i < t._stagesCnt; i ++ ) {
-    int count;
-    s >> count;
-    for ( int j = 0; j < count; j ++ ) {
-      if ( i == 0 ) { // round robin stage
-        RRGroup* rrg = new RRGroup();
-        s >> (*rrg);
+  TournProps props;
+  s >> props; 
  
-        rrg->setTournament( &t );
-        t._groups[i] << rrg; 
-      } else {
-        SwissGroup* sg = new SwissGroup();
-        s >> (*sg);
-        
-        sg->setTournament( &t );
-        t._groups[i] << sg; 
-      }
-    }   
+  QString errtext;
+  if ( !props.validate( errtext ) ) {
+    qWarning() << __FUNCTION__ << "invalid tourn props:" << errtext;
+    return s;
   }
-*/
+  
+  qDebug() << __FUNCTION__ << "props player count=" << props.players.count();
+
+  t._algo = TournAlgoFactory::algo( props );
+  if ( !t._algo ) {
+    qWarning() << "unable to load tournament (algo = NULL)";
+    return s;
+  }
+
+  t._data = new TournData( t._algo );
+  t._data->setTournament( &t );
+
+  qDebug() << __FUNCTION__ << "t._data = " << (long) t._data << "t._algo =" << (long)t._algo;
+
+  s >> (*t._data);
+
+  qDebug() << __FUNCTION__ << (int)props.type << t._algo->stagesCnt() << 
+              t._data->groups()[0].count();
+  
+
   return s;
 }
 
-QDataStream &operator<<(QDataStream &s, const Tournament& )
+QDataStream &operator<<(QDataStream &s, const Tournament& t )
 {
-/*  if ( !t.isValid() ) {
+  if ( !t.isValid() || !t._algo || !t._data ) {
     qWarning() << __FUNCTION__ << 
                   "trying to serialize invalid tournament object";
     return s;
   }
   
-  s << t._magic << t._groupCnt << t._stagesCnt 
-    << (int) t._matchType << t._category << (int)t._rrBreakAlgo; 
+  s << t._magic << t._algo->props() << (*t._data);
 
-  for ( unsigned int i = 0; i < t._stagesCnt; i ++ ) {
-    int count = t._groups[ i ].count();
-    s << count;
-    for ( int j = 0; j < count; j ++ ) {
-      const Group* g = t._groups[ i ].at( j );
-      if ( i == 0 ) { // round robin stage
-        const RRGroup* rrg = dynamic_cast< const RRGroup* >( g );
-
-        s << (*rrg);
-      } else {
-        const SwissGroup* sg = dynamic_cast< const SwissGroup* >( g );
-         
-        s << (*sg);
-      }
-    }   
-  }
-*/
   return s;
 }
 

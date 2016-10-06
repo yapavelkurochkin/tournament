@@ -74,6 +74,9 @@ class Group
     bool readOnly() const { return completed(); }
     /**< group should not be edited when it is completed */
 
+    virtual QString type() const { return ""; };
+    /**< string should describe a type of group (for example "swiss") */
+
     virtual bool operator< (const Group& gr) const { return _name < gr.name(); }
     virtual QString csvResult( QChar ) const { return ""; }
 };

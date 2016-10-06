@@ -31,6 +31,8 @@ class SwissGroup : public Group
 
     static unsigned int matchesCount( unsigned int numOfPlayers );
     static bool lessThan(const Group* g1, const Group* g2);
+
+    QString type() const { return "swiss"; }
 };
 
 

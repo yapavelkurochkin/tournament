@@ -92,7 +92,7 @@ PlayerList QPlayoffAlgo::qualifTopResults( QList< Group* > groups ) const
 
   Group* prev = groups[ 0 ];
   PlayerList winners = prev->winners();
-  qSort( winners.begin(), winners.end(), qGreater< Player >() );
+  // no sort here! we should save winners order here 
 
   PlayerList toppls;
   toppls << players.mid( 0, props().seededNum );
@@ -109,7 +109,7 @@ PlayerList QPlayoffAlgo::qualifBotResults( QList< Group* > groups ) const
 
   Group* prev = groups[ 0 ];
   PlayerList loosers = prev->loosers();
-  qSort( loosers.begin(), loosers.end(), qGreater< Player >() );
+  // no sort here! save winners order
 
   if ( loosers.count() & 1 ) { // odd number of players
     loosers << byePlayer;

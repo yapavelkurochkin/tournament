@@ -1,0 +1,5 @@
+tournament (0.0.11) unstable; urgency=low
+
+      * packaged to debian package 
+
+ -- pavel kurochkin <pavel.kurochkin@gmail.com>  Mon, 03 Oct 2016 21:56:02 +0300

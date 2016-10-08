@@ -24,9 +24,28 @@ HEADERS=playerlist.h player.h playertable.h rrgroup.h\
 
 RESOURCES=tournament.qrc
 
-deploy.depends = all 
-deploy.commands = macdeployqt tournament.app -dmg
+unix {
+  CONFIG -= debug
 
-QMAKE_EXTRA_TARGETS += deploy
+  target.path = /usr/bin
+  target.files = $$TARGET
+
+  INSTALLS = target
+
+  # for build with qt statically
+  QTPLUGIN.platforms = qxcb
+
+  # for building deb-package
+  deb.commands = dpkg-buildpackage -B 
+
+  QMAKE_EXTRA_TARGETS += deb
+}
+
+macx {
+  deploy.depends = all 
+  deploy.commands = macdeployqt tournament.app -dmg
+
+  QMAKE_EXTRA_TARGETS += deploy
+}
 
 

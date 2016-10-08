@@ -78,9 +78,22 @@ russian
     # qmake
     # make
 
+### Mac OS X
+
 Если дело происходит на mac os x, то:
 
     # make deploy
 
 Создаст файл tournament.dmg для установки
+
+### Linux
+
+On Qt5.5 installation I had a problem when 'make' returned error:
+
+    /usr/bin/ld: cannot find -lGL
+    collect2: error: ld returned 1 exit status
+    Makefile:311: recipe for target 'tournament' failed
+
+There is no need in -lGL flag, you can remove it without any problem and program will be built.
+
 

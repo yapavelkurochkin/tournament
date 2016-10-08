@@ -58,7 +58,8 @@ class Match
     unsigned int maxGames() const { return MAX_GAMES_PER_MATCH;
                                      /*real number of games depends from admin */}
     bool played() const { return validate(); }
-
+    bool isBye() const;
+ 
     bool validate() const;
 
   protected:

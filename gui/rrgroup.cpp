@@ -6,8 +6,8 @@
 
 /** Round robin games are followed first always
  */
-RRGroup::RRGroup( QString name, Tournament* t, PlayerList players )
- : Group( name, t, 0, players ) 
+RRGroup::RRGroup( QString name, PlayerList players )
+ : Group( name, 0, players ) 
 {
   roundRobin();
 }

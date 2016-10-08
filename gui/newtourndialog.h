@@ -3,9 +3,11 @@
 
 #include <QDialog>
 #include <QComboBox>
+#include <QLineEdit>
 
 #include "playertable.h"
 #include "match.h" 
+#include "tournprops.h"
 
 class NewTournDialog : public QDialog
 {
@@ -14,14 +16,19 @@ class NewTournDialog : public QDialog
   public:
     NewTournDialog( QWidget* parent );
 
-    QString category() const;
-    unsigned int groupCount() const;
-    PlayerList players() const;
+    TournProps tournProps() const;
+
+  protected slots:
+    void tryToAccept();
+    void typeChanged( int );
 
   protected:
     QComboBox *matchCombo, 
               *catCombo,
-              *gCombo;
+              *gCombo,
+              *sizeCombo,
+              *typeCombo;
+    QLineEdit *noQualEdit;
     PlayerTable *table;
 };
 

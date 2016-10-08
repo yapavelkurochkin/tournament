@@ -3,20 +3,20 @@
 #include "tournament.h"
 #include "group.h"
 
-Group::Group( QString name, Tournament* t, unsigned int stage, PlayerList players )
+Group::Group( QString name, unsigned int stage, PlayerList players )
  : _name( name ),
    _players( players ),
-   _tournament( t ),
+   _tournData( NULL ),
    _stage( stage )
 {
 }
 
-Group::Group( QString name, Tournament* t,
+Group::Group( QString name, 
                MatchList matches, PlayerList players )
  : _name( name ),
    _players( players ),
    _matches( matches ),
-   _tournament( t ),
+   _tournData( NULL ),
    _stage( 0 )
 {
 }
@@ -121,7 +121,11 @@ void Group::setMatchResults( Player a, Player b, QList< Game > res )
   m.games().clear();
   m.games() << res;
 
-  _tournament->groupChanged( this );
+  if ( _tournData ) {
+     _tournData->groupChanged( this );
+  } else {
+    qWarning( "_tournData undefined" );
+  }
 }
 
 void Group::setMatchResults( Match m )
@@ -223,6 +227,43 @@ double Group::earnedRating( Player p ) const
   }
 
   return total;
+}
+
+/** \return list of players who won at least 1 match
+ */
+PlayerList Group::winners() const
+{
+  PlayerList list;
+  for ( int i = 0; i < _matches.count(); i++) {
+    list << _matches.at( i ).winner();
+  }
+
+  return list;
+}
+
+/** \return list of players who lost at least 1 match.
+ *          'bye' players are not included in list
+ */
+PlayerList Group::loosers() const
+{
+  PlayerList list;
+  for ( int i = 0; i < _matches.count(); i++) {
+    Player p = _matches.at( i ).looser();
+    if ( !p.isBye() ) {
+      list << p;
+    }
+  }
+
+  return list;
+}
+
+/** \return same as const_players(), but without BYE players.
+ */
+PlayerList Group::const_validPlayers() const
+{ 
+  PlayerList l = const_players();
+  l.removeAll( byePlayer );
+  return l;
 }
 
 /** Serialization operators

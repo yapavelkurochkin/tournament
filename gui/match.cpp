@@ -11,6 +11,10 @@
 // Valid games: 11:9, 13:11. Invalid games: 6:0, 11:10
 bool Game::validate() const
 {
+  if ( a.isBye() || b.isBye() ) {
+    return true;
+  }
+
   if ( ( aBalls >= 11 ) && ( (int)(aBalls - bBalls) >= 2 ) ) {
     return true;
   } 
@@ -37,7 +41,13 @@ Game& Game::swap( )
 
 Player Game::winner() const
 {
-  return ( aBalls > bBalls ) ? a : b;
+  if ( a.isBye() ) {
+    return b;
+  } else if ( b.isBye() ) {
+    return a;
+  } else {
+    return ( aBalls > bBalls ) ? a : b;
+  }
 }
 
 // number of balls won by player
@@ -74,12 +84,18 @@ Match::Match( Player a, Player b )
 
 Player Match::winner() const 
 {
-  return ( gamesWon( _a ) > gamesWon( _b ) ) ? _a : _b;
+  if ( _a.isBye() ) {
+    return _b;
+  } else if ( _b.isBye() ) {
+    return _a;
+  } else {
+    return ( gamesWon( _a ) > gamesWon( _b ) ) ? _a : _b;
+  }
 }
 
 Player Match::looser() const 
 {
-  return ( gamesWon( _a ) < gamesWon( _b ) ) ? _a : _b;
+  return ( winner() == _a ) ? _b : _a;
 }
 
 unsigned int Match::gamesWon( Player p ) const 
@@ -98,6 +114,10 @@ unsigned int Match::gamesWon( Player p ) const
  
 bool Match::validate() const
 {
+  if ( _a.isBye() || _b.isBye() ) {
+    return true; 
+  }
+
   unsigned int aGames = gamesWon( _a );
   unsigned int bGames = gamesWon( _b );
   unsigned int totalGames = aGames + bGames;
@@ -142,8 +162,19 @@ QString Match::gamesToString( ) const
 
 QString Match::toString() const 
 {
-  return QString::number( gamesWon( _a ) ) 
-             + " : " + QString::number( gamesWon( _b ) );
+  if ( isBye() ) {
+    return "";
+  } else {
+    return QString::number( gamesWon( _a ) ) 
+               + " : " + QString::number( gamesWon( _b ) );
+  }
+}
+
+// one of players is fake 'BYE' man
+// \sa Player::isBye()
+bool Match::isBye() const
+{ 
+  return ( _a.isBye() || _b.isBye() );
 }
 
 /** \return opponent of player.
@@ -158,7 +189,7 @@ Player Match::opponent( Player p ) const
  */
 double Match::earnedRating( Player p ) const
 {
-  if ( played() ) {
+  if ( played() && !isBye() ) {
     return calcEarnedRating( p.rating(), opponent( p ).rating(),
                              gamesWon( p ), gamesWon( opponent( p ) ) ); 
   } else {

@@ -23,7 +23,8 @@ RatingsTable::RatingsTable( Group* group, QWidget* parent )
  */
 void RatingsTable::setupCells()
 {
-  PlayerList players = _group->const_players();
+  PlayerList players = _group->const_validPlayers();
+
   int plCnt = players.count();
   setRowCount( plCnt + 1 );
   setColumnCount( plCnt + 1 + 1 ); // 1 column for total rating results
@@ -73,7 +74,7 @@ void RatingsTable::updateMatchCell( int row, int col )
   int aIndex = row - 1;
   int bIndex = col - 1;
 
-  PlayerList players = _group->const_players();
+  PlayerList players = _group->const_validPlayers();
 
   if ( aIndex >= players.count() || bIndex >= players.count() ) {
     qCritical() << __FUNCTION__ << "invalid row&col indexes: " << row << col;
@@ -113,7 +114,9 @@ void RatingsTable::updateMatchCell( int row, int col )
  */
 void RatingsTable::updateMatchCells( )
 {
-  int plCnt = _group->const_players().count();
+  PlayerList players = _group->const_validPlayers();
+
+  int plCnt = players.count();
 
   for ( int i = 1; i < rowCount(); i ++ ) {
     for ( int j = 1; j < plCnt + 1; j ++ ) {
@@ -128,11 +131,13 @@ void RatingsTable::updateMatchCells( )
  */
 void RatingsTable::updateTotalRatings()
 {
-  int plCnt = _group->const_players().count();
+  PlayerList players = _group->const_validPlayers();
+
+  int plCnt = players.count();
   int col = plCnt + 1;
 
   for ( int i = 1; i < rowCount(); i ++ ) {
-    Player p = _group->const_players().at( i - 1 );
+    Player p = players.at( i - 1 );
     double earned = _group->earnedRating( p );
     double total = p.rating() + earned;    
 

@@ -86,10 +86,18 @@ QList< Group* > SwissGroup::split( ) const
 
   const TournAlgo *a = _tournData->algo();
   Q_CHECK_PTR( a );
+ 
+  // winners group
+  SwissGroup *wg = new SwissGroup( _fromPlace, _stage + 1, 
+                                   a->permutePlayers( w ) );
 
-  ret << new SwissGroup( _fromPlace, _stage + 1, a->permutePlayers( w ) );
-  ret << new SwissGroup( _fromPlace + _players.count() / 2, 
-                         _stage + 1, a->permutePlayers( l ) );
+  // loosers group
+  SwissGroup *lg = new SwissGroup( _fromPlace + _players.count() / 2, 
+                                   _stage + 1, a->permutePlayers( l ) );
+
+  lg->setQualif( isQualif() );
+
+  ret << wg << lg;
 
   foreach( Group *g, ret ) {
     g->setTournData( _tournData );

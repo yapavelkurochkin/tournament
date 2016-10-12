@@ -16,6 +16,9 @@ RatingsTable::RatingsTable( Group* group, QWidget* parent )
   updateTotalRatings();
 
   resizeColumnsToContents();
+
+  setSelectionMode( QAbstractItemView::SingleSelection );
+  setSelectionBehavior( QAbstractItemView::SelectRows );
 }
 
 /** should be called in constructor for basic setup of 

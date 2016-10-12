@@ -59,6 +59,9 @@ class Match
                                      /*real number of games depends from admin */}
     bool played() const { return validate(); }
     bool isBye() const;
+
+    void setQualif( bool q = true ) { _qualif = q; }
+    bool isQualif( ) const { return _qualif; }
  
     bool validate() const;
 
@@ -67,6 +70,9 @@ class Match
     Player _b;
     QList< Game > _results;
     Type _type;  
+    bool _qualif;
+    /*!<< means that this match is in qualification stage and 
+          rating will not be calculated */
 
     friend QDataStream &operator >> ( QDataStream &s, Match &m );
     friend QDataStream &operator << ( QDataStream &s, const Match &m );

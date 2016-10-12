@@ -66,6 +66,12 @@ Tournament* Tournament::fromFile( QString fileName )
     QDataStream ds( &file );
     
     ds >> (*t);
+
+    if ( !t->isValid() ) { // tried to load old .trn file
+      delete t;
+      return NULL;
+    }
+
     t->_fileName = fileName; 
   } 
 

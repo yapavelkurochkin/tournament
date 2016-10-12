@@ -50,6 +50,7 @@ QList<Group*> QPlayoffAlgo::initGroups( ) const
 
   SwissGroup *sg = new SwissGroup( 0, 0, permutePlayers( pls ) );
   sg->setName( QObject::tr( "Qualification" ) );
+  sg->setQualif( );
 
   groups << sg;
 
@@ -74,9 +75,12 @@ QList<Group*> QPlayoffAlgo::buildGroups( unsigned int stage,
     PlayerList toppls = qualifTopResults( prevGroups );
     PlayerList botpls = qualifBotResults( prevGroups );
 
-		groups << new SwissGroup( 1, stage, permutePlayers( toppls ) );
-		groups << new SwissGroup( 1 + toppls.count(), stage, permutePlayers( botpls ) );
+    SwissGroup *wg, *lg;
+		wg = new SwissGroup( 1, stage, permutePlayers( toppls ) );
+		lg = new SwissGroup( 1 + toppls.count(), stage, permutePlayers( botpls ) );
+    lg->setQualif( prevGroups.at(0)->isQualif() );
 
+    groups << wg << lg;
     return groups;
   }
 

@@ -78,7 +78,8 @@ QDataStream &operator<<(QDataStream &s, const Game &g)
  *****************************/
 Match::Match( Player a, Player b )
 : _a( a ),
-  _b ( b )
+  _b ( b ),
+  _qualif( false )
 {
 }
 
@@ -189,7 +190,7 @@ Player Match::opponent( Player p ) const
  */
 double Match::earnedRating( Player p ) const
 {
-  if ( played() && !isBye() ) {
+  if ( played() && !isBye() && !isQualif() ) {
     return calcEarnedRating( p.rating(), opponent( p ).rating(),
                              gamesWon( p ), gamesWon( opponent( p ) ) ); 
   } else {
@@ -201,13 +202,13 @@ double Match::earnedRating( Player p ) const
  */
 QDataStream &operator >> ( QDataStream &s, Match &m )
 {
-  s >> m._a >> m._b >> m._results;
+  s >> m._a >> m._b >> m._results >> m._qualif;
   return s;
 }
 
 QDataStream &operator << ( QDataStream &s, const Match &m )
 {
-  s << m._a << m._b << m._results;
+  s << m._a << m._b << m._results << m._qualif;
   return s;
 }
 

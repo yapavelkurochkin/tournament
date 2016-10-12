@@ -266,6 +266,27 @@ PlayerList Group::const_validPlayers() const
   return l;
 }
 
+/** \brief returns true if FIRST match is marked as qualification.
+ *         normally all matches should have same flags (qualif or !qualif).
+ */
+bool Group::isQualif() const
+{
+  if ( _matches.count() ) {
+    return _matches.at( 0 ).isQualif();
+  } else {
+    return false; 
+  }
+}
+
+/** marks all matches with qualification flag.
+ */
+void Group::setQualif( bool q )
+{
+  for ( int i = 0; i < _matches.count(); i++ ) {
+    _matches[ i ].setQualif( q );
+  } 
+}
+
 /** Serialization operators
   */
 QDataStream &operator<<( QDataStream &s, const Group &g )
@@ -284,7 +305,7 @@ QDataStream &operator>>( QDataStream &s, Group &g )
   s >> g._players;
   s >> g._matches;
   s >> g._stage;
-  
+
   return s;
 }
-    
+ 

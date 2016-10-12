@@ -76,6 +76,9 @@ class Group
 
     virtual QString type() const { return ""; };
     /**< string should describe a type of group (for example "swiss") */
+ 
+    bool isQualif() const;
+    void setQualif( bool q = true );
 
     virtual bool operator< (const Group& gr) const { return _name < gr.name(); }
     virtual QString csvResult( QChar ) const { return ""; }

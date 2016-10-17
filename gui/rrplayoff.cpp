@@ -37,7 +37,7 @@ QList<Group*> RRPlayoffAlgo::initGroups( ) const
   PlayerList players = props().players;
   qSort( players );
 
-  for ( int i = 0; i < props().rrGroupNum; i ++ ) {
+  for ( unsigned int i = 0; i < props().rrGroupNum; i ++ ) {
     groups << new RRGroup( QChar( 'A' + i ) );
   }
 
@@ -114,6 +114,10 @@ QList<Group*> RRPlayoffAlgo::buildGroups( unsigned int stage,
 				fromPlace += gs;
 			}
 		}
+
+    foreach( Group *g, groups ) {
+      dynamic_cast< SwissGroup* >(g)->permuteMatches( breakAlgo() );
+    }
 
     return groups;
   }

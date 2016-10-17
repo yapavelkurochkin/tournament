@@ -119,7 +119,7 @@ void LeagueMainWindow::loadTournament( QString fName )
 {
   if ( !fName.isNull() ) {
     tourn = Tournament::fromFile( fName );
-    if ( tourn ) {
+    if ( tourn && tourn->isValid() ) {
       _history->reset( tourn );
       newTournamentWidget( tourn );
 

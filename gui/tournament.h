@@ -40,6 +40,7 @@ class Tournament : public QObject {
 
     void update( );
 
+    bool isValid() const { return _magic == TOURN_MAGIC_NUMBER; }
   signals:
     void newSwissGroupCreated( SwissGroup* g );
     void tournamentChanged( Tournament* t );
@@ -55,8 +56,6 @@ class Tournament : public QObject {
 
     QString _fileName;
     /*<< file which corresponds to this tournament */
-
-    bool isValid() const { return _magic == TOURN_MAGIC_NUMBER; }
 
     friend QDataStream &operator>>(QDataStream &, Tournament&);
     friend QDataStream &operator<<(QDataStream &, const Tournament&);

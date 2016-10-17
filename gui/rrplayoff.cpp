@@ -115,6 +115,10 @@ QList<Group*> RRPlayoffAlgo::buildGroups( unsigned int stage,
 			}
 		}
 
+    foreach( Group *g, groups ) {
+      dynamic_cast< SwissGroup* >(g)->permuteMatches( breakAlgo() );
+    }
+
     return groups;
   }
 

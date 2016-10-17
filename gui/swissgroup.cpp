@@ -84,23 +84,19 @@ QList< Group* > SwissGroup::split( ) const
   if ( w.count() & 1 ) w << byePlayer;
   if ( l.count() & 1 ) l << byePlayer;
 
-  const TournAlgo *a = _tournData->algo();
-  Q_CHECK_PTR( a );
- 
   // winners group
-  SwissGroup *wg = new SwissGroup( _fromPlace, _stage + 1, 
-                                   a->permutePlayers( w ) );
-
+  ret << new SwissGroup( _fromPlace, _stage + 1, w ); 
   // loosers group
-  SwissGroup *lg = new SwissGroup( _fromPlace + _players.count() / 2, 
-                                   _stage + 1, a->permutePlayers( l ) );
-
-  lg->setQualif( isQualif() );
-
-  ret << wg << lg;
+  ret << new SwissGroup( _fromPlace + _players.count() / 2, 
+                                   _stage + 1, l );
 
   foreach( Group *g, ret ) {
+    const TournAlgo *a = _tournData->algo();
+    Q_CHECK_PTR( a );
+ 
     g->setTournData( _tournData );
+    g->setQualif( isQualif() );
+    dynamic_cast<SwissGroup*>(g)->permuteMatches( a->breakAlgo() );
   }
  
   return ret; 
@@ -170,3 +166,28 @@ bool SwissGroup::lessThan(const Group* g1, const Group* g2)
   }
 }
 
+/* redorder matches so that this group will be simply splitted by
+ * winners and loosers, without permuation
+ * \todo this function should be in TournAlgo class... like permutePlayers()
+ */
+void SwissGroup::permuteMatches( BreakAlgo::Algo br )
+{
+  if ( _matches.count() <= 2 ) {
+    // nothing to permute
+    return;
+  }
+
+  MatchList tmp = _matches;
+  _matches.clear();
+
+  for ( int i = 0; i < tmp.count() / 2; i ++ ) {
+    if ( br == BreakAlgo::ADBC ) {  
+			_matches << tmp.at( i ) << tmp.at( tmp.count() - i - 1 );
+    } else if ( br == BreakAlgo::ACBD ) {
+			_matches << tmp.at( i ) << tmp.at( tmp.count() / 2 + i );
+    } else {
+      // no changes
+      _matches << tmp.at( i*2 ) << tmp.at( i*2 + 1 );
+    }
+  }
+}

@@ -21,7 +21,7 @@ class LeagueMainWindow : public QMainWindow
     QAction *loadT, *newT, *saveT, *about, 
 		        *ratings, *exportT, *undoT, *redoT,
             *breakADBC, *breakACBD, *breakABCD;
-  Tournament* tourn;
+    Tournament* tourn;
     QString progName;
     TournamentHistory* _history;
 

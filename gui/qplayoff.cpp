@@ -79,8 +79,12 @@ QList<Group*> QPlayoffAlgo::buildGroups( unsigned int stage,
 		wg = new SwissGroup( 1, stage, permutePlayers( toppls ) );
 		lg = new SwissGroup( 1 + toppls.count(), stage, permutePlayers( botpls ) );
     lg->setQualif( prevGroups.at(0)->isQualif() );
-
     groups << wg << lg;
+
+    foreach( Group *g, groups ) {
+      dynamic_cast< SwissGroup* >(g)->permuteMatches( breakAlgo() );
+    }
+
     return groups;
   }
 

@@ -27,11 +27,6 @@ struct Game
 class Match 
 {
   public:
-    typedef enum { 
-      BestOf3,
-      BestOf5
-    } Type;
-    
     Match( Player a = Player(), Player b = Player() );
 
     QList< Game > games_const( ) const { return _results; }
@@ -69,7 +64,6 @@ class Match
     Player _a;
     Player _b;
     QList< Game > _results;
-    Type _type;  
     bool _qualif;
     /*!<< means that this match is in qualification stage and 
           rating will not be calculated */

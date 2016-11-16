@@ -11,7 +11,6 @@ class SwissGroup : public Group
 
   public:
     SwissGroup( unsigned int fromPlace,
-                Tournament* tourn,
                 unsigned int stage,
                 PlayerList players );
     SwissGroup(); 
@@ -31,7 +30,13 @@ class SwissGroup : public Group
          { return ( _players.count() == 8 ) && ( _fromPlace == 1 ); }
 
     static unsigned int matchesCount( unsigned int numOfPlayers );
+    static bool lessThan(const Group* g1, const Group* g2);
+
+    QString type() const { return "swiss"; }
+
+    void permuteMatches( BreakAlgo::Algo br );
 };
+
 
 #endif // SWISSGROUP__H
 

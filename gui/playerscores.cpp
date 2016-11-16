@@ -1,4 +1,4 @@
-#include <qDebug.h>
+#include <QDebug>
 #include "playerscores.h"
 
 PlayerResults::PlayerResults( Player p )

@@ -36,7 +36,7 @@ void PlayerTable::setPlayerList( PlayerList pl )
 void PlayerTable::mouseDoubleClickEvent( QMouseEvent * )
 {
   QString fName = QFileDialog::getOpenFileName(this,
-                  tr("Open players list file"), QDir::homePath(), 
+                  tr("Open players list file"), "", 
                   tr("Txt Files (*.txt)"));
 
   if ( !fName.isNull() ) {

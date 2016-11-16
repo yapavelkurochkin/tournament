@@ -10,7 +10,7 @@ class RRGroup: public Group
   void roundRobin();
 
   public:
-    RRGroup( QString name = QString(), Tournament* tourn = NULL, 
+    RRGroup( QString name = QString(), 
              PlayerList players = PlayerList() );
 
     virtual void addPlayer( Player player );
@@ -20,6 +20,8 @@ class RRGroup: public Group
     friend QDataStream &operator<<( QDataStream &s, const RRGroup &g );
     friend QDataStream &operator>>( QDataStream &s, RRGroup &g );
     QString csvResult( QChar sep ) const;
+    
+    QString type() const { return "round-robin"; }
 };
 
 typedef QList< RRGroup > RRGroupList;

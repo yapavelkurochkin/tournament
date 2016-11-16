@@ -8,7 +8,7 @@
 RatingsDialog::RatingsDialog( Group* group, QWidget* parent )
 : QDialog( parent )
 {
-  setWindowTitle( tr( "Earned ratings" ) );
+  setWindowTitle( tr( "Ratings" ) );
 
   RatingsTable* rt = new RatingsTable( group, this );
   QVBoxLayout* vbl = new QVBoxLayout( this );

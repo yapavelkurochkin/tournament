@@ -27,11 +27,6 @@ struct Game
 class Match 
 {
   public:
-    typedef enum { 
-      BestOf3,
-      BestOf5
-    } Type;
-    
     Match( Player a = Player(), Player b = Player() );
 
     QList< Game > games_const( ) const { return _results; }
@@ -58,14 +53,20 @@ class Match
     unsigned int maxGames() const { return MAX_GAMES_PER_MATCH;
                                      /*real number of games depends from admin */}
     bool played() const { return validate(); }
+    bool isBye() const;
 
+    void setQualif( bool q = true ) { _qualif = q; }
+    bool isQualif( ) const { return _qualif; }
+ 
     bool validate() const;
 
   protected:
     Player _a;
     Player _b;
     QList< Game > _results;
-    Type _type;  
+    bool _qualif;
+    /*!<< means that this match is in qualification stage and 
+          rating will not be calculated */
 
     friend QDataStream &operator >> ( QDataStream &s, Match &m );
     friend QDataStream &operator << ( QDataStream &s, const Match &m );

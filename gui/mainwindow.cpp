@@ -13,6 +13,7 @@
 #include "tournwidget.h"
 #include "newtourndialog.h"
 #include "ratingsdialog.h"
+#include "rrplayoff.h"
 #include "about.h"
 
 LeagueMainWindow::LeagueMainWindow()
@@ -118,13 +119,16 @@ void LeagueMainWindow::loadTournament( QString fName )
 {
   if ( !fName.isNull() ) {
     tourn = Tournament::fromFile( fName );
-    if ( tourn ) {
+    if ( tourn && tourn->isValid() ) {
       _history->reset( tourn );
       newTournamentWidget( tourn );
-      switch ( tourn->rrBreakAlgo() ) {
-        case Tournament::ABCD: breakABCD->setChecked( true ); break;
-        case Tournament::ACBD: breakACBD->setChecked( true ); break;
-        case Tournament::ADBC: breakADBC->setChecked( true ); break;
+
+      if ( tourn->algo_const() ) { 
+				switch ( tourn->algo_const()->breakAlgo() ) {
+					case BreakAlgo::ABCD: breakABCD->setChecked( true ); break;
+					case BreakAlgo::ACBD: breakACBD->setChecked( true ); break;
+					case BreakAlgo::ADBC: breakADBC->setChecked( true ); break;
+				}
       }
     }
   }
@@ -133,7 +137,7 @@ void LeagueMainWindow::loadTournament( QString fName )
 void LeagueMainWindow::loadTournamentInteractive( )
 {
   QString fName = QFileDialog::getOpenFileName(this,
-                  tr("Open tournament"), QDir::homePath(), 
+                  tr("Open tournament"), "", 
                   tr("Tournament Files (*.trn)"));
 
   loadTournament( fName );
@@ -160,7 +164,7 @@ TournamentWidget* LeagueMainWindow::newTournamentWidget( Tournament *t )
 void LeagueMainWindow::saveTournament( )
 {
   QString fName = QFileDialog::getSaveFileName(this,
-                  tr("Save tournament"), QDir::homePath(), 
+                  tr("Save tournament"), "", 
                   tr("Tournament Files (*.trn)"));
 
   if ( !fName.isNull() ) {
@@ -174,7 +178,7 @@ void LeagueMainWindow::saveTournament( )
 void LeagueMainWindow::exportTournament( )
 {
   QString fName = QFileDialog::getSaveFileName(this,
-                  tr("Export tournament results"), QDir::homePath(), 
+                  tr("Export tournament results"), "", 
                   tr("CSV Files (*.csv)"));
 
   if ( !fName.isNull() ) {
@@ -192,11 +196,9 @@ void LeagueMainWindow::newTournament( )
   NewTournDialog d( this );
 
   if ( QDialog::Accepted == d.exec() ) {
-    QString cat = d.category();
-    unsigned int groups = d.groupCount();
-    PlayerList players = d.players();
-
-    tourn = new Tournament( players, cat, groups );
+    TournProps p = d.tournProps();
+    
+    tourn = new Tournament( p );
     _history->reset( tourn );
     
     newTournamentWidget( tourn );
@@ -211,7 +213,7 @@ void LeagueMainWindow::setWindowName()
   QString name = progName;
 
   if ( tourn ) {
-    name += " -- " + tourn->category();
+    name += " -- " + tourn->algo_const()->props().category;
 
     if ( !tourn->fileName().isEmpty() ) {
       name += " -- " + QFileInfo( tourn->fileName() ).baseName();
@@ -243,7 +245,8 @@ void LeagueMainWindow::showAboutDialog()
 void LeagueMainWindow::showRatingsTable()
 {
   if ( tourn ) {
-    Group g( tr("Total"), tourn, tourn->matchList(), tourn->players() ); 
+    Group g( tr("Total"), tourn->data_const()->matchList(), 
+                          tourn->data_const()->playerList() ); 
     RatingsDialog d( &g, this );
     d.exec(); 
   } 
@@ -281,15 +284,21 @@ void LeagueMainWindow::saveLast()
 
 void LeagueMainWindow::selectBreakADBC( )
 { 
-  if ( tourn ) tourn->setRRBreakAlgo( Tournament::ADBC );  
+  if ( tourn && tourn->algo() ) {
+    tourn->algo()->setBreakAlgo( BreakAlgo::ADBC); 
+  } 
 }
 
 void LeagueMainWindow::selectBreakABCD( )
 { 
-  if ( tourn ) tourn->setRRBreakAlgo( Tournament::ABCD );  
+  if ( tourn && tourn->algo() ) {
+    tourn->algo()->setBreakAlgo( BreakAlgo::ABCD ); 
+  } 
 }
 
 void LeagueMainWindow::selectBreakACBD( )
 { 
-  if ( tourn ) tourn->setRRBreakAlgo( Tournament::ACBD );  
+  if ( tourn && tourn->algo() ) {
+    tourn->algo()->setBreakAlgo( BreakAlgo::ACBD ); 
+  } 
 }

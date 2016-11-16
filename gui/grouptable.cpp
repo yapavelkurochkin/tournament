@@ -32,8 +32,11 @@ void GroupTable::adjustSize( )
     height += sizeHintForRow( i );
   }
 
+  // ditry hack: we need some more space
+  height += 4 * sizeHintForRow( 0 );
+
   // 5% is for inter-cell lines
-  setMinimumWidth( width + width * 0.05 );
-  setMinimumHeight( height + height * 0.05 );
+  setMinimumWidth( width + width * 0.15 );
+  setMinimumHeight( height + height * 0.15 );
 }
 

@@ -3,20 +3,20 @@
 #include "tournament.h"
 #include "group.h"
 
-Group::Group( QString name, Tournament* t, unsigned int stage, PlayerList players )
+Group::Group( QString name, unsigned int stage, PlayerList players )
  : _name( name ),
    _players( players ),
-   _tournament( t ),
+   _tournData( NULL ),
    _stage( stage )
 {
 }
 
-Group::Group( QString name, Tournament* t,
+Group::Group( QString name, 
                MatchList matches, PlayerList players )
  : _name( name ),
    _players( players ),
    _matches( matches ),
-   _tournament( t ),
+   _tournData( NULL ),
    _stage( 0 )
 {
 }
@@ -121,7 +121,11 @@ void Group::setMatchResults( Player a, Player b, QList< Game > res )
   m.games().clear();
   m.games() << res;
 
-  _tournament->groupChanged( this );
+  if ( _tournData ) {
+     _tournData->groupChanged( this );
+  } else {
+    qWarning( "_tournData undefined" );
+  }
 }
 
 void Group::setMatchResults( Match m )
@@ -225,6 +229,64 @@ double Group::earnedRating( Player p ) const
   return total;
 }
 
+/** \return list of players who won at least 1 match
+ */
+PlayerList Group::winners() const
+{
+  PlayerList list;
+  for ( int i = 0; i < _matches.count(); i++) {
+    list << _matches.at( i ).winner();
+  }
+
+  return list;
+}
+
+/** \return list of players who lost at least 1 match.
+ *          'bye' players are not included in list
+ */
+PlayerList Group::loosers() const
+{
+  PlayerList list;
+  for ( int i = 0; i < _matches.count(); i++) {
+    Player p = _matches.at( i ).looser();
+    if ( !p.isBye() ) {
+      list << p;
+    }
+  }
+
+  return list;
+}
+
+/** \return same as const_players(), but without BYE players.
+ */
+PlayerList Group::const_validPlayers() const
+{ 
+  PlayerList l = const_players();
+  l.removeAll( byePlayer );
+  return l;
+}
+
+/** \brief returns true if FIRST match is marked as qualification.
+ *         normally all matches should have same flags (qualif or !qualif).
+ */
+bool Group::isQualif() const
+{
+  if ( _matches.count() ) {
+    return _matches.at( 0 ).isQualif();
+  } else {
+    return false; 
+  }
+}
+
+/** marks all matches with qualification flag.
+ */
+void Group::setQualif( bool q )
+{
+  for ( int i = 0; i < _matches.count(); i++ ) {
+    _matches[ i ].setQualif( q );
+  } 
+}
+
 /** Serialization operators
   */
 QDataStream &operator<<( QDataStream &s, const Group &g )
@@ -243,7 +305,7 @@ QDataStream &operator>>( QDataStream &s, Group &g )
   s >> g._players;
   s >> g._matches;
   s >> g._stage;
-  
+
   return s;
 }
-    
+ 

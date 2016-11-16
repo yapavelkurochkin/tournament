@@ -1,14 +1,15 @@
 #include <QDebug>
 #include "tournament.h"
 #include "swissgroup.h"
+#include "qplayoff.h"
 
 /** first plays with last. second plays with pre-last. and so on.
  *  player.count() should be even.
  *  \param fromPlace -- means the best place possible for this group
  */
-SwissGroup::SwissGroup( unsigned int fromPlace, Tournament* tourn,
+SwissGroup::SwissGroup( unsigned int fromPlace, 
                         unsigned int stage, PlayerList players ) 
-: Group( QString( "" ), tourn, stage, players ),
+: Group( QString( "" ), stage, players ),
   _fromPlace( fromPlace )
 {
   int cnt = _players.count();
@@ -35,10 +36,9 @@ SwissGroup::SwissGroup( unsigned int fromPlace, Tournament* tourn,
 /** Should be used only during serializing/deserializing
  */
 SwissGroup::SwissGroup()
-: Group( QString( "" ), NULL, 2, PlayerList() ),
+: Group( QString( "" ), 2, PlayerList() ),
   _fromPlace( 1 )
 {
-
 }
 
 void SwissGroup::initGroupName()
@@ -51,9 +51,20 @@ void SwissGroup::initGroupName()
   } else if ( isQuarterFinal() ) {
     _name = QObject::tr( "1/4 Final" );
   } else {
-    _name =  QString( "%1 - %2" )
-                  .arg( _fromPlace )
-                  .arg( _fromPlace + cnt - 1 );
+    if ( _players.contains( byePlayer ) ) {
+      cnt --;
+    }
+
+    int begin = _fromPlace;
+    int end = _fromPlace + cnt - 1;
+    if ( begin == end ) {
+		  _name =  QString( "%1" )
+			      					.arg( begin );
+    } else {
+		  _name =  QString( "%1 - %2" )
+			      					.arg( begin )
+						      		.arg( end );
+    }
   }
 }
 
@@ -65,16 +76,28 @@ QList< Group* > SwissGroup::split( ) const
     return QList< Group* >();
   }
 
-  PlayerList winners, loosers;
-  for ( int i = 0; i < _matches.count(); i ++ ) {
-    winners << _matches.at( i ).winner();
-    loosers << _matches.at( i ).looser();
-  }
-
   QList< Group* > ret;
-  ret << new SwissGroup( _fromPlace, _tournament, _stage + 1, winners );
+  PlayerList w = winners(), l = loosers();
+
+  // number of winnders and loosers can be non-even, when group consists,
+  // for example, from 6 persons. We need to add 'bye' players 
+  if ( w.count() & 1 ) w << byePlayer;
+  if ( l.count() & 1 ) l << byePlayer;
+
+  // winners group
+  ret << new SwissGroup( _fromPlace, _stage + 1, w ); 
+  // loosers group
   ret << new SwissGroup( _fromPlace + _players.count() / 2, 
-                         _tournament, _stage + 1, loosers );
+                                   _stage + 1, l );
+
+  foreach( Group *g, ret ) {
+    const TournAlgo *a = _tournData->algo();
+    Q_CHECK_PTR( a );
+ 
+    g->setTournData( _tournData );
+    g->setQualif( isQualif() );
+    dynamic_cast<SwissGroup*>(g)->permuteMatches( a->breakAlgo() );
+  }
  
   return ret; 
 }
@@ -126,3 +149,45 @@ QString SwissGroup::csvResult( QChar sep ) const
 	return ret;
 }
 
+/** Compares swiss groups by their fromPlace field.
+ */
+bool SwissGroup::lessThan(const Group* g1, const Group* g2)
+{
+  Q_ASSERT( g1 );
+  Q_ASSERT( g2 ); 
+
+  if ( g1 && g2 ) {
+    const SwissGroup* sg1 = dynamic_cast< const SwissGroup* >( g1 );
+    const SwissGroup* sg2 = dynamic_cast< const SwissGroup* >( g2 );
+
+    return sg1->fromPlace() < sg2->fromPlace();
+  } else {
+    return false;
+  }
+}
+
+/* redorder matches so that this group will be simply splitted by
+ * winners and loosers, without permuation
+ * \todo this function should be in TournAlgo class... like permutePlayers()
+ */
+void SwissGroup::permuteMatches( BreakAlgo::Algo br )
+{
+  if ( _matches.count() <= 2 ) {
+    // nothing to permute
+    return;
+  }
+
+  MatchList tmp = _matches;
+  _matches.clear();
+
+  for ( int i = 0; i < tmp.count() / 2; i ++ ) {
+    if ( br == BreakAlgo::ADBC ) {  
+			_matches << tmp.at( i ) << tmp.at( tmp.count() - i - 1 );
+    } else if ( br == BreakAlgo::ACBD ) {
+			_matches << tmp.at( i ) << tmp.at( tmp.count() / 2 + i );
+    } else {
+      // no changes
+      _matches << tmp.at( i*2 ) << tmp.at( i*2 + 1 );
+    }
+  }
+}

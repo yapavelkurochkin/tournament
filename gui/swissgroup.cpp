@@ -84,11 +84,26 @@ QList< Group* > SwissGroup::split( ) const
   if ( w.count() & 1 ) w << byePlayer;
   if ( l.count() & 1 ) l << byePlayer;
 
+  qDebug() << "Winners:";
+  for ( int i = 0; i < w.count(); i ++ ) {
+    qDebug() << w.at( i ).name();
+  }
+
+  qDebug() << "Loosers:";
+  for ( int i = 0; i < l.count(); i ++ ) {
+    qDebug() << l.at( i ).name();
+  }
+
   // winners group
-  ret << new SwissGroup( _fromPlace, _stage + 1, w ); 
+  if ( !isPlayerListByed( w ) ) {
+    ret << new SwissGroup( _fromPlace, _stage + 1, w ); 
+  }
+
   // loosers group
-  ret << new SwissGroup( _fromPlace + _players.count() / 2, 
-                                   _stage + 1, l );
+  if ( !isPlayerListByed( l ) ) {
+    ret << new SwissGroup( _fromPlace + _players.count() / 2, 
+                           _stage + 1, l );
+  }
 
   foreach( Group *g, ret ) {
     const TournAlgo *a = _tournData->algo();
@@ -97,6 +112,12 @@ QList< Group* > SwissGroup::split( ) const
     g->setTournData( _tournData );
     g->setQualif( isQualif() );
     dynamic_cast<SwissGroup*>(g)->permuteMatches( a->breakAlgo() );
+
+    // if there is at least one bye player, we should notify that
+    // at least one game is fakely played.
+    if ( g->const_players().contains( byePlayer ) ) {
+      _tournData->groupChanged( g );
+    }
   }
  
   return ret; 

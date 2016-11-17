@@ -1,7 +1,13 @@
 #include <QHash>
+#include <QMetaType>
 #include "player.h"
 
-Player byePlayer( "bye", 0.0 );
+Q_DECLARE_METATYPE( Player );
+
+// byeplayer should have least rating. this provide correct
+// sorting because operator< will always return true. 
+// i.e. (byePlayer < anyPlayer) = true;
+Player byePlayer( "bye", -100000.0 );
 
 Player::Player( )
 : _rating( 0.0 )
@@ -15,14 +21,26 @@ Player::Player( QString name, double rating )
 
 }
 
+/* if rating is different than it compared.
+ * otherwise - name (for lexical sorting) compared reversly:  
+ * player with lexically bigger name should follow last.
+ */
 bool Player::operator< ( const Player& pl ) const
 {
-  return ( _rating < pl.rating() );
+  if ( _rating == pl.rating() ) {
+    return ( _name > pl.name() );
+  } else {
+    return ( _rating < pl.rating() );
+  }
 }
 
 bool Player::operator> ( const Player& pl ) const
 {
-  return ( _rating > pl.rating() );
+  if ( _rating == pl.rating() ) {
+    return ( _name < pl.name() );
+  } else {
+    return ( _rating > pl.rating() );
+  }
 }
 
 bool Player::operator== ( const Player& pl ) const

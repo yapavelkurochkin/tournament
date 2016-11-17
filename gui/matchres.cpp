@@ -84,8 +84,6 @@ void MatchResDialog::textChanged( )
     game.bBalls = leB->text().toInt(); 
 
     if ( !game.validate() ) {
-      qDebug() << __FUNCTION__ << "wrong game!";
-      
       _okButton->setEnabled( false );
       return;
     }

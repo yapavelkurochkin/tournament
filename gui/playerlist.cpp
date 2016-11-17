@@ -34,3 +34,15 @@ PlayerList loadPlayerList( QString fname )
   return ret;
 }
 
+// at least one real player => false
+// all players = bye  => true
+bool isPlayerListByed( PlayerList pl )
+{ 
+  foreach( Player p, pl ) {
+    if ( !p.isBye() ) {
+      return false;
+    }
+  }
+
+  return true;
+} 

@@ -242,16 +242,14 @@ PlayerList Group::winners() const
 }
 
 /** \return list of players who lost at least 1 match.
- *          'bye' players are not included in list
+ *          'bye' players are included in list
  */
 PlayerList Group::loosers() const
 {
   PlayerList list;
   for ( int i = 0; i < _matches.count(); i++) {
     Player p = _matches.at( i ).looser();
-    if ( !p.isBye() ) {
-      list << p;
-    }
+    list << p;
   }
 
   return list;

@@ -43,6 +43,7 @@ void PlayerTable::mouseDoubleClickEvent( QMouseEvent * )
     PlayerList players = loadPlayerList( fName );
     if ( players.count() > 0 ) {
       setPlayerList( players );
+      emit updated( players );
     } else {
       QMessageBox msg;
       msg.setText( tr( "I cannot find any player in '" ) + fName + "'" );

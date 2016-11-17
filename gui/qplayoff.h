@@ -16,6 +16,8 @@ class QPlayoffAlgo : public TournAlgo {
     QList<Group*> buildGroups( unsigned int stage, 
                                QList<Group*> prevGroups ) const;
   
+    unsigned int calcMatchNum() const;
+
   protected:
     PlayerList qualifTopResults( QList< Group* > groups ) const;
     PlayerList qualifBotResults( QList< Group* > groups ) const;

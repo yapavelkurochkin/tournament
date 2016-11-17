@@ -8,7 +8,8 @@ struct TournProps {
 	// value can be used as an index. 
 	enum TournType {
 		RRPlayOff       = 0,  // round-robin stage + playoff
-		QualifPlayOff   = 1   // qualification (optional) + playoff
+		QualifPlayOff,        // qualification (optional) + playoff
+		PlayOff               // simple playoff
 	};
 
   TournProps();
@@ -20,7 +21,7 @@ struct TournProps {
   PlayerList players;      // list of players
   QString category;        // category name
 
-  // type == QualifPlayOff:
+  // type == QualifPlayOff || type == PlayOff :
   unsigned int playoffNum; // how many players in playoff (power of 2)  
   unsigned int seededNum;  // how many players will skip qualification 
                            // and play in playoff directly

@@ -75,14 +75,16 @@ MatchList TournData::matchList( int stage ) const
 /** Called each time when match of group is completed.
  *  Function builds groups when some stage finished or full swissgroup
  *  completed.
+ *
+ *  \todo it seems that some code should be moved into buildGroups() function
  */
  void TournData::groupChanged( Group *g )
 {
   Q_ASSERT( g != NULL );
   Q_ASSERT( _tournament != NULL );
 
-  if ( g->stage() == 0 ) {
-    // 0th stage is always qualification (RoundRobin or another one).
+  if ( g->stage() == 0 && ( algo()->props().type != TournProps::PlayOff ) ) {
+    // 0th stage is for qualification (RoundRobin or another one).
     // it should be fully completed before next stage.
     if ( _algo->stageCompleted( _groups[0] ) ) {
       _groups[1] = _algo->buildGroups( 1, _groups[0] );
@@ -109,37 +111,25 @@ QDataStream &operator>>(QDataStream &s, TournData& t )
     return s;
   }
 
-  qDebug() << __FUNCTION__ << "stagescnt = " << t.algo()->stagesCnt();
 	t._groups = new QList<Group*>[ t.algo()->stagesCnt() ];
   
 	for ( unsigned int i = 0; i < t.algo()->stagesCnt(); i ++ ) {
 		int count;
 		s >> count;
 
-    qDebug() << __FUNCTION__ << "i=" << i << "count = " << count;
-
 		for ( int j = 0; j < count; j ++ ) {
 			QString type;
 			s >> type;
 			
-      qDebug() << __FUNCTION__ << "type (" << j << ") = " << type;
-
 			if ( type == "round-robin" ) {
 				RRGroup* rrg = new RRGroup();
 				s >> (*rrg);
-        
-        qDebug() << __FUNCTION__ << "group size" 
-                                 << rrg->const_players().count();
- 
 				rrg->setTournData( &t );
   			t._groups[i] << rrg; 
 			} else if ( type == "swiss" ) {
 				SwissGroup* sg = new SwissGroup();
 				s >> (*sg);
 
-        qDebug() << __FUNCTION__ << "group size" 
-                                 << sg->const_players().count();
-	
 				sg->setTournData( &t );
 				t._groups[i] << sg; 
 			} else {
@@ -162,14 +152,12 @@ QDataStream &operator<<(QDataStream &s, const TournData& t )
     int count = t._groups[i].count();
 
     s << count;    
-    qDebug() << __FUNCTION__ << "i=" << i << "count = " << count;
 
 		for ( int j = 0; j < count; j ++ ) {
       Group *g = t._groups[i].at( j );
 			QString type = g->type();
       
 			s << type;
-      qDebug() << __FUNCTION__ << "type (" << j << ") = " << type;
 			
 			if ( type == "round-robin" ) {
 				s << (*dynamic_cast< RRGroup* >( g ));
@@ -179,12 +167,8 @@ QDataStream &operator<<(QDataStream &s, const TournData& t )
 				qCritical() << "unknown group type:" << type;
 				return s;
 			}
-        
-      qDebug() << __FUNCTION__ << "group size" << g->const_players().count();
 		}   
 	}
   
-  qDebug() << __FUNCTION__ << "finished";
-
   return s;
 }

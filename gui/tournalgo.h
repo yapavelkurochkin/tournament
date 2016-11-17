@@ -41,7 +41,11 @@ class TournAlgo {
     virtual QList<Group*> buildGroups( unsigned int stage, 
                                  QList<Group*> prevGroups = QList< Group* >() ) const = 0;
 
+    virtual unsigned int calcMatchNum( ) const { return 0; }
+
     PlayerList permutePlayers( PlayerList pls ) const;
+
+    
 };
 
 #endif // TOURNALGO__H

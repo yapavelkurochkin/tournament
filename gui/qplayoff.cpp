@@ -8,13 +8,14 @@ extern unsigned int log2( unsigned int x );
 QPlayoffAlgo::QPlayoffAlgo( TournProps p )
 : TournAlgo( p )
 {
-  _qualifNum = p.players.count() - p.seededNum;
-  
-  // round qualifNum to the nearest power of 2
-  unsigned int l2 = log2( _qualifNum );
-  _qualifNum = ( ( 1 << l2 ) < _qualifNum ) ? ( 1 << ( l2 + 1 ) ) : 1 << l2;  
- 
-  _stagesCnt = 1 /* qualification */ + log2( p.seededNum + _qualifNum / 2 );
+  // we need such number of winners in qualification for full 
+  // playoff.
+  unsigned qualifWinNum = p.playoffNum - p.seededNum;
+
+  // to reach qualifWinNum we need 2x players
+  _qualifNum = qualifWinNum * 2;  
+
+  _stagesCnt = 1 /* qualification */ + log2( p.playoffNum );
 
   qDebug() << __FUNCTION__ << "qualifNum:" << _qualifNum << "stages:" << _stagesCnt;
   // EXAMPLE: let p.count() = 20. p.seededNum = 8.
@@ -65,6 +66,7 @@ QList<Group*> QPlayoffAlgo::buildGroups( unsigned int stage,
   if ( stage >= stagesCnt() ) {
     return QList< Group* >();
   }
+
   if ( stage == 0 ) {
     return initGroups( );
   }
@@ -100,7 +102,8 @@ PlayerList QPlayoffAlgo::qualifTopResults( QList< Group* > groups ) const
 
   Group* prev = groups[ 0 ];
   PlayerList winners = prev->winners();
-  // no sort here! we should save winners order here 
+
+  // no sort here! we should preserve winners order here 
 
   PlayerList toppls;
   toppls << players.mid( 0, props().seededNum );
@@ -117,6 +120,7 @@ PlayerList QPlayoffAlgo::qualifBotResults( QList< Group* > groups ) const
 
   Group* prev = groups[ 0 ];
   PlayerList loosers = prev->loosers();
+  loosers.removeAll( byePlayer );
   // no sort here! save winners order
 
   if ( loosers.count() & 1 ) { // odd number of players
@@ -126,3 +130,14 @@ PlayerList QPlayoffAlgo::qualifBotResults( QList< Group* > groups ) const
   return loosers; 
 }
   
+unsigned int QPlayoffAlgo::calcMatchNum() const
+{
+  unsigned int ret = log2( _props.playoffNum ) * _props.playoffNum / 2;
+
+  if ( _qualifNum ) {
+    unsigned qualifWinNum = _props.playoffNum - _props.seededNum;
+    ret += log2( _qualifNum ) * qualifWinNum / 2;
+  }
+
+  return ret;  
+}

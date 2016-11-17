@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <QComboBox>
 #include <QLineEdit>
+#include <QLabel>
 
 #include "playertable.h"
 #include "match.h" 
@@ -21,6 +22,7 @@ class NewTournDialog : public QDialog
   protected slots:
     void tryToAccept();
     void typeChanged( int );
+    void playerListUpdated(  );
 
   protected:
     QComboBox *matchCombo, 
@@ -28,8 +30,8 @@ class NewTournDialog : public QDialog
               *gCombo,
               *sizeCombo,
               *typeCombo;
-    QLineEdit *noQualEdit;
     PlayerTable *table;
+    QLabel *plNumLabel;
 };
 
 #endif // NEWTOURNDIALOG__H 

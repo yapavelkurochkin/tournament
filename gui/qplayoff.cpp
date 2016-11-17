@@ -66,6 +66,7 @@ QList<Group*> QPlayoffAlgo::buildGroups( unsigned int stage,
   if ( stage >= stagesCnt() ) {
     return QList< Group* >();
   }
+
   if ( stage == 0 ) {
     return initGroups( );
   }
@@ -101,7 +102,8 @@ PlayerList QPlayoffAlgo::qualifTopResults( QList< Group* > groups ) const
 
   Group* prev = groups[ 0 ];
   PlayerList winners = prev->winners();
-  // no sort here! we should save winners order here 
+
+  // no sort here! we should preserve winners order here 
 
   PlayerList toppls;
   toppls << players.mid( 0, props().seededNum );
@@ -118,6 +120,7 @@ PlayerList QPlayoffAlgo::qualifBotResults( QList< Group* > groups ) const
 
   Group* prev = groups[ 0 ];
   PlayerList loosers = prev->loosers();
+  loosers.removeAll( byePlayer );
   // no sort here! save winners order
 
   if ( loosers.count() & 1 ) { // odd number of players
@@ -127,3 +130,14 @@ PlayerList QPlayoffAlgo::qualifBotResults( QList< Group* > groups ) const
   return loosers; 
 }
   
+unsigned int QPlayoffAlgo::calcMatchNum() const
+{
+  unsigned int ret = log2( _props.playoffNum ) * _props.playoffNum / 2;
+
+  if ( _qualifNum ) {
+    unsigned qualifWinNum = _props.playoffNum - _props.seededNum;
+    ret += log2( _qualifNum ) * qualifWinNum / 2;
+  }
+
+  return ret;  
+}

@@ -12,9 +12,12 @@ TournProps::TournProps()
 {
 }
 
+/** if number of seeded players is equal to number of players,
+ *  then there is no qualification. 
+ */
 TournProps::TournProps( PlayerList _p, QString _c, 
                         unsigned int _pnum, unsigned int _snum )
-: type( QualifPlayOff ),
+: type( ( _snum == _p.count() ) ? PlayOff : QualifPlayOff ),
   players( _p ),
   category( _c ),
   playoffNum( _pnum ),
@@ -41,7 +44,8 @@ bool TournProps::validate( QString& errtext ) const
 
   if ( type == QualifPlayOff ) {
     if ( (unsigned int) ( players.count() ) < playoffNum ) {
-  		errtext = "Playoff size could not be greater than number of players";
+	    errtext = "Number of players is less than playoff size."
+                "Please select simple playoff.";
       return false;
     }
 
@@ -53,6 +57,12 @@ bool TournProps::validate( QString& errtext ) const
   
     // TODO: there can be situation with big number of players, small playoff size
     //       and small skipQual number.
+  } else if ( type == PlayOff ) {
+    if ( (unsigned int)( players.count() ) > playoffNum ) {
+	    errtext = "Number of players should not exceed playoff size."
+                "Please, remove some players or select 'Qualification + Playoff'";
+      return false;
+    }
   }
 
   return true;  

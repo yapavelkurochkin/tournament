@@ -5,6 +5,8 @@
 #include <QMessageBox>
 
 #include "newtourndialog.h"
+#include "tournalgo.h"
+#include "tournalgofactory.h"
 
 NewTournDialog::NewTournDialog( QWidget* parent )
 : QDialog( parent )
@@ -20,7 +22,8 @@ NewTournDialog::NewTournDialog( QWidget* parent )
 
   typeCombo = new QComboBox();
   typeCombo->addItems( QStringList()  << tr( "Round-Robin + Playoff" )
-                                      << tr( "Playoff with qualification" ) );
+                                      << tr( "Playoff with qualification" )
+                                      << tr( "Playoff" ) );
   connect( typeCombo, SIGNAL( currentIndexChanged( int ) ), 
            this,      SLOT( typeChanged( int ) ) );
  
@@ -32,20 +35,13 @@ NewTournDialog::NewTournDialog( QWidget* parent )
 
   sizeCombo = new QComboBox();
   sizeCombo->addItems( QStringList()  << "2" << "4" 
-                                      << "8" << "16" << "32" );
-
-  // how many players go through w/o qualification
-  noQualEdit = new QLineEdit();
-  noQualEdit->setText( "1" ); 
-  noQualEdit->setAlignment( Qt::AlignRight ); 
-  noQualEdit->setValidator( new QIntValidator( 0, 100 ) );
+                                      << "8" << "16" << "32" << "64" );
 
   QFormLayout *fl = new QFormLayout;
   fl->addRow( tr("&Category"), catCombo );
   fl->addRow( tr("&Type"), typeCombo );
   fl->addRow( tr("&Groups"), gCombo );
   fl->addRow( tr("&Playoff"), sizeCombo );
-  fl->addRow( tr("&Seeded"), noQualEdit );
   // TODO: add selector 'Do not play round-robin stage'
 
   table = new PlayerTable( this );
@@ -59,27 +55,42 @@ NewTournDialog::NewTournDialog( QWidget* parent )
   connect(buttonBox, SIGNAL(accepted()), this, SLOT(tryToAccept()));
   connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
+  plNumLabel = new QLabel( this );
+  plNumLabel->setVisible( false );
+  fl->addRow( plNumLabel ); 
   fl->addRow( buttonBox );
   
   setLayout( fl );
   
   typeChanged( 0 );
+
+  connect( table, SIGNAL( updated( PlayerList ) ),
+           this,  SLOT( playerListUpdated( ) ) );
 }
 
 TournProps NewTournDialog::tournProps() const
 {
-  // warning: It is assumed that index of item in combobox corresponds 
+  // warning: It is assumed that index of item in combobox corresponds
   // to correct value in enum type
-  if ( (TournProps::TournType) typeCombo->currentIndex() == TournProps::RRPlayOff ) {
-    return TournProps( table->playerList(), 
+  TournProps::TournType type = (TournProps::TournType) typeCombo->currentIndex();
+  if ( type == TournProps::RRPlayOff ) {
+    return TournProps( table->playerList(),
                        catCombo->currentText(),
                        gCombo->currentText().toUInt() );
   } else {
-    return TournProps( table->playerList(), 
+    int pcnt = table->playerList().count();
+    int size = sizeCombo->currentText().toInt();
+    int seeded = pcnt;
+
+    if ( type == TournProps::QualifPlayOff ) {
+      seeded -= ( pcnt - size ) * 2;
+    } 
+
+    return TournProps( table->playerList(),
                        catCombo->currentText(),
-                       sizeCombo->currentText().toInt(),
-                       noQualEdit->text().toInt() );
-  } 
+                       size,
+                       seeded );
+  }
 }
 
 /** \brief Checking whether entered values are valid.
@@ -101,12 +112,14 @@ void NewTournDialog::typeChanged( int index )
     case TournProps::RRPlayOff: 
       gCombo->setEnabled( true );
       sizeCombo->setEnabled( false );
-      noQualEdit->setEnabled( false );
       break; 
     case TournProps::QualifPlayOff:
       gCombo->setEnabled( false );
       sizeCombo->setEnabled( true );
-      noQualEdit->setEnabled( true );
+      break;
+    case TournProps::PlayOff:
+      gCombo->setEnabled( false );
+      sizeCombo->setEnabled( true );
       break;
     default: 
       qCritical( "unknown tournament type selected!" );
@@ -114,3 +127,15 @@ void NewTournDialog::typeChanged( int index )
   }
 }
 
+void NewTournDialog::playerListUpdated( )
+{
+  PlayerList pl = table->playerList();
+  if ( pl.count() ) {
+    TournAlgo *algo = TournAlgoFactory::algo( tournProps() ); 
+    if ( algo ) {
+			plNumLabel->setText( "Players: " + QString::number( pl.count() ) 
+													 + "\nMatches: " + QString::number( algo->calcMatchNum() ) );
+			plNumLabel->setVisible( true );
+    }
+  }
+}

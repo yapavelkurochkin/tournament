@@ -1,7 +1,13 @@
 #include <QHash>
+#include <QMetaType>
 #include "player.h"
 
-Player byePlayer( "bye", 0.0 );
+Q_DECLARE_METATYPE( Player );
+
+// byeplayer should have least rating. this provide correct
+// sorting because operator< will always return true. 
+// i.e. (byePlayer < anyPlayer) = true;
+Player byePlayer( "bye", -100000.0 );
 
 Player::Player( )
 : _rating( 0.0 )

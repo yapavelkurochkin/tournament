@@ -7,6 +7,7 @@
 typedef QList<Player> PlayerList;
 
 extern PlayerList loadPlayerList( QString file );
+bool isPlayerListByed( PlayerList ); 
 
 #endif // PLAYERLIST__H
 

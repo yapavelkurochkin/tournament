@@ -15,14 +15,26 @@ Player::Player( QString name, double rating )
 
 }
 
+/* if rating is different than it compared.
+ * otherwise - name (for lexical sorting) compared reversly:  
+ * player with lexically bigger name should follow last.
+ */
 bool Player::operator< ( const Player& pl ) const
 {
-  return ( _rating < pl.rating() );
+  if ( _rating == pl.rating() ) {
+    return ( _name > pl.name() );
+  } else {
+    return ( _rating < pl.rating() );
+  }
 }
 
 bool Player::operator> ( const Player& pl ) const
 {
-  return ( _rating > pl.rating() );
+  if ( _rating == pl.rating() ) {
+    return ( _name < pl.name() );
+  } else {
+    return ( _rating > pl.rating() );
+  }
 }
 
 bool Player::operator== ( const Player& pl ) const

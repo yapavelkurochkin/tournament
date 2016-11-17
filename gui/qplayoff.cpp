@@ -8,13 +8,14 @@ extern unsigned int log2( unsigned int x );
 QPlayoffAlgo::QPlayoffAlgo( TournProps p )
 : TournAlgo( p )
 {
-  _qualifNum = p.players.count() - p.seededNum;
-  
-  // round qualifNum to the nearest power of 2
-  unsigned int l2 = log2( _qualifNum );
-  _qualifNum = ( ( 1 << l2 ) < _qualifNum ) ? ( 1 << ( l2 + 1 ) ) : 1 << l2;  
- 
-  _stagesCnt = 1 /* qualification */ + log2( p.seededNum + _qualifNum / 2 );
+  // we need such number of winners in qualification for full 
+  // playoff.
+  unsigned qualifWinNum = p.playoffNum - p.seededNum;
+
+  // to reach qualifWinNum we need 2x players
+  _qualifNum = qualifWinNum * 2;  
+
+  _stagesCnt = 1 /* qualification */ + log2( p.playoffNum );
 
   qDebug() << __FUNCTION__ << "qualifNum:" << _qualifNum << "stages:" << _stagesCnt;
   // EXAMPLE: let p.count() = 20. p.seededNum = 8.

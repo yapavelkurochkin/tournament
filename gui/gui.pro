@@ -52,4 +52,9 @@ macx {
   QMAKE_EXTRA_TARGETS += deploy
 }
 
+win32 {
+  deploy.depends = all 
+  deploy.commands = windeployqt --no-translations release/tournament.exe
 
+  QMAKE_EXTRA_TARGETS += deploy
+}

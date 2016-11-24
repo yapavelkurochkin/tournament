@@ -1,3 +1,15 @@
+tournament (0.0.13) unstable; urgency=low
+
+      * added simple playoff mode 
+
+ -- pavel kurochkin <pavel.kurochkin@gmail.com>  Fri, 25 Nov 2016 01:03:46 +0300
+
+tournament (0.0.12) unstable; urgency=low
+
+      * added 'playoff + qualification' mode
+
+ -- pavel kurochkin <pavel.kurochkin@gmail.com>  Mon, 23 Oct 2016 21:56:02 +0300
+
 tournament (0.0.11) unstable; urgency=low
 
       * packaged to debian package 

@@ -49,7 +49,7 @@ QList<Group*> QPlayoffAlgo::initGroups( ) const
     qDebug() << "qualif #" << i << ":" << pls.last().name() << pls.last().rating();
   }
 
-  SwissGroup *sg = new SwissGroup( 0, 0, permutePlayers( pls ) );
+  SwissGroup *sg = new SwissGroup( 1, 0, permutePlayers( pls ) );
   sg->setName( QObject::tr( "Qualification" ) );
   sg->setQualif( );
 

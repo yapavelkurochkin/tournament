@@ -37,7 +37,7 @@ SwissGroup::SwissGroup( unsigned int fromPlace,
  */
 SwissGroup::SwissGroup()
 : Group( QString( "" ), 2, PlayerList() ),
-  _fromPlace( 1 )
+  _fromPlace( 0 )
 {
 }
 
@@ -54,8 +54,8 @@ void SwissGroup::initGroupName()
     int begin = _fromPlace;
     int end = _fromPlace + cnt - 1;
 		_name =  QString( "%1 - %2" )
-		     					.arg( begin + 1 ) // humans start counting from 1
-				      		.arg( end + 1);
+		     					.arg( begin ) // humans start counting from 1
+				      		.arg( end );
   }
 }
 

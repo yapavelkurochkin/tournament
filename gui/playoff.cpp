@@ -33,7 +33,7 @@ QList<Group*> PlayoffAlgo::initGroups( ) const
   PlayerList players = props().players;
   qSort( players.begin(), players.end(), qGreater< Player >() );
 
-  SwissGroup *sg = new SwissGroup( 0, 0, permutePlayers( players ) );
+  SwissGroup *sg = new SwissGroup( 1, 0, permutePlayers( players ) );
   sg->setQualif( false );
   sg->permuteMatches( breakAlgo() );  
 

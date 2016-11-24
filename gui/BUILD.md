@@ -1,7 +1,7 @@
 linux debian 8
 ==============
 
-To build debian project:
+To build debian package:
 
     sudo apt-get install dpkg-dev debhelper
     qmake
@@ -39,4 +39,18 @@ In qt5.4 shell (installed with Qt and can be found in Start panel) change direct
     mingw32-make deploy
 
 After that release/ directory is ready for deploy: make tournament.zip and send it to user.
+
+macosx
+======
+
+To build for win8 you should install Qt. I tested on Qt5.4 and Qt4.8
+
+In bash shell change directory to gui/ and type
+
+    qmake
+    make
+    make deploy
+
+After that tournament.dmg file is ready for deploy.
+
 

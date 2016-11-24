@@ -51,20 +51,11 @@ void SwissGroup::initGroupName()
   } else if ( isQuarterFinal() ) {
     _name = QObject::tr( "1/4 Final" );
   } else {
-    if ( _players.contains( byePlayer ) ) {
-      cnt --;
-    }
-
     int begin = _fromPlace;
     int end = _fromPlace + cnt - 1;
-    if ( begin == end ) {
-		  _name =  QString( "%1" )
-			      					.arg( begin );
-    } else {
-		  _name =  QString( "%1 - %2" )
-			      					.arg( begin )
-						      		.arg( end );
-    }
+		_name =  QString( "%1 - %2" )
+		     					.arg( begin + 1 ) // humans start counting from 1
+				      		.arg( end + 1);
   }
 }
 

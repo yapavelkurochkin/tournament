@@ -83,20 +83,22 @@ MatchList TournData::matchList( int stage ) const
   Q_ASSERT( g != NULL );
   Q_ASSERT( _tournament != NULL );
 
-  if ( g->stage() == 0 && ( algo()->props().type != TournProps::PlayOff ) ) {
-    // 0th stage is for qualification (RoundRobin or another one).
-    // it should be fully completed before next stage.
-    if ( _algo->stageCompleted( _groups[0] ) ) {
-      _groups[1] = _algo->buildGroups( 1, _groups[0] );
-      foreach( Group *gr, _groups[ 1 ] ) {
-        gr->setTournData( this );
+  if (!g->readOnly()) {
+      if ( g->stage() == 0 && ( algo()->props().type != TournProps::PlayOff )) {
+        // 0th stage is for qualification (RoundRobin or another one).
+        // it should be fully completed before next stage.
+        if ( _algo->stageCompleted( _groups[0] ) ) {
+          _groups[1] = _algo->buildGroups( 1, _groups[0] );
+          foreach( Group *gr, _groups[ 1 ] ) {
+            gr->setTournData( this );
+          }
+         }
+      } else {
+        if ( g->completed() && ( !_algo->isStageLast( g->stage() ) ) ) {
+          _groups[ g->stage() + 1 ] << dynamic_cast< SwissGroup* >( g )->split();
+          // split() function should set tourn data
+        }
       }
-    }
-  } else {
-    if ( g->completed() && ( !_algo->isStageLast( g->stage() ) ) ) {
-      _groups[ g->stage() + 1 ] << dynamic_cast< SwissGroup* >( g )->split();
-      // split() function should set tourn data 
-    }
   }
 
   if ( _tournament ) {

@@ -70,7 +70,7 @@ QList< Group* > SwissGroup::split( ) const
   QList< Group* > ret;
   PlayerList w = winners(), l = loosers();
 
-  // number of winnders and loosers can be non-even, when group consists,
+  // number of winners and loosers can be non-even, when group consists,
   // for example, from 6 persons. We need to add 'bye' players 
   if ( w.count() & 1 ) w << byePlayer;
   if ( l.count() & 1 ) l << byePlayer;
@@ -188,6 +188,8 @@ void SwissGroup::permuteMatches( BreakAlgo::Algo br )
     // nothing to permute
     return;
   }
+
+  Q_ASSERT( ( _matches.count() & 0x01 ) == 0 );
 
   MatchList tmp = _matches;
   _matches.clear();

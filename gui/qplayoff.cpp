@@ -1,4 +1,7 @@
+#include <math.h>
+
 #include <QDebug>
+
 #include "qplayoff.h"
 #include "swissgroup.h"
 #include "tournament.h"
@@ -27,7 +30,6 @@ QPlayoffAlgo::QPlayoffAlgo( TournProps p )
 /**
  *  List of players is sorted at first.
  *  Players who are not in seeded list should play simple playoff.
- *  Intended, that _qualifNum is power of 2.
  */
 QList<Group*> QPlayoffAlgo::initGroups( ) const
 {
@@ -112,7 +114,7 @@ PlayerList QPlayoffAlgo::qualifTopResults( QList< Group* > groups ) const
   return toppls; 
 }
 
-/** loosers list size can be non-even, so, 'bye' guys should be added.
+/** loosers list size can be non-2-powered ;), so, 'bye' guys should be added.
  */
 PlayerList QPlayoffAlgo::qualifBotResults( QList< Group* > groups ) const
 {
@@ -123,7 +125,9 @@ PlayerList QPlayoffAlgo::qualifBotResults( QList< Group* > groups ) const
   loosers.removeAll( byePlayer );
   // no sort here! save winners order
 
-  if ( loosers.count() & 1 ) { // odd number of players
+  int pow2count = 1 << (int) ceil( log2( (double) loosers.count() ) );
+
+  for ( int i = loosers.count(); i < pow2count; i ++ ) {
     loosers << byePlayer;
   }
 

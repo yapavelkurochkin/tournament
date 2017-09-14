@@ -39,14 +39,21 @@ Game& Game::swap( )
   return (*this);
 }
 
+/** \return winner player if known or Undefined player with 
+ *          name = nameA + "/" + nameB
+ */
 Player Game::winner() const
 {
-  if ( a.isBye() ) {
-    return b;
-  } else if ( b.isBye() ) {
-    return a;
+  if ( played() ) {
+    if ( a.isBye() ) {
+      return b;
+    } else if ( b.isBye() ) {
+      return a;
+    } else {
+      return ( aBalls > bBalls ) ? a : b;
+    }
   } else {
-    return ( aBalls > bBalls ) ? a : b;
+    return Player::mkUndefinedPlayer( a, b );
   }
 }
 
@@ -85,18 +92,26 @@ Match::Match( Player a, Player b )
 
 Player Match::winner() const 
 {
-  if ( _a.isBye() ) {
-    return _b;
-  } else if ( _b.isBye() ) {
-    return _a;
+  if ( played() ) {
+    if ( _a.isBye() ) {
+      return _b;
+    } else if ( _b.isBye() ) {
+      return _a;
+    } else {
+      return ( gamesWon( _a ) > gamesWon( _b ) ) ? _a : _b;
+    }
   } else {
-    return ( gamesWon( _a ) > gamesWon( _b ) ) ? _a : _b;
+    return Player::mkUndefinedPlayer( _a, _b );
   }
 }
 
 Player Match::looser() const 
 {
-  return ( winner() == _a ) ? _b : _a;
+  if ( played ) {
+    return ( winner() == _a ) ? _b : _a;
+  } else {
+    return Player::mkUndefinedPlayer( _a, _b );
+  }
 }
 
 unsigned int Match::gamesWon( Player p ) const 

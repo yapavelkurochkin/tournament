@@ -17,6 +17,7 @@ struct Game
   Player winner() const;
   unsigned int balls( Player p ) const;
   unsigned int lostBalls( Player p ) const;
+  bool played() const { return validate(); }
 
   friend QDataStream &operator>>(QDataStream &s, Game &g);
   friend QDataStream &operator<<(QDataStream &s, const Game &g);

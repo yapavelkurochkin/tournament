@@ -71,3 +71,11 @@ QDataStream &operator<<( QDataStream & s, const Player& p )
   return s;
 }
 
+// creates so called 'undefined' player. This player has property
+// 'isUndefined()' = true.
+// See also: Match::winner()
+Player Player::mkUndefinedPlayer( Player a, Player b )
+{
+  Player undef( a.name() + "/" + b.name(), 0 );
+  return undef;
+}

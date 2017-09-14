@@ -2,6 +2,9 @@
 #include <QDebug>
 #include <QFile>
 #include <QDir>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QJsonDocument>
 
 #include "tournament.h"
 #include "rrgroup.h"
@@ -146,6 +149,8 @@ QDataStream &operator<<(QDataStream &s, const Tournament& t )
  */
 void Tournament::saveAsCSV( QString file )
 {
+  return saveAsJson( file ); // FIXME: just test
+
   if ( !isValid() ) {
     qWarning() << __FUNCTION__ << 
                   "trying to save a results of invalid tournament object";
@@ -169,6 +174,52 @@ void Tournament::saveAsCSV( QString file )
 
 		out << totalRatingAsCSV( sep ) << endl;
   }
+}
+
+/** prints the results to .json file
+ */
+void Tournament::saveAsJson( QString file )
+{
+  if ( !isValid() ) {
+    qWarning() << __FUNCTION__ << 
+                  "trying to save a results of invalid tournament object";
+    return;
+	}
+
+  QJsonObject json;
+  json["version"] = (int)1;
+  
+  // players list
+  QJsonArray plArray;
+  foreach (const Player p, algo_const()->props().players) {
+		QJsonObject plObj;
+		p.write(plObj);
+		plArray.append(plObj);
+  }
+
+  json["players"] = plArray;
+
+	QFile jsonFile( file );
+
+	if (jsonFile.open(QFile::WriteOnly | QFile::Truncate)) {
+    QJsonArray gArray;
+	
+    for ( unsigned int i = 0; i < _algo->stagesCnt(); i ++ ) {
+      QJsonObject gObj;
+      int count = _data->groups()[ i ].count();
+      for ( int j = 0; j < count; j ++ ) {
+        const Group* g = _data->groups()[ i ].at( j );
+
+        g->write( gObj );
+        gArray.append( gObj );
+      }
+    }
+
+    json["groups"] = gArray;   
+ 
+    QJsonDocument saveDoc(json);
+    jsonFile.write( saveDoc.toJson() );
+  }		
 }
 
 /** prints total ratings as CSV. there are 4 columns:

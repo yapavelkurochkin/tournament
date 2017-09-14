@@ -17,8 +17,6 @@ class Tournament : public QObject {
   Q_OBJECT;
 
   public:
-    Tournament( PlayerList players, QString category,
-                unsigned int groupCnt = 4); 
     Tournament( TournProps props ); 
     Tournament(  );
 
@@ -28,6 +26,7 @@ class Tournament : public QObject {
     bool save( QString fname );
     bool save( QFile* f );
     void saveAsCSV( QString fname );
+    void saveAsJson( QString fname );
     QString totalRatingAsCSV( QChar sep );
 
     void setFileName( QString fn ) { _fileName = fn; }

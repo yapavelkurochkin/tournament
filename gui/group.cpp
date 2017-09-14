@@ -1,4 +1,5 @@
 #include <QDebug>
+#include <QJsonArray>
 
 #include "tournament.h"
 #include "group.h"
@@ -283,6 +284,25 @@ void Group::setQualif( bool q )
   for ( int i = 0; i < _matches.count(); i++ ) {
     _matches[ i ].setQualif( q );
   } 
+}
+
+/** export results to json
+ */
+void Group::write( QJsonObject &json ) const
+{
+  json["name"] = name();
+  json["stage"] = (int)stage();
+  json["type"] = type();
+  json["qualif"] = isQualif();
+
+  QJsonArray mArray;
+  foreach( Match m, _matches ) {
+    QJsonObject mObj;
+    m.write( mObj );
+    mArray.append( mObj );
+  }
+  
+  json["matches"] = mArray; 
 }
 
 /** Serialization operators

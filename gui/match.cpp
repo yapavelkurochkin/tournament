@@ -1,3 +1,4 @@
+#include <QJsonArray>
 #include "match.h"
 #include "../rating/rating.h"
 
@@ -61,6 +62,13 @@ unsigned int Game::lostBalls( Player p ) const
 {
   return ( p == a ) ? bBalls : aBalls;
 }
+
+void Game::write( QJsonObject &json ) const
+{
+  json["aBalls"] = (int)aBalls;
+  json["bBalls"] = (int)bBalls;
+}
+
 QDataStream &operator>>(QDataStream &s, Game &g)
 {
   s >> g.a >> g.b >> g.aBalls >> g.bBalls;
@@ -72,6 +80,7 @@ QDataStream &operator<<(QDataStream &s, const Game &g)
   s << g.a << g.b << g.aBalls << g.bBalls;
   return s;
 }
+
 
 /******************************
  * Match                      *
@@ -196,6 +205,29 @@ double Match::earnedRating( Player p ) const
   } else {
     return 0.0;
   }
+}
+
+void Match::write( QJsonObject &json ) const
+{
+  QJsonObject aObj, bObj, wObj, lObj;
+  _a.write( aObj );
+  _b.write( bObj );
+  winner().write( wObj );
+  looser().write( lObj );
+
+  json["a"] = aObj;
+  json["b"] = bObj;
+  json["winner"] = wObj;
+  json["looser"] = lObj;
+  
+  QJsonArray gArray;
+  foreach ( const Game g, games_const() ) {
+		QJsonObject gObj;
+		g.write(gObj);
+		gArray.append(gObj);
+  }
+
+  json["games"] = gArray;
 }
 
 /* serialization operators

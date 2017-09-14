@@ -19,7 +19,7 @@ class LeagueMainWindow : public QMainWindow
 
   protected:
     QAction *loadT, *newT, *saveT, *about, 
-		        *ratings, *exportT, *undoT, *redoT,
+		        *ratings, *exportT, *jsonT, *undoT, *redoT,
             *breakADBC, *breakACBD, *breakABCD;
     Tournament* tourn;
     QString progName;
@@ -44,6 +44,7 @@ class LeagueMainWindow : public QMainWindow
     void loadTournamentInteractive();
     void saveTournament();
     void exportTournament();
+    void exportTournamentToJson();
     void newTournament();
     void showAboutDialog();
     void showRatingsTable();

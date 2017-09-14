@@ -40,6 +40,8 @@ void LeagueMainWindow::createActions()
                          SLOT( saveTournament() ) );
   exportT = newAction( tr("&Export to CSV"), QKeySequence::UnknownKey,
                          SLOT( exportTournament() ) );
+  jsonT   = newAction( tr("&Export to JSON"), QKeySequence::UnknownKey,
+                         SLOT( exportTournamentToJson() ) );
   ratings = newAction( tr("&Ratings"), 
                          SLOT( showRatingsTable() ) );
   about = newAction( tr("&About"), QKeySequence::HelpContents,
@@ -98,7 +100,9 @@ void LeagueMainWindow::createMenus()
   fileMenu->addAction( newT );
   fileMenu->addAction( loadT );
   fileMenu->addAction( saveT );
+  fileMenu->addSeparator();
   fileMenu->addAction( exportT );
+  fileMenu->addAction( jsonT );
   fileMenu->addSeparator();
   fileMenu->addAction( ratings );
 
@@ -184,6 +188,19 @@ void LeagueMainWindow::exportTournament( )
   if ( !fName.isNull() ) {
     if ( tourn ) {
       tourn->saveAsCSV( fName );
+    }
+  }
+}
+
+void LeagueMainWindow::exportTournamentToJson( )
+{
+  QString fName = QFileDialog::getSaveFileName(this,
+                  tr("Export tournament results"), "", 
+                  tr("JSON Files (*.json)"));
+
+  if ( !fName.isNull() ) {
+    if ( tourn ) {
+      tourn->saveAsJson( fName );
     }
   }
 }

@@ -3,6 +3,7 @@
 
 #include <QString>
 #include <QDataStream>
+#include <QJsonObject>
 
 class Player {
   QString _name;
@@ -25,6 +26,8 @@ class Player {
     bool operator< ( const Player& pl ) const;
     bool operator> ( const Player& pl ) const;
     bool operator== ( const Player& pl ) const;
+
+    void write(QJsonObject &json) const;
 };
 
 extern Player byePlayer;

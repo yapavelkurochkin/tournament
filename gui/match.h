@@ -3,6 +3,7 @@
 
 #include <QList>
 #include <QDataStream>
+#include <QJsonObject>
 #include "playerlist.h"
 
 struct Game
@@ -20,6 +21,8 @@ struct Game
 
   friend QDataStream &operator>>(QDataStream &s, Game &g);
   friend QDataStream &operator<<(QDataStream &s, const Game &g);
+
+  void write( QJsonObject &json ) const;
 };
 
 #define MAX_GAMES_PER_MATCH 5
@@ -59,6 +62,8 @@ class Match
     bool isQualif( ) const { return _qualif; }
  
     bool validate() const;
+
+    void write( QJsonObject &json ) const;
 
   protected:
     Player _a;

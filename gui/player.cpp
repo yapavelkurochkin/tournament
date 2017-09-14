@@ -48,6 +48,12 @@ bool Player::operator== ( const Player& pl ) const
   return _name == pl.name();
 }
 
+void Player::write(QJsonObject &json) const
+{
+  json["name"] = _name;
+  json["rating"] = _rating; 
+}
+
 uint qHash(const Player &p)
 {
   return qHash( p.name() );

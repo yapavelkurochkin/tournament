@@ -14,11 +14,7 @@ class SwissGroup : public Group
                 unsigned int stage,
                 PlayerList players );
     SwissGroup(); 
-    
-    friend QDataStream &operator<<( QDataStream &s, const SwissGroup &g );
-    friend QDataStream &operator>>( QDataStream &s, SwissGroup &g );
-    QString csvResult( QChar sep ) const;
-
+   
     QList< Group* > split() const;
     unsigned int fromPlace() const { return _fromPlace; }
 
@@ -35,6 +31,12 @@ class SwissGroup : public Group
     QString type() const { return "swiss"; }
 
     void permuteMatches( BreakAlgo::Algo br );
+
+    // serializers 
+    friend QDataStream &operator<<( QDataStream &s, const SwissGroup &g );
+    friend QDataStream &operator>>( QDataStream &s, SwissGroup &g );
+    QString csvResult( QChar sep ) const;
+    void write( QJsonObject &json ) const;
 };
 
 

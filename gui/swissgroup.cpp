@@ -120,47 +120,6 @@ unsigned int SwissGroup::matchesCount( unsigned int numOfPlayers )
   return numOfPlayers / 2; 
 }
 
-/** Serialization operators
-  */
-QDataStream &operator<<( QDataStream &s, const SwissGroup &g )
-{
-  s << dynamic_cast< const Group& >( g );
-  s << g._fromPlace;
-
-  return s;
-}
-
-QDataStream &operator>>( QDataStream &s, SwissGroup &g )
-{
-  s >> dynamic_cast< Group& >( g );
-  s >> g._fromPlace;
-  
-  return s;
-}
-
-/** print a group results into table in CSV format
- *
- * \sep -- separator character
- */
-QString SwissGroup::csvResult( QChar sep ) const
-{
-  QString ret;
-  QTextStream out( &ret );
-
-  out << name() << sep << sep << endl;
-
-  // number of players = row count
-  for ( int i = 0; i < _matches.count(); i ++ ) {
-	  Match m = _matches.at( i );
-	  if ( m.played() ) {
-      out << m.playerA().name() << "-" << m.playerB().name() << sep;
-      out << m.toString() << endl;
-    }
-	}
-
-	return ret;
-}
-
 /** Compares swiss groups by their fromPlace field.
  */
 bool SwissGroup::lessThan(const Group* g1, const Group* g2)
@@ -205,3 +164,56 @@ void SwissGroup::permuteMatches( BreakAlgo::Algo br )
     }
   }
 }
+/** Serialization operators
+  */
+QDataStream &operator<<( QDataStream &s, const SwissGroup &g )
+{
+  s << dynamic_cast< const Group& >( g );
+  s << g._fromPlace;
+
+  return s;
+}
+
+QDataStream &operator>>( QDataStream &s, SwissGroup &g )
+{
+  s >> dynamic_cast< Group& >( g );
+  s >> g._fromPlace;
+  
+  return s;
+}
+
+void SwissGroup::write( QJsonObject &json ) const
+{
+  if ( !isQualif() ) {
+		json["fromPlace"] = (int)_fromPlace;
+		json["toPlace"] = (int)_fromPlace + _players.count() - 1;
+		json["final"] = isFinal() ? "1/1" :
+										isHalfFinal() ? "1/2" :
+										isQuarterFinal() ? "1/4": "no";
+  }
+
+  Group::write( json );
+}
+/** print a group results into table in CSV format
+ *
+ * \sep -- separator character
+ */
+QString SwissGroup::csvResult( QChar sep ) const
+{
+  QString ret;
+  QTextStream out( &ret );
+
+  out << name() << sep << sep << endl;
+
+  // number of players = row count
+  for ( int i = 0; i < _matches.count(); i ++ ) {
+	  Match m = _matches.at( i );
+	  if ( m.played() ) {
+      out << m.playerA().name() << "-" << m.playerB().name() << sep;
+      out << m.toString() << endl;
+    }
+	}
+
+	return ret;
+}
+

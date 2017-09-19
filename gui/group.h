@@ -83,7 +83,7 @@ class Group
 
     virtual bool operator< (const Group& gr) const { return _name < gr.name(); }
     virtual QString csvResult( QChar ) const { return ""; }
-    void write( QJsonObject &json ) const;
+    virtual void write( QJsonObject &json ) const;
 };
 
 #endif // GROUP__H

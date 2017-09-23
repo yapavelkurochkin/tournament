@@ -103,6 +103,36 @@ MatchList TournData::matchList( int stage ) const
      _tournament->update();
   }
 }
+ 
+static bool resLessThan( const QPair< unsigned int, Player > &p1,
+                         const QPair< unsigned int, Player > &p2 )
+{
+  return p1.first < p2.first;
+}
+                           
+
+/** \return sorted list of players accordingly to their places in tournament.
+ */
+QList< QPair< unsigned int, Player > > TournData::results() const
+{
+  QList< QPair< unsigned int, Player > > list;
+
+  // 0th stage can't define a place
+  for ( unsigned int s = 1; s < _algo->stagesCnt(); s++ ) {
+    foreach( Group * g, groupList( s ) ) { 
+      SwissGroup *sg = dynamic_cast< SwissGroup* >( g );
+      if ( sg ) {
+        list << sg->absPlaces( );
+      }
+    } 
+  }
+
+  qSort( list.begin(), list.end(), resLessThan );
+
+  return list; 
+}
+
+    
 
 // t.algo should be valid before loading from datastream
 QDataStream &operator>>(QDataStream &s, TournData& t )

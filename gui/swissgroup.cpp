@@ -164,6 +164,31 @@ void SwissGroup::permuteMatches( BreakAlgo::Algo br )
     }
   }
 }
+
+
+/** swiss group is always defines player places in tournament.  this function
+ * returns a list with paits (place-player) in tournament. Function will work
+ * only if SwissGroup has size = 2 and stage > 0, because only such group
+ * finally defines player's place in tournament, other wise it returns empty
+ * list.  Returned list can be joined with another list and thus create full
+ * list of tournament players.  returned list is unsorted! 
+ */
+QList< QPair< unsigned int, Player > > SwissGroup::absPlaces( )
+{
+  QList< QPair< unsigned int, Player > > list;
+  if ( ( size() > 2 ) || ( stage() == 0 ) || !completed() ) {
+    return list;
+  }
+  
+
+  foreach( Player p, const_players() ) {
+    unsigned int place = playerPlace( p ) - 1 + fromPlace();
+    list << QPair< unsigned int, Player > ( place, p ); 
+  }
+
+  return list;
+}
+
 /** Serialization operators
   */
 QDataStream &operator<<( QDataStream &s, const SwissGroup &g )

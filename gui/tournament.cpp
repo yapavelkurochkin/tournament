@@ -149,8 +149,6 @@ QDataStream &operator<<(QDataStream &s, const Tournament& t )
  */
 void Tournament::saveAsCSV( QString file )
 {
-  return saveAsJson( file ); // FIXME: just test
-
   if ( !isValid() ) {
     qWarning() << __FUNCTION__ << 
                   "trying to save a results of invalid tournament object";
@@ -189,15 +187,19 @@ void Tournament::saveAsJson( QString file )
   QJsonObject json;
   json["version"] = (int)1;
   
-  // players list
+  // players list sort accordingly to places
   QJsonArray plArray;
-  foreach (const Player p, algo_const()->props().players) {
+  QList< QPair< unsigned int, Player > > res = _data->results();
+  
+  for ( int i = 0; i < res.count(); i ++ ) {
 		QJsonObject plObj;
-		p.write(plObj);
+	  plObj["name"] = res.at(i).second.name();
+    plObj["place"] = (int)res.at(i).first;	
 		plArray.append(plObj);
   }
 
   json["players"] = plArray;
+
 
 	QFile jsonFile( file );
 

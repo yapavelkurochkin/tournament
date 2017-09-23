@@ -43,6 +43,8 @@ class TournData {
     MatchList matchList( int stage = -1 /* all stages */ ) const;
     PlayerList playerList() const;
 
+    QList< QPair< unsigned int, Player > > results() const;
+
     friend QDataStream &operator>>(QDataStream &s, TournData& t );
     friend QDataStream &operator<<(QDataStream &s, const TournData& t );
 };

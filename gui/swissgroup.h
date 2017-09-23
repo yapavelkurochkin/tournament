@@ -18,6 +18,8 @@ class SwissGroup : public Group
     QList< Group* > split() const;
     unsigned int fromPlace() const { return _fromPlace; }
 
+    QList< QPair< unsigned int, Player > > absPlaces( );
+
     bool isFinal() const 
          { return ( _players.count() == 2 ) && ( _fromPlace == 1 ); }
     bool isHalfFinal() const 

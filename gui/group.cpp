@@ -303,6 +303,16 @@ void Group::write( QJsonObject &json ) const
   }
   
   json["matches"] = mArray; 
+
+  QJsonArray mPlayersArray;
+  foreach( Player p, _players ) {
+      QJsonObject mObj;
+
+      p.write( mObj );
+      mPlayersArray.append( mObj );
+  }
+
+  json["players"] = mPlayersArray;
 }
 
 /** Serialization operators

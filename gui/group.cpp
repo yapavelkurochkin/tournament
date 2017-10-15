@@ -295,8 +295,30 @@ void Group::write( QJsonObject &json ) const
   json["type"] = type();
   json["qualif"] = isQualif();
 
+  MatchList ml = _matches;
+  
+  // FIXME: I am sorry for this workaround. The most common
+  //        case is a tournament with about 15-30 players.
+  //        first stage is qualification and second has size 16 players.
+  //        Here we permute list of matches just for proper
+  //        rendering of tournament results. Though, this permutation
+  //        does not affect logic and common sense.
+  //        This permutation is valid for ADBC breaking only.
+  if ( _tournData && ( _tournData->algo()->breakAlgo() == BreakAlgo::ADBC ) ) {
+    if ( ml.count() == 8 ) { // 16 players => 8 matches
+      Match m1 = ml.at( 6 );
+      Match m2 = ml.at( 7 );
+
+      ml[6] = ml.at(2);
+      ml[7] = ml.at(3);
+
+      ml[2] = m1;
+      ml[3] = m2;
+    }
+  }   
+
   QJsonArray mArray;
-  foreach( Match m, _matches ) {
+  foreach( Match m, ml ) {
     QJsonObject mObj;
     m.write( mObj );
     mArray.append( mObj );

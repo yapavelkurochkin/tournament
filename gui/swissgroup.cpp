@@ -209,13 +209,11 @@ QDataStream &operator>>( QDataStream &s, SwissGroup &g )
 
 void SwissGroup::write( QJsonObject &json ) const
 {
-  if ( !isQualif() ) {
-		json["fromPlace"] = (int)_fromPlace;
-		json["toPlace"] = (int)_fromPlace + _players.count() - 1;
-		json["final"] = isFinal() ? "1/1" :
-										isHalfFinal() ? "1/2" :
-										isQuarterFinal() ? "1/4": "no";
-  }
+  json["fromPlace"] = (int)_fromPlace;
+  json["toPlace"] = (int)_fromPlace + _players.count() - 1;
+  json["final"] = isFinal() ? "1/1" :
+                  isHalfFinal() ? "1/2" :
+                  isQuarterFinal() ? "1/4": "no";
 
   Group::write( json );
 }

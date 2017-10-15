@@ -207,11 +207,11 @@ void Tournament::saveAsJson( QString file )
     QJsonArray gArray;
 	
     for ( unsigned int i = 0; i < _algo->stagesCnt(); i ++ ) {
-      QJsonObject gObj;
       int count = _data->groups()[ i ].count();
       for ( int j = 0; j < count; j ++ ) {
         const Group* g = _data->groups()[ i ].at( j );
 
+        QJsonObject gObj;
         g->write( gObj );
         gArray.append( gObj );
       }

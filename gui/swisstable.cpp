@@ -67,18 +67,22 @@ void SwissTable::setupCells()
 void SwissTable::editMatchResults( int row, int col )
 {
   int mIndex = row - 1;
- 
-  if ( _group->readOnly() ) {
-    QMessageBox::information( this, _group->name(), 
-                              "Group cannot be edited!" );
-    qDebug() << __FUNCTION__ << "group cannot be edited!";
-    return;
-  }
 
   Match m = _group->matchList().at( mIndex );
   MatchResDialog dialog( m, this );
 
   if ( dialog.exec() == QDialog::Accepted ) {
+      if (_group->readOnly()) {  // For read only groups, only allow edits if the match winner outcome will not change
+          Match editedMatch = dialog.match();
+
+          if (!(m.winner() == editedMatch.winner())) {
+              QMessageBox::information( this, _group->name(),
+                                        "You cannot change the match winner on a finished group." );
+              qDebug() << __FUNCTION__ << "group cannot be edited (winner would change)!";
+              return;
+          }
+      }
+
     _group->setMatchResults( dialog.match() ); 
 
     updateMatchCell( row, col );

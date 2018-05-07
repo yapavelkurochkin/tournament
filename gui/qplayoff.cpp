@@ -82,7 +82,13 @@ QList<Group*> QPlayoffAlgo::buildGroups( unsigned int stage,
     SwissGroup *wg, *lg;
 		wg = new SwissGroup( 1, stage, permutePlayers( toppls ) );
 		lg = new SwissGroup( 1 + toppls.count(), stage, permutePlayers( botpls ) );
+#ifdef INHERIT_QUALIF_FLAG
+    // enable INHERIT_QUALIF_FLAG if you need to calculate rating only for that players
+    // who are not lost qualification.
     lg->setQualif( prevGroups.at(0)->isQualif() );
+#else
+    lg->setQualif( false );
+#endif
     groups << wg << lg;
 
     foreach( Group *g, groups ) {

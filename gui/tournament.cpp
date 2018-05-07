@@ -180,45 +180,46 @@ void Tournament::saveAsJson( QString file )
 {
   if ( !isValid() ) {
     qWarning() << __FUNCTION__ << 
-                  "trying to save a results of invalid tournament object";
+      "trying to save a results of invalid tournament object";
     return;
-	}
+  }
 
   QJsonObject json;
   json["version"] = (int)1;
+  json["magic"] = (int)_magic;
   
   // players list sort accordingly to places
   QJsonArray plArray;
   QList< QPair< unsigned int, Player > > res = _data->results();
-  
+
   for ( int i = 0; i < res.count(); i ++ ) {
-		QJsonObject plObj;
-	  plObj["name"] = res.at(i).second.name();
+    QJsonObject plObj;
+    plObj["name"] = res.at(i).second.name();
     plObj["place"] = (int)res.at(i).first;	
-		plArray.append(plObj);
+    plArray.append(plObj);
   }
 
   json["players"] = plArray;
 
 
-	QFile jsonFile( file );
+  QFile jsonFile( file );
 
-	if (jsonFile.open(QFile::WriteOnly | QFile::Truncate)) {
+  if (jsonFile.open(QFile::WriteOnly | QFile::Truncate)) {
     QJsonArray gArray;
-	
+
     for ( unsigned int i = 0; i < _algo->stagesCnt(); i ++ ) {
       int count = _data->groups()[ i ].count();
       for ( int j = 0; j < count; j ++ ) {
-        const Group* g = _data->groups()[ i ].at( j );
+	const Group* g = _data->groups()[ i ].at( j );
 
-        QJsonObject gObj;
-        g->write( gObj );
-        gArray.append( gObj );
+	QJsonObject gObj;
+	g->write( gObj );
+	gArray.append( gObj );
       }
     }
 
     json["groups"] = gArray;   
- 
+
     QJsonDocument saveDoc(json);
     jsonFile.write( saveDoc.toJson() );
   }		
@@ -231,22 +232,22 @@ void Tournament::saveAsJson( QString file )
 QString Tournament::totalRatingAsCSV( QChar sep )
 {
   QString ret;
-	QTextStream out( &ret );
+  QTextStream out( &ret );
 
   PlayerList pls = _data->playerList();
-	qSort( pls.end(), pls.begin() );
+  qSort( pls.end(), pls.begin() );
 
   Group fake( "unused", _data->matchList(), pls );
   for ( int i = 0; i < pls.count(); i ++ ) {
-	  Player p = pls.at( i );
+    Player p = pls.at( i );
     if ( !p.isBye() ) {
-			double earned = fake.earnedRating( p ); 
-			double total = p.rating() + earned;
-			out << p.name() << sep << p.ratingAsStr() << sep
-					<< "+" + QString::number( earned, 'f', 1 ) << sep
-					<< QString::number( total , 'f', 1 ) << endl;
-	  }
+      double earned = fake.earnedRating( p ); 
+      double total = p.rating() + earned;
+      out << p.name() << sep << p.ratingAsStr() << sep
+	<< "+" + QString::number( earned, 'f', 1 ) << sep
+	<< QString::number( total , 'f', 1 ) << endl;
+    }
   }
 
-	return ret;
+  return ret;
 }

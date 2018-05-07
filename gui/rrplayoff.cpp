@@ -95,25 +95,25 @@ QList<Group*> RRPlayoffAlgo::buildGroups( unsigned int stage,
     // groupCnt = 2 => gs(1) = 4
     // groupCnt = 4 => gs(1) = 8
     // groupCnt = 8 => gs(1) = 16
-  	//
-	  // first gs players are playing 1-2 2-1 1-2 2-1   
-		int gs = props().rrGroupNum * 2; 
-		PlayerList players = roundRobinResults( prevGroups );
+    //
+    // first gs players are playing 1-2 2-1 1-2 2-1   
+    int gs = props().rrGroupNum * 2; 
+    PlayerList players = roundRobinResults( prevGroups );
 
-		qDebug() << __PRETTY_FUNCTION__ << "players count:", players.count();
+    qDebug() << __PRETTY_FUNCTION__ << "players count:", players.count();
 
-		groups << new SwissGroup( 1, stage, players.mid( 0, gs ) );
+    groups << new SwissGroup( 1, stage, players.mid( 0, gs ) );
 
-		players = players.mid( gs ); 
-		// next gs/2 players are playing 3-3 4-4 5-5, etc..
-		int fromPlace = gs;
-		while ( ( gs = ( gs / 2 ) ) >= 2 ) {
-			while ( gs <= players.count() ) {
-				groups << new SwissGroup( fromPlace + 1, stage, players.mid( 0, gs ) );
-				players = players.mid( gs );
-				fromPlace += gs;
-			}
-		}
+    players = players.mid( gs ); 
+    // next gs/2 players are playing 3-3 4-4 5-5, etc..
+    int fromPlace = gs;
+    while ( ( gs = ( gs / 2 ) ) >= 2 ) {
+      while ( gs <= players.count() ) {
+	groups << new SwissGroup( fromPlace + 1, stage, players.mid( 0, gs ) );
+	players = players.mid( gs );
+	fromPlace += gs;
+      }
+    }
 
     foreach( Group *g, groups ) {
       dynamic_cast< SwissGroup* >(g)->permuteMatches( breakAlgo() );

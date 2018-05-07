@@ -39,13 +39,13 @@ void TournData::initGroups( )
 PlayerList TournData::playerList() const
 {
   PlayerList list;
-	for ( int i = 0; i < (int)_algo->stagesCnt(); i ++ ) {
-		QList<Group*> gl = _groups[ i ];
-		for ( int j = 0; j < gl.count(); j ++ ) {
+  for ( int i = 0; i < (int)_algo->stagesCnt(); i ++ ) {
+    QList<Group*> gl = _groups[ i ];
+    for ( int j = 0; j < gl.count(); j ++ ) {
       const Group* g = gl.at( j );
       list << g->const_players();
     }
-	}
+  }
 
   // removing duplicates by converting to hash-based set and back.
   QSet<Player> set = list.toSet();
@@ -62,12 +62,12 @@ MatchList TournData::matchList( int stage ) const
       ml << _groups[ stage ].at( j )->matchList();
     }   
   } else { 
-		for ( unsigned int i = 0; i < _algo->stagesCnt(); i ++ ) {
-			QList<Group*> gl = _groups[ i ];
-			for ( int j = 0; j < gl.count(); j ++ ) {
-				ml << gl.at( j )->matchList();
-			}   
-		}
+    for ( unsigned int i = 0; i < _algo->stagesCnt(); i ++ ) {
+      QList<Group*> gl = _groups[ i ];
+      for ( int j = 0; j < gl.count(); j ++ ) {
+	ml << gl.at( j )->matchList();
+      }   
+    }
   }
   return ml;
 }

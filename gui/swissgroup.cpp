@@ -53,9 +53,9 @@ void SwissGroup::initGroupName()
   } else {
     int begin = _fromPlace;
     int end = _fromPlace + cnt - 1;
-		_name =  QString( "%1 - %2" )
-		     					.arg( begin ) // humans start counting from 1
-				      		.arg( end );
+    _name =  QString( "%1 - %2" )
+      .arg( begin ) // humans start counting from 1
+      .arg( end );
   }
 }
 
@@ -102,7 +102,6 @@ QList< Group* > SwissGroup::split( ) const
  
     g->setTournData( _tournData );
     g->setQualif( isQualif() );
-    dynamic_cast<SwissGroup*>(g)->permuteMatches( a->breakAlgo() );
 
     // if there is at least one bye player, we should notify that
     // at least one game is fakely played.
@@ -138,12 +137,13 @@ bool SwissGroup::lessThan(const Group* g1, const Group* g2)
 }
 
 /* redorder matches so that this group will be simply splitted by
- * winners and loosers, without permuation
+ * winners and loosers, without permutation.
+ * \warning permutePlayers should be called before this function
  * \todo this function should be in TournAlgo class... like permutePlayers()
  */
 void SwissGroup::permuteMatches( BreakAlgo::Algo br )
 {
-  if ( _matches.count() <= 2 ) {
+  if ( _matches.count() <= 2 || br == BreakAlgo::ABCD ) {
     // nothing to permute
     return;
   }
@@ -151,17 +151,24 @@ void SwissGroup::permuteMatches( BreakAlgo::Algo br )
   Q_ASSERT( ( _matches.count() & 0x01 ) == 0 );
 
   MatchList tmp = _matches;
-  _matches.clear();
 
-  for ( int i = 0; i < tmp.count() / 2; i ++ ) {
-    if ( br == BreakAlgo::ADBC ) {  
-			_matches << tmp.at( i ) << tmp.at( tmp.count() - i - 1 );
-    } else if ( br == BreakAlgo::ACBD ) {
-			_matches << tmp.at( i ) << tmp.at( tmp.count() / 2 + i );
-    } else {
-      // no changes
-      _matches << tmp.at( i*2 ) << tmp.at( i*2 + 1 );
+  int k = 1; // k means the number of groups in one permutation entity.
+             // 1 -- permuting matches
+             // 2 -- permuting pairs
+             // 4 -- permuting quads
+  while ( ( tmp.count() / k ) > 2 ) { 
+    _matches.clear();
+
+    for ( int i = 0; i < tmp.count() / 2; i += k ) {
+      if ( br == BreakAlgo::ADBC ) {  
+	_matches << tmp.mid( i, k ) << tmp.mid( tmp.count() - i - k, k );
+      } else if ( br == BreakAlgo::ACBD ) {
+	_matches << tmp.mid( i, k ) << tmp.mid( tmp.count() / 2 + i, k );
+      } 
     }
+    tmp = _matches;
+
+    k *= 2;
   }
 }
 

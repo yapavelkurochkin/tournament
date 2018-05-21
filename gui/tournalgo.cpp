@@ -46,15 +46,15 @@ PlayerList TournAlgo::permutePlayers( PlayerList pls ) const
   if ( _break == BreakAlgo::ADBC ) {
     // first - last
     // second - pre-last
-		for ( int i = 0; i < pls.count() / 2; i ++ ) {
-			out << pls.at( i ) << pls.at( pls.count() - i - 1 );
-		}
+    for ( int i = 0; i < pls.count() / 2; i ++ ) {
+      out << pls.at( i ) << pls.at( pls.count() - i - 1 );
+    }
   } else if ( _break == BreakAlgo::ACBD ) {
     // first - middle
     // second - middle + 1
-		for ( int i = 0; i < pls.count() / 2; i ++ ) {
-			out << pls.at( i ) << pls.at( pls.count() / 2 + i );
-		}
+    for ( int i = 0; i < pls.count() / 2; i ++ ) {
+      out << pls.at( i ) << pls.at( pls.count() / 2 + i );
+    }
   } else {
     // ABCD does not require permutation
   }

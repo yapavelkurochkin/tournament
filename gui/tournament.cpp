@@ -139,7 +139,7 @@ QDataStream &operator<<(QDataStream &s, const Tournament& t )
     return s;
   }
   
-  s << t._magic << t._algo->props() << (*t._data);
+  s << t._magic << t._algo->props_const() << (*t._data);
 
   return s;
 }

@@ -12,12 +12,19 @@ struct TournProps {
 		PlayOff               // simple playoff
 	};
 
+        // Loser Bracket breaking type after Round-Robin stage
+	enum LBrBreakType {
+		LBrThirdThird       = 0, // short: 3-3, 4-4,etc..
+		LBrPlayOff               // full: playoff
+	};
+
   TournProps();
   TournProps( PlayerList players, QString cat, 
               unsigned int playoffNum, unsigned int seededNum );
   TournProps( PlayerList players, QString cat, unsigned int rrGroupNum );
 
   TournType type;
+  LBrBreakType lBrBreakType;
   PlayerList players;      // list of players
   QString category;        // category name
 

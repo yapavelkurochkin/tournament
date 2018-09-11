@@ -230,7 +230,7 @@ void LeagueMainWindow::setWindowName()
   QString name = progName;
 
   if ( tourn ) {
-    name += " -- " + tourn->algo_const()->props().category;
+    name += " -- " + tourn->algo_const()->props_const().category;
 
     if ( !tourn->fileName().isEmpty() ) {
       name += " -- " + QFileInfo( tourn->fileName() ).baseName();
@@ -272,18 +272,18 @@ void LeagueMainWindow::showRatingsTable()
 void LeagueMainWindow::undo( )
 {
   Tournament* t = _history->reward();
-	if ( t ) {
+  if ( t ) {
     tourn = t;
-		newTournamentWidget( tourn ); 
+    newTournamentWidget( tourn ); 
   }
 }
 
 void LeagueMainWindow::redo( )
 {
   Tournament* t = _history->forward();
-	if ( t ) {
+  if ( t ) {
     tourn = t;
-		newTournamentWidget( tourn ); 
+    newTournamentWidget( tourn ); 
   }
 }
 

@@ -8,9 +8,9 @@ extern unsigned int log2( unsigned int x );
 PlayoffAlgo::PlayoffAlgo( TournProps p )
 : TournAlgo( p )
 {
-  if ( (unsigned int) ( props().players.count() ) < props().playoffNum ) {
+  if ( (unsigned int) ( props_const().players.count() ) < props_const().playoffNum ) {
     unsigned int i = 0,
-		 n = props().playoffNum - props().players.count();
+		 n = props_const().playoffNum - props_const().players.count();
     for ( i = 0; i < n; i ++ ) {
       _props.players << byePlayer;
     }
@@ -30,7 +30,7 @@ QList<Group*> PlayoffAlgo::initGroups( ) const
 {
   QList< Group* > groups;
   
-  PlayerList players = props().players;
+  PlayerList players = props_const().players;
   qSort( players.begin(), players.end(), qGreater< Player >() );
 
   SwissGroup *sg = new SwissGroup( 1, 0, permutePlayers( players ) );
@@ -60,7 +60,7 @@ QList<Group*> PlayoffAlgo::buildGroups( unsigned int stage,
 
 unsigned int PlayoffAlgo::calcMatchNum(  ) const
 {
-  PlayerList pl = props().players;
+  PlayerList pl = props_const().players;
   pl.removeAll( byePlayer );
-  return ( (int)(pl.count() / 2) ) * log2( props().playoffNum );
+  return ( (int)(pl.count() / 2) ) * log2( props_const().playoffNum );
 }

@@ -34,10 +34,10 @@ RRPlayoffAlgo::RRPlayoffAlgo( TournProps p )
 QList<Group*> RRPlayoffAlgo::initGroups( ) const
 {
   QList< Group* > groups;
-  PlayerList players = props().players;
+  PlayerList players = props_const().players;
   qSort( players );
 
-  for ( unsigned int i = 0; i < props().rrGroupNum; i ++ ) {
+  for ( unsigned int i = 0; i < props_const().rrGroupNum; i ++ ) {
     groups << new RRGroup( QChar( 'A' + i ) );
   }
 
@@ -48,11 +48,11 @@ QList<Group*> RRPlayoffAlgo::initGroups( ) const
     int i_start = 0, i_end = 0;
 
     if ( dir < 0 ) { // up -> down
-      i_start = props().rrGroupNum - 1;
+      i_start = props_const().rrGroupNum - 1;
       i_end = -1;
     } else { // down -> up
       i_start = 0;
-      i_end = props().rrGroupNum;
+      i_end = props_const().rrGroupNum;
     }
 
     int i = i_start;
@@ -97,7 +97,7 @@ QList<Group*> RRPlayoffAlgo::buildGroups( unsigned int stage,
     // groupCnt = 8 => gs(1) = 16
     //
     // first gs players are playing 1-2 2-1 1-2 2-1   
-    int gs = props().rrGroupNum * 2; 
+    int gs = props_const().rrGroupNum * 2; 
     PlayerList players = roundRobinResults( prevGroups );
 
     qDebug() << __PRETTY_FUNCTION__ << "players count:", players.count();
@@ -105,14 +105,22 @@ QList<Group*> RRPlayoffAlgo::buildGroups( unsigned int stage,
     groups << new SwissGroup( 1, stage, players.mid( 0, gs ) );
 
     players = players.mid( gs ); 
-    // next gs/2 players are playing 3-3 4-4 5-5, etc..
     int fromPlace = gs;
-    while ( ( gs = ( gs / 2 ) ) >= 2 ) {
-      while ( gs <= players.count() ) {
-	groups << new SwissGroup( fromPlace + 1, stage, players.mid( 0, gs ) );
-	players = players.mid( gs );
-	fromPlace += gs;
+
+    if ( props_const().lBrBreakType == TournProps::LBrThirdThird ) {
+      // next gs/2 players are playing 3-3 4-4 5-5, etc..
+      while ( ( gs = ( gs / 2 ) ) >= 2 ) {
+	while ( gs <= players.count() ) {
+	  groups << new SwissGroup( fromPlace + 1, stage, players.mid( 0, gs ) );
+	  players = players.mid( gs );
+	  fromPlace += gs;
+	}
       }
+    } else {
+      if ( players.count() & 1 ) { // need bye player to be added
+        players << byePlayer;
+      }
+      groups << new SwissGroup( fromPlace + 1, stage, players );
     }
 
     foreach( Group *g, groups ) {

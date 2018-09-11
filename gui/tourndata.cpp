@@ -5,6 +5,7 @@
 #include "group.h"
 #include "tournament.h"
 #include "swissgroup.h"
+#include "lbrdialog.h"
 
 TournData::TournData( const TournAlgo *algo  )
 :_algo( algo ),
@@ -83,10 +84,21 @@ MatchList TournData::matchList( int stage ) const
   Q_ASSERT( g != NULL );
   Q_ASSERT( _tournament != NULL );
 
-  if ( g->stage() == 0 && ( algo()->props().type != TournProps::PlayOff ) ) {
+  if ( g->stage() == 0 && ( algo()->props_const().type != TournProps::PlayOff ) ) {
     // 0th stage is for qualification (RoundRobin or another one).
     // it should be fully completed before next stage.
     if ( _algo->stageCompleted( _groups[0] ) ) {
+
+      // we give manager a possibility to select how to break loser bracket: to
+      // play shortly (3-3, 4-4, ...) or to play full playoff (like winners do
+      // after round-robin stage)
+      if ( algo()->props_const().type == TournProps::RRPlayOff ) {
+        LBrDialog d(NULL);
+        d.exec();
+        // dirty hack here ;(
+        ((TournAlgo*)_algo)->props()->lBrBreakType = d.lBrBreakType();
+      }
+
       _groups[1] = _algo->buildGroups( 1, _groups[0] );
       foreach( Group *gr, _groups[ 1 ] ) {
         gr->setTournData( this );

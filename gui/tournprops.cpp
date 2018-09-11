@@ -17,7 +17,7 @@ TournProps::TournProps()
  */
 TournProps::TournProps( PlayerList _p, QString _c, 
                         unsigned int _pnum, unsigned int _snum )
-: type( ( _snum == _p.count() ) ? PlayOff : QualifPlayOff ),
+: type( ( _snum == (unsigned int)_p.count() ) ? PlayOff : QualifPlayOff ),
   players( _p ),
   category( _c ),
   playoffNum( _pnum ),
@@ -28,6 +28,7 @@ TournProps::TournProps( PlayerList _p, QString _c,
 
 TournProps::TournProps( PlayerList _p, QString _c, unsigned int _rrnum )
 : type( RRPlayOff ),
+  lBrBreakType( LBrThirdThird ),
   players( _p ),
   category( _c ),
   playoffNum( _rrnum * 2 ), // two players from each round-robin group

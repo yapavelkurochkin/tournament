@@ -35,11 +35,11 @@ QList<Group*> QPlayoffAlgo::initGroups( ) const
 {
   QList< Group* > groups;
   
-  PlayerList players = props().players;
+  PlayerList players = props_const().players;
   qSort( players.begin(), players.end(), qGreater< Player >() );
 
   PlayerList pls;
-  for ( unsigned int i = props().seededNum; i < props().seededNum + _qualifNum; i ++ ) { 
+  for ( unsigned int i = props_const().seededNum; i < props_const().seededNum + _qualifNum; i ++ ) { 
     if ( (int)i < players.count() ) {
       pls << players.at( i );
     } else { 
@@ -105,7 +105,7 @@ PlayerList QPlayoffAlgo::qualifTopResults( QList< Group* > groups ) const
 {
   Q_ASSERT( groups.count() == 1 );
 
-  PlayerList players = props().players;
+  PlayerList players = props_const().players;
   qSort( players.begin(), players.end(), qGreater< Player >() );
 
   Group* prev = groups[ 0 ];
@@ -114,7 +114,7 @@ PlayerList QPlayoffAlgo::qualifTopResults( QList< Group* > groups ) const
   // no sort here! we should preserve winners order here 
 
   PlayerList toppls;
-  toppls << players.mid( 0, props().seededNum );
+  toppls << players.mid( 0, props_const().seededNum );
   toppls << winners;
 
   return toppls; 

@@ -27,7 +27,8 @@ class TournAlgo {
     virtual ~TournAlgo(){};
 
     unsigned int stagesCnt() const { return _stagesCnt; }
-    TournProps props() const { return _props; }
+    TournProps props_const() const { return _props; }
+    TournProps* props() { return &_props; }
 
     BreakAlgo::Algo breakAlgo() const { return _break; }  
     void setBreakAlgo ( BreakAlgo::Algo a ) { _break = a; }  

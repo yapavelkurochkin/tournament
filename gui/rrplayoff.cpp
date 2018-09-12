@@ -117,7 +117,7 @@ QList<Group*> RRPlayoffAlgo::buildGroups( unsigned int stage,
 	}
       }
     } else {
-      while ( 1<<(log2(players.count())) < players.count() ) { // need bye players to be added
+      while ( 1<<(log2((unsigned int)players.count())) < players.count() ) { // need bye players to be added
         players << byePlayer;
       }
       groups << new SwissGroup( fromPlace + 1, stage, players );

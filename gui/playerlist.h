@@ -8,6 +8,7 @@ typedef QList<Player> PlayerList;
 
 extern PlayerList loadPlayerList( QString file );
 bool isPlayerListByed( PlayerList ); 
+PlayerList rndPermPlayerList( PlayerList );
 
 #endif // PLAYERLIST__H
 

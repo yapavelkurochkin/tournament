@@ -23,8 +23,6 @@ PlayoffAlgo::PlayoffAlgo( TournProps p )
 
 /**
  *  List of players is sorted at first.
- *  Players who are not in seeded list should play simple playoff.
- *  Intended, that _qualifNum is power of 2.
  */
 QList<Group*> PlayoffAlgo::initGroups( ) const
 {

@@ -46,3 +46,18 @@ bool isPlayerListByed( PlayerList pl )
 
   return true;
 } 
+
+// randomly permute players in list and return permuted list
+PlayerList rndPermPlayerList( PlayerList in )
+{
+  PlayerList out;
+  while ( in.count() ) {
+    int i = qrand() % in.count();
+
+    out << in.at( i );
+    in.removeAt(i);
+  }
+
+  return out;
+}
+

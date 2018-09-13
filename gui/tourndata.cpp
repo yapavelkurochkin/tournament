@@ -84,7 +84,9 @@ MatchList TournData::matchList( int stage ) const
   Q_ASSERT( g != NULL );
   Q_ASSERT( _tournament != NULL );
 
-  if ( g->stage() == 0 && ( algo()->props_const().type != TournProps::PlayOff ) ) {
+  if ( ( g->stage() == 0 ) 
+       && ( ( algo()->props_const().type == TournProps::RRPlayOff ) 
+            || ( algo()->props_const().type == TournProps::QualifPlayOff ) ) ) {
     // 0th stage is for qualification (RoundRobin or another one).
     // it should be fully completed before next stage.
     if ( _algo->stageCompleted( _groups[0] ) ) {

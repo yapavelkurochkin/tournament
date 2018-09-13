@@ -9,7 +9,11 @@ struct TournProps {
 	enum TournType {
 		RRPlayOff       = 0,  // round-robin stage + playoff
 		QualifPlayOff,        // qualification (optional) + playoff
-		PlayOff               // simple playoff
+		PlayOff,              // simple playoff
+		NRTournB              // Russian National Rating Tournament B
+				      // (actually the playoff with some
+				      // starting conditions like permuting
+				      // players by the clusters)
 	};
 
         // Loser Bracket breaking type after Round-Robin stage

@@ -58,13 +58,13 @@ bool TournProps::validate( QString& errtext ) const
   
     // TODO: there can be situation with big number of players, small playoff size
     //       and small skipQual number.
-  } else if ( type == PlayOff ) {
+  } else if ( ( type == PlayOff ) || ( type == NRTournB ) ) {
     if ( (unsigned int)( players.count() ) > playoffNum ) {
 	    errtext = "Number of players should not exceed playoff size."
                 "Please, remove some players or select 'Qualification + Playoff'";
       return false;
     }
-  }
+  } 
 
   return true;  
 }

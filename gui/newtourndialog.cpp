@@ -23,7 +23,8 @@ NewTournDialog::NewTournDialog( QWidget* parent )
   typeCombo = new QComboBox();
   typeCombo->addItems( QStringList()  << tr( "Round-Robin + Playoff" )
                                       << tr( "Playoff with qualification" )
-                                      << tr( "Playoff" ) );
+                                      << tr( "Playoff" ) 
+                                      << tr( "Playoff Tourn. B N.R." ) );
   connect( typeCombo, SIGNAL( currentIndexChanged( int ) ), 
            this,      SLOT( typeChanged( int ) ) );
  
@@ -42,7 +43,6 @@ NewTournDialog::NewTournDialog( QWidget* parent )
   fl->addRow( tr("&Type"), typeCombo );
   fl->addRow( tr("&Groups"), gCombo );
   fl->addRow( tr("&Playoff"), sizeCombo );
-  // TODO: add selector 'Do not play round-robin stage'
 
   table = new PlayerTable( this );
   fl->addRow( table ); 
@@ -86,10 +86,12 @@ TournProps NewTournDialog::tournProps() const
       seeded -= ( pcnt - size ) * 2;
     } 
 
-    return TournProps( table->playerList(),
-                       catCombo->currentText(),
-                       size,
-                       seeded );
+    TournProps tp( table->playerList(),
+                   catCombo->currentText(),
+                   size,
+                   seeded );
+    tp.type = type;
+    return tp;
   }
 }
 
@@ -102,7 +104,7 @@ void NewTournDialog::tryToAccept()
   if ( tournProps().validate( msg ) ) {
     accept();
   } else {
-	  QMessageBox::information( this, "Incorrect parameters", msg );
+    QMessageBox::information( this, "Incorrect parameters", msg );
   }
 }
 
@@ -114,10 +116,8 @@ void NewTournDialog::typeChanged( int index )
       sizeCombo->setEnabled( false );
       break; 
     case TournProps::QualifPlayOff:
-      gCombo->setEnabled( false );
-      sizeCombo->setEnabled( true );
-      break;
     case TournProps::PlayOff:
+    case TournProps::NRTournB:
       gCombo->setEnabled( false );
       sizeCombo->setEnabled( true );
       break;
@@ -133,9 +133,10 @@ void NewTournDialog::playerListUpdated( )
   if ( pl.count() ) {
     TournAlgo *algo = TournAlgoFactory::algo( tournProps() ); 
     if ( algo ) {
-			plNumLabel->setText( "Players: " + QString::number( pl.count() ) 
-													 + "\nMatches: " + QString::number( algo->calcMatchNum() ) );
-			plNumLabel->setVisible( true );
+      plNumLabel->setText( "Players: "  + QString::number( pl.count() ) 
+                                        + "\nMatches: "
+                                        + QString::number( algo->calcMatchNum() ) );
+      plNumLabel->setVisible( true );
     }
   }
 }

@@ -52,7 +52,9 @@ void SwissGroup::initGroupName()
     _name = QObject::tr( "1/4 Final" );
   } else {
     int begin = _fromPlace;
-    int end = _fromPlace + cnt - 1;
+    int byes = 0;
+    foreach ( Player p, _players ) { if ( p == byePlayer ) byes ++; }
+    int end = _fromPlace + cnt - 1 - byes;
     _name =  QString( "%1 - %2" )
       .arg( begin ) // humans start counting from 1
       .arg( end );
@@ -86,14 +88,15 @@ QList< Group* > SwissGroup::split( ) const
   }
 
   // winners group
+  SwissGroup *wsg = NULL;  
   if ( !isPlayerListByed( w ) ) {
-    ret << new SwissGroup( _fromPlace, _stage + 1, w ); 
+    wsg = new SwissGroup( _fromPlace, _stage + 1, w ); 
+    ret << wsg;
   }
 
   // loosers group
   if ( !isPlayerListByed( l ) ) {
-    ret << new SwissGroup( _fromPlace + _players.count() / 2, 
-                           _stage + 1, l );
+    ret << new SwissGroup( wsg->toPlace() + 1, _stage + 1, l );
   }
 
   foreach( Group *g, ret ) {

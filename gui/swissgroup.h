@@ -17,6 +17,8 @@ class SwissGroup : public Group
    
     QList< Group* > split() const;
     unsigned int fromPlace() const { return _fromPlace; }
+    unsigned int toPlace() const 
+         { return _fromPlace + _players.count() - byePlayersCount() - 1; }
 
     QList< QPair< unsigned int, Player > > absPlaces( );
 

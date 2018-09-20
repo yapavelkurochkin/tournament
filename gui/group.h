@@ -41,6 +41,7 @@ class Group
     virtual void removePlayer( Player player );
     PlayerList const_players() const { return _players; }
     PlayerList const_validPlayers() const;
+    unsigned int byePlayersCount() const; 
 
     Match& match( Player a, Player b );
     Match const_match( Player a, Player b ) const;

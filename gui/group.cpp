@@ -265,6 +265,20 @@ PlayerList Group::const_validPlayers() const
   return l;
 }
 
+/** \return number of byePlayer-s in a group
+ */
+unsigned int Group::byePlayersCount() const 
+{
+  unsigned int c = 0;
+  foreach ( Player p, const_players() ) {
+    if ( p == byePlayer ) { 
+      c ++;
+    }
+  }
+
+  return c;
+}
+
 /** \brief returns true if FIRST match is marked as qualification.
  *         normally all matches should have same flags (qualif or !qualif).
  */

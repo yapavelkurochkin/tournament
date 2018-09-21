@@ -322,10 +322,12 @@ void Group::write( QJsonObject &json ) const
 
   QJsonArray mPlayersArray;
   foreach( Player p, _players ) {
+    if ( !(p == byePlayer) ) {
       QJsonObject mObj;
 
       p.write( mObj );
       mPlayersArray.append( mObj );
+    }
   }
 
   json["players"] = mPlayersArray;

@@ -52,9 +52,7 @@ void SwissGroup::initGroupName()
     _name = QObject::tr( "1/4 Final" );
   } else {
     int begin = _fromPlace;
-    int byes = 0;
-    foreach ( Player p, _players ) { if ( p == byePlayer ) byes ++; }
-    int end = _fromPlace + cnt - 1 - byes;
+    int end = toPlace();
     _name =  QString( "%1 - %2" )
       .arg( begin ) // humans start counting from 1
       .arg( end );
@@ -192,8 +190,10 @@ QList< QPair< unsigned int, Player > > SwissGroup::absPlaces( )
   
 
   foreach( Player p, const_players() ) {
-    unsigned int place = playerPlace( p ) - 1 + fromPlace();
-    list << QPair< unsigned int, Player > ( place, p ); 
+    if ( !(p == byePlayer) ) {
+      unsigned int place = playerPlace( p ) - 1 + fromPlace();
+      list << QPair< unsigned int, Player > ( place, p );
+    }
   }
 
   return list;
@@ -219,8 +219,8 @@ QDataStream &operator>>( QDataStream &s, SwissGroup &g )
 
 void SwissGroup::write( QJsonObject &json ) const
 {
-  json["fromPlace"] = (int)_fromPlace;
-  json["toPlace"] = (int)_fromPlace + _players.count() - 1;
+  json["fromPlace"] = (int)fromPlace();
+  json["toPlace"] = (int)toPlace();
   json["final"] = isFinal() ? "1/1" :
                   isHalfFinal() ? "1/2" :
                   isQuarterFinal() ? "1/4": "no";
